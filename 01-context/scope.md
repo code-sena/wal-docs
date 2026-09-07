@@ -1,69 +1,67 @@
 # System Scope
 
-> **Why this document exists:** Scope prevents scope creep and aligns expectations.
-> It is equally important to define what the system does NOT do as what it does.
-> Review this document at the start of each planning cycle.
-
 ---
 
 ## In Scope
 
-What the system **DOES build and maintain**:
+What the system **does build and maintain** (per the "Alcance" section of the SRS):
 
-### MVP Features
+### MVP functionality
 
 | # | Feature | Description | Responsible service |
 |---|---------|-------------|---------------------|
-| 1 | [Feature A] | [Brief description] | [service-name] |
-| 2 | [Feature B] | [Brief description] | [service-name] |
-| 3 | [Feature C] | [Brief description] | [service-name] |
+| 1 | Sign-up and login | Registration, authentication, and account recovery for users | Mobile app / Backend |
+| 2 | Emergency contacts | Configuring trusted contacts for the support network | Mobile app |
+| 3 | Panic button | Sending alerts with real-time location, triggerable via widget, sudden movement, physical buttons, or a discreet confirmation | Mobile app |
+| 4 | Multi-channel notifications | Sending configurable alerts via SMS, email, and push notifications | Backend + external services (FCM, SMS) |
+| 5 | Real-time tracking | Selected contacts follow the location while the alert stays active | Mobile app / Backend |
+| 6 | Evidence | Recording and backing up audio and video tied to an alert | Mobile app / Backend |
+| 7 | History | Historical record of events, alerts, and locations issued | Backend |
+| 8 | Zones and directory | Map of safe/unsafe zones and directory of nearby support centers | Mobile app / Backend |
+| 9 | Guidance resources | Guide on how to act in risk situations | Mobile app |
+| 10 | Personalization | Changing the app's language and visual theme | Mobile app |
+| 11 | Public informational site | Landing page with no authentication required | Web (Angular) |
+| 12 | Authenticated user portal | Reviewing history, location, evidence, and device status | Web (Angular) |
+| 13 | Admin panel | Managing users, alerts, zones, evidence, reports, system configuration, and moderation | Web (Angular) / Backend |
 
 ### Included integrations
 
 | External system | Integration type | Purpose |
 |----------------|-----------------|---------|
-| [System A] | REST API / Webhook / SDK | [purpose] |
-| [System B] | SFTP / Database | [purpose] |
+| Firebase Cloud Messaging (FCM) | SDK / API | Sending push notifications |
+| SMS messaging service (e.g. Twilio) | API | Sending SMS alerts |
+| Email service | API | Sending additional email notifications |
 
-### Environments being built
+### Environments
 
-| Environment | Purpose |
-|-------------|---------|
-| Local | Development on the developer's machine |
-| Development (dev) | Continuous integration and development testing |
-| Staging | Pre-production, PO acceptance testing |
-| Production | Production environment |
+The SRS defines a single target technology stack (React Native/Expo, Angular, Spring Boot, PostgreSQL) but doesn't lay out separate Local/Dev/Staging/Production environments — that split is an implementation decision left to the team, not something the requirements document scopes.
 
 ---
 
 ## Out of Scope
 
-What the system **does NOT build** in this version and why:
+The SRS doesn't include an explicit "out of scope" section, but its own wording draws a few boundaries:
 
-| # | What is out of scope | Reason | Future version? |
-|---|---------------------|--------|----------------|
-| 1 | [Feature X] | [Out of budget / Not MVP / Uses external system] | Yes — H2 2024 |
-| 2 | [Integration with Y] | [Provider has no public API yet] | Pending provider |
-| 3 | [Module Z] | [Another team builds it] | N/A |
+- **iOS** — the SRS repeatedly scopes device compatibility to Android only ("aplicación... compatible con dispositivos Android desde la versión 10 en adelante"), which implicitly leaves iOS out of the current scope.
+- **Direct integration with authorities/emergency services** — the system provides a directory of emergency numbers and support centers (RF7.1) and lets the user place a call (RF1.2), but doesn't describe any automated dispatch or data exchange with police/emergency-service systems.
+- **Persisted administrative report history** — the admin panel generates and exports reports with filters (RF13.4), but the SRS doesn't describe storing a historical log of previously generated reports.
 
-### What another system / team handles (and why not us)
+### What another system/team handles (and why not us)
 
-| Feature | Who builds it | Why not us |
-|---------|--------------|-----------|
-| [SSO Authentication] | Central IAM team | Reuse existing implementation |
-| [Financial reports] | BI system / Analytics team | Outside the core domain |
+Not described in the SRS — the document scopes Alerta Mujer as a self-contained mobile + web + backend system, without naming any adjacent system it depends on or hands work off to.
 
 ---
 
 ## Scope assumptions
 
-> These assumptions are taken to be true. If they change, the scope must be renegotiated.
-
 | # | Assumption | Consequence if false |
 |---|-----------|---------------------|
-| 1 | External system [X] has an available REST API | We would have to build the integration differently |
-| 2 | Users use [language / device / etc.] | The UX design would change |
-| 3 | Initial data volume is < [N] records | The database strategy might change |
+| 1 | The requirements described will remain stable throughout the development cycle | The SRS would need to be revised and re-baselined mid-development, per the IEEE 830 standard it follows |
+| 2 | Devices have the necessary permissions for sending messages and accessing location | The app couldn't send alerts or location |
+| 3 | The emergency-resource directory will be kept up to date by administrative staff (RF13.1) | Support information would become outdated |
+| 4 | Alerts will be responded to promptly by the relevant authorities | The system's core value proposition — reducing emergency response time — wouldn't actually be achieved, even though the alert itself was sent correctly |
+| 5 | Users have consistent access to location and messaging services | The app couldn't notify contacts or locate the user |
+| 6 | Internet connectivity is available to communicate with the REST API | The system couldn't send/receive real-time alerts |
 
 ---
 
@@ -71,11 +69,12 @@ What the system **does NOT build** in this version and why:
 
 | Type | Description |
 |------|-------------|
-| **Time** | [MVP must be ready in X weeks / by date Y] |
-| **Budget** | [N development hours / X USD of infrastructure] |
-| **Technology** | [Must use the corporate stack: Java + PostgreSQL] |
-| **Regulatory** | [Must comply with X regulation / certification] |
-| **Team** | [N developers available] |
+| **Technology** | Mobile app in React Native + Expo (Android); web in Angular; backend in Spring Boot + Spring Security + Spring Data JPA; PostgreSQL database with Liquibase |
+| **Compatibility** | The app must be compatible with Android devices (minimum version left pending in the SRS) |
+| **Connectivity** | Requires internet access to send real-time alerts |
+| **Security** | Must follow security protocols and personal-data-protection regulations |
+| **Concurrency** | The architecture must support multiple concurrent connections and simultaneous alerts from multiple users, with fault tolerance |
+| **Time / Budget / Team** | Not addressed in the SRS — it's a requirements document, not a project plan |
 
 ---
 
@@ -83,27 +82,15 @@ What the system **does NOT build** in this version and why:
 
 | Dependency | Team / Provider | Required date | Status |
 |-----------|----------------|--------------|--------|
-| API of [System X] | [Team name] | [date] | 🟢 Available |
-| Credentials for [Provider Y] | [Contact] | [date] | 🟡 In progress |
-| [Infrastructure Z] | DevOps | [date] | 🔴 Pending |
+| Firebase Cloud Messaging (FCM) | Google / Firebase | Not set — no delivery date is defined at the requirements stage | Provider fixed (Firebase), integration not yet built |
+| SMS messaging service | Provider not yet finalized — the SRS names Twilio only as an example ("ej. Twilio") | Not set | Provider selection pending |
+| Email service | Provider not named in the SRS | Not set | Provider selection pending |
 
 ---
 
-## How to update the scope
-
-The scope can change, but the change has a process:
-
-1. Document the proposed change in this file
-2. Evaluate the impact on schedule and effort
-3. Obtain approval from the Product Owner and Tech Lead
-4. Update the roadmap in `03-product/vision.md`
-5. Create or update HUs in `04-requirements/user-stories.md`
-
----
-
-## Correlations
+## Related sections
 
 - Vision and roadmap → `03-product/vision.md`
-- Term glossary → `01-context/glossary.md`
-- System overview → `01-context/overview.md`
+- Glossary of terms → `01-context/glossary.md`
+- System description → `01-context/overview.md`
 - Scope-related risks → `15-project-control/risks.md`

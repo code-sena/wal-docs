@@ -1,186 +1,192 @@
 # Domain Map — Bounded Contexts
 
-> **What to fill in here:** The domain map is the central DDD (Domain-Driven Design) artifact.
-> It defines the system's boundaries and how they relate to each other.
-> Build it first with the team and domain experts in an Event Storming session.
-
-## Before filling in this document: Event Storming
-
-**Event Storming** is a collaborative workshop for modeling the domain before writing code.
-It lasts 2–4 hours with the whole team (dev + PO + business expert).
-
-**Materials:** Long wall, 4-color sticky notes, markers.
-
-**Standard colors:**
-| Color | Represents | Example |
-|-------|-----------|---------|
-| 🟠 Orange | **Domain events** (something that happened, past tense) | `AppointmentScheduled`, `PaymentReceived` |
-| 🔵 Blue | **Commands** (action that triggers the event) | `ScheduleAppointment`, `ProcessPayment` |
-| 🟡 Yellow | **Actors** (who executes the command) | `Patient`, `Doctor`, `Admin` |
-| 🩷 Pink | **External systems** or integration points | `Payment Gateway`, `Email SMTP` |
-
-**Session steps:**
-1. (30 min) Post all events that occur in the business, in chronological order, on the wall
-2. (30 min) Identify which command or actor triggers each event
-3. (45 min) Group related events — each group is a candidate Bounded Context
-4. (30 min) Draw relationships between Bounded Contexts (who depends on whom)
-5. (30 min) Discuss the resulting map and agree on names
-
-**Result:** The session output directly feeds the 3 documents in `02-domain/`:
-- Identified events → `domain-events.md`
-- Entities and their rules → `entities-and-rules.md`
-- Bounded Contexts and their map → this document
-
----
+> Map built by cross-referencing the database tables with the Functional Requirements from the SRS (RF1–RF13) and the actors defined in section 2.2 (User, Administrator).
 
 ---
 
 ## 1. Domain overview
 
-> One paragraph of context about the business and what problem the system solves.
-> Write it without technical terms — it must be readable by a business expert.
-
-```
-[Describe the business domain here. E.g.: "The system manages the complete cycle of
-[X] reservations, from the customer's request through to confirmation and billing."]
-```
+Alerta Mujer manages the complete lifecycle of a gender-based violence emergency: from the registration of the user, her account, and her device, through the activation of an alert that shares real-time location and notifies trusted contacts and help centers, to the recording of evidence, the map of risk/safe zones, the resource directory, and administrative oversight (auditing, user reports, moderation) from a web panel.
 
 ---
 
 ## 2. Identified Bounded Contexts
 
-A **Bounded Context** is the explicit boundary within which a particular domain model
-has consistent meaning. Each bounded context has its own Ubiquitous Language.
-
-> **Signs of a good bounded context:**
-> - Has a clear responsible team
-> - Has its own database
-> - Can be deployed independently
-> - The same term in two different contexts can mean different things
-
-### Bounded Context: [Name — e.g.: User Management]
+### Bounded Context: Identity and Accounts
 
 | Field | Value |
 |-------|-------|
-| **Name** | [ContextName] |
-| **Responsibility** | [What this context captures in one sentence] |
-| **Owning team** | [Responsible team or person] |
-| **Microservice(s)** | [service-name, service2-name] |
-| **Database** | [PostgreSQL / MongoDB / Redis / etc.] |
-| **Ubiquitous Language** | [Key business terms in this context] |
+| **Name** | Identity and Accounts |
+| **Responsibility** | Registration, authentication, account recovery, profile, devices, sessions, and preferences |
+| **Tables** | `role`, `user`, `account`, `user_profile`, `recovery_request`, `device`, `device_permission`, `device_session`, `alert_activation_setting`, `user_preference` |
+| **Database** | PostgreSQL |
+| **Ubiquitous Language** | User, Account, Profile, Device, Session |
 
 **Context-specific terms (Ubiquitous Language):**
 
 | Term | Meaning in THIS context | Different in another context? |
 |------|------------------------|-------------------------------|
-| [User] | [Person with an active account] | [Yes — in Billing it's "Client"] |
-| [Account] | [Set of credentials] | [No] |
+| `user` | Person with a name, ID document, and role (user or administrator) | In the rest of the system, almost everything hangs off `user_profile`, not directly off `user` |
+| `account` | Access credentials (password, status) for a `user` | This is what gets authenticated; different from the personal-data profile |
+| `user_profile` | Extension of `user` used as an FK by almost all other contexts (alerts, zones, notifications, locations) | This is the real "business actor" within the domain |
 
 ---
 
-### Bounded Context: [Name — e.g.: Order Management]
+### Bounded Context: Emergency Contacts
 
 | Field | Value |
 |-------|-------|
-| **Name** | [ContextName] |
-| **Responsibility** | |
-| **Owning team** | |
-| **Microservice(s)** | |
-| **Database** | |
-| **Ubiquitous Language** | |
+| **Name** | Emergency Contacts |
+| **Responsibility** | Creation, lookup, editing, and deletion of a user's trusted contacts |
+| **Tables** | `emergency_contact` |
+| **Database** | PostgreSQL |
+| **Ubiquitous Language** | Emergency contact |
+
+---
+
+### Bounded Context: Alert Management (Core Domain)
+
+| Field | Value |
+|-------|-------|
+| **Name** | Alert Management |
+| **Responsibility** | Alert activation, sending to contacts, location tracking, mini-alerts/reminders, frequent locations |
+| **Tables** | `alert`, `alert_contact`, `location_log`, `alert_reminder`, `frequent_location` |
+| **Database** | PostgreSQL |
+| **Ubiquitous Language** | Alert, activation, delivery channel, recorded location |
+
+---
+
+### Bounded Context: Evidence
+
+| Field | Value |
+|-------|-------|
+| **Name** | Evidence |
+| **Responsibility** | Recording of files (photo/video/audio) associated with an alert |
+| **Tables** | `evidence` |
+| **Database** | PostgreSQL (+ external storage referenced by `file_url`) |
+| **Ubiquitous Language** | Evidence |
+
+---
+
+### Bounded Context: Notifications (Supporting)
+
+| Field | Value |
+|-------|-------|
+| **Name** | Notifications |
+| **Responsibility** | Internal notifications to the user (different from the contact-sending, which lives in `alert_contact`) |
+| **Tables** | `notification` |
+| **Database** | PostgreSQL |
+| **Ubiquitous Language** | Notification, priority, persistent |
+
+---
+
+### Bounded Context: Zones and Help Resources
+
+| Field | Value |
+|-------|-------|
+| **Name** | Zones and Help Resources |
+| **Responsibility** | Safe/risk zones, zone reports/classification by users, directory of emergency resources, and calls made to those resources |
+| **Tables** | `zone`, `zone_report`, `emergency_resource`, `resource_call` |
+| **Database** | PostgreSQL |
+| **Ubiquitous Language** | Zone, risk level, emergency resource, call |
+
+---
+
+### Bounded Context: Administration and Moderation
+
+| Field | Value |
+|-------|-------|
+| **Name** | Administration and Moderation |
+| **Responsibility** | Auditing of administrative actions, reports about users, moderation actions, and global system configuration |
+| **Tables** | `audit_log`, `user_report`, `moderation_action`, `system_configuration` |
+| **Database** | PostgreSQL |
+| **Ubiquitous Language** | Audit, user report, moderation action, system configuration |
 
 ---
 
 ## 3. Context Map
 
-The Context Map shows relationships between bounded contexts. Relationships define
-how contexts communicate and who holds the "power" in the integration.
-
 ```
-┌─────────────────────┐        ┌──────────────────────┐
-│  [Context A]        │        │  [Context B]         │
-│                     │──────▶│                      │
-│  Domain:            │  D→C  │  Domain:             │
-│  [responsibility]   │       │  [responsibility]    │
-└─────────────────────┘       └──────────────────────┘
-                                        │
-                               D→C      │
-                                        ▼
-                              ┌──────────────────────┐
-                              │  [Context C]         │
-                              │                      │
-                              │  [responsibility]    │
-                              └──────────────────────┘
+┌────────────────────────┐        ┌──────────────────────────┐
+│ Identity and Accounts  │──U→D──▶│ Emergency Contacts        │
+│ (user, account,        │        │ (emergency_contact)       │
+│  user_profile, device)  │        └────────────┬─────────────┘
+└───────────┬────────────┘                      │ U→D
+            │ U→D                                ▼
+            ▼                        ┌────────────────────────────┐
+┌────────────────────────────────────│  Alert Management (Core)   │
+│                                     │  alert, alert_contact,     │
+│                                     │  location_log,             │
+│                                     │  alert_reminder,           │
+│                                     │  frequent_location         │
+│                                     └───┬──────────┬─────────┬───┘
+│                                         │          │         │
+▼                                        ▼          ▼         ▼
+┌─────────────┐              ┌───────────────┐ ┌──────────┐ ┌────────────────────┐
+│ device_     │              │ Evidence      │ │ Notifi-  │ │ Zones and Help      │
+│ session,    │              │ (evidence)    │ │ cations  │ │ Resources           │
+│ device_     │              └───────────────┘ │(notifi-  │ │ (zone, zone_report, │
+│ permission  │                                │ cation)  │ │ emergency_resource, │
+└─────────────┘                                └──────────┘ │ resource_call)      │
+                                                              └──────────┬──────────┘
+                                                                         │
+                                                                         ▼
+                                                          ┌──────────────────────────┐
+                                                          │ Administration and       │
+                                                          │ Moderation                │
+                                                          │ (audit_log, user_report, │
+                                                          │ moderation_action,       │
+                                                          │ system_configuration)    │
+                                                          └──────────────────────────┘
 ```
-
-### Context relationship types
-
-| Type | Symbol | Description | Example |
-|------|--------|-------------|---------|
-| **Upstream → Downstream** | `U → D` | U provides, D consumes. D depends on U. | Auth → Orders |
-| **Shared Kernel** | `SK` | Two teams share part of the model | Shared User ID |
-| **Customer/Supplier** | `C/S` | Supplier (U) negotiates with Customer (D) | Inventory → Sales |
-| **Conformist** | `CONF` | D adopts U's model without negotiating | Legacy integration |
-| **Anti-Corruption Layer** | `ACL` | D translates U's model to protect itself | Gateway → External API |
-| **Open Host Service** | `OHS` | U publishes a published protocol | Event Bus, REST API |
-| **Published Language** | `PL` | Explicit shared language | OpenAPI spec, events |
 
 ### Relationships table
 
 | Context A | Relationship | Context B | Communication channel | Contract |
 |-----------|-------------|-----------|----------------------|---------|
-| [Context A] | U → D | [Context B] | REST / Event | OpenAPI / AsyncAPI |
-| [Context B] | ACL | [Context C] | Adapter | Internal interface |
+| Identity and Accounts | U → D (FK `user_id`, `account_id`) | Emergency Contacts | Internal (same DB) | `emergency_contact.user_profile_id` |
+| Identity and Accounts | U → D (FK `user_profile_id`, `device_id`) | Alert Management | Internal (same DB) | `alert.user_profile_id`, `alert.device_id` |
+| Emergency Contacts | U → D | Alert Management | Internal | `alert_contact.emergency_contact_id` |
+| Alert Management | D → U (event) | Evidence | Internal | `evidence.alert_id` |
+| Alert Management | D → U (event) | Notifications | Internal | `notification.alert_id` (optional) |
+| Alert Management | D → U | Zones and Help Resources | Internal | `resource_call.alert_id`, `location_log.alert_id` (optional) |
+| Zones and Help Resources | U → D | Administration and Moderation | Internal | `zone_report.reviewed_by_account_id` |
+| All contexts | D → U (audit) | Administration and Moderation | Internal | `audit_log.account_id` logs actions on any entity (`entity_type`, `entity_id`) |
 
 ---
 
 ## 4. Core Domain, Supporting, Generic
 
-DDD classifies subdomains by their strategic value:
-
-| Type | Description | Investment | Example |
-|------|-------------|-----------|---------|
-| **Core Domain** | Where the business competitive advantage lies. What differentiates us. | MAXIMUM — build, don't buy | Matching algorithm |
-| **Supporting Subdomain** | Necessary for the core but not differentiating. Can be outsourced. | MEDIUM | Order management |
-| **Generic Subdomain** | Commodity. Off-the-shelf solution exists. | MINIMUM — buy/use OSS | Authentication, emails |
-
-### Classification of this project's bounded contexts
-
 | Bounded Context | Type | Justification |
 |----------------|------|---------------|
-| [Context A] | Core | [why it is the heart of the business] |
-| [Context B] | Supporting | [why it supports without being differentiating] |
-| [Context C] | Generic | [standard solution available] |
+| Alert Management | Core | This is the system's core purpose (activating and propagating an emergency) |
+| Emergency Contacts | Supporting | Needed so the alert has someone to notify |
+| Zones and Help Resources | Supporting | Complements prevention and support |
+| Evidence | Supporting | Reinforces the alert's supporting evidence |
+| Administration and Moderation | Supporting | Needed to operate the system |
+| Identity and Accounts | Generic | Registration/login/devices/sessions are a problem already solved in the industry |
+| Notifications | Generic | Standard internal notification |
 
 ---
 
 ## 5. Modeling decisions
 
-### How were these decisions made?
-
-> Document the Event Storming session or the process you used to arrive at the map.
-> If you changed the map, explain why.
-
-- **Event Storming session:** [date], [participants]
-- **Tool used:** [Miro / Lucidchart / physical whiteboard]
-- **Map iterations:** v1 (date), v2 (date)
+- `Device` is placed in Identity and Accounts, because it hangs off `account` and groups permissions (RF1.1–RF1.6) and activation methods (RF5.1–RF5.4) specific to the user's device.
+- `resource_call` (calls to help centers) is included within Zones and Help Resources: it complements the emergency resource directory (RF7.1) and the lookup of nearby centers (RF9.3), although the SRS does not explicitly describe keeping a historical record of the call.
+- `zone_report` complements zone registration (RF9.2) by allowing other users to classify an already-existing zone; the team has it under evaluation because the SRS only describes registration by whoever creates the zone, not a later reclassification.
+- Administrative reports with filters and export (RF13.4) are generated via direct queries on the other tables; there is no `report` table because there is no need to persist a history of generated reports.
 
 ### Key decisions and discarded alternatives
 
 | Decision | Discarded alternative | Reason |
 |----------|----------------------|--------|
-| [Separate Context A and B] | [Have them in one] | [Business logic is different and they evolve at different rates] |
+| Separate `user` (identity) from `user_profile` (business actor) | Use a single `user` table | Almost all FKs in the rest of the system point to `user_profile_id`, reflecting that the SRS distinguishes between registration data (RF2.1) and the user's activity within the app (RF3, RF4, RF9) |
+| Put `resource_call` in "Zones and Help Resources" instead of "Alert Management" | Put it in Alerts because it has an optional `alert_id` | Its main entity is `emergency_resource`, and `alert_id` is nullable: a call to a help center (RF7.1) can be made without an active alert |
 
 ---
 
 ## 6. How to update this map
 
-1. Before adding a new microservice, verify whether it belongs to an existing bounded context.
-2. If a context's ubiquitous language is changing, review whether the context should be split.
-3. Run an Event Storming session every time the domain changes significantly.
-4. The context map MUST be synchronized with the C4 system-level diagram (`05-architecture/overview.md`).
-
-> **Important correlation:** The bounded contexts in this document →
-> Microservices in `09-microservices/service-catalog.md` →
-> C4 diagrams in `08-uml/` →
-> Service separation ADRs in `05-architecture/decisions/`
+1. If the team confirms the removal of `zone_report` or `resource_call`, update this map and the corresponding relationships.
+2. Validate this map with the team before using it as the basis for the microservices architecture.
+3. Sync with the C4 diagram in `05-architecture/overview.md` once it exists.

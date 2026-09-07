@@ -1,258 +1,312 @@
 # Domain Events
 
-> **What to fill in here:** A domain event is a fact that occurred in the business.
-> They are the backbone of asynchronous communication between bounded contexts.
-> The name is ALWAYS in past tense and in the ubiquitous language of the domain.
-
----
-
-## What is a domain event?
-
-A **Domain Event** communicates that something important occurred in the business.
-It is an immutable message that describes the fact in past tense.
-
-```
-✓ OrderCreated
-✓ PaymentRejected
-✓ UserRegistered
-✓ StockDepleted
-
-✗ CreateOrder (this is a command, not an event)
-✗ OrderUpdated (too generic — what changed?)
-✗ OrderEvent (does not indicate what occurred)
-```
-
-### Difference between Command and Event
-
-| Concept | Intent | Tense | Can fail? |
-|---------|--------|-------|-----------|
-| **Command** | Instruction to do something | Present | Yes |
-| **Event** | Notification of something that occurred | Past | No (it already happened) |
-
-```
-User → [CreateOrder] → System → [OrderCreated] → Other contexts
-          (Command)                  (Event)
-```
+> Catalog of Alerta Mujer's domain events, built from each table's state changes (`status`, `note:` with the allowed values) and from the SRS Functional Requirements that give rise to them.
 
 ---
 
 ## Event catalog
 
-### Event: [EventName]
+### Event: UserRegistered
 
 | Field | Value |
 |-------|-------|
-| **Name** | `[EventName]` |
-| **Bounded Context** | [Origin context] |
-| **Aggregate** | [Aggregate that generates it] |
-| **Trigger** | [Which business action generates this event] |
-| **Consumers** | [Which services/contexts listen to this event] |
-| **Channel (topic)** | `[topic.name]` |
-| **Schema version** | `v1` |
-| **Delivery guarantee** | At-least-once / At-most-once / Exactly-once |
+| **Name** | `UserRegistered` |
+| **Bounded Context** | Identity and Accounts |
+| **Aggregate** | User |
+| **Trigger** | A record is created in `user` + `account` + `user_profile` (RF2.1) |
+| **Consumers** | Administration and Moderation (the user becomes available for lookup and management, RF13.1) |
 
-**Payload (JSON schema):**
-
+**Payload:**
 ```json
 {
-  "eventId": "550e8400-e29b-41d4-a716-446655440000",
-  "eventType": "[EventName]",
-  "aggregateId": "550e8400-e29b-41d4-a716-446655440001",
-  "aggregateType": "[AggregateName]",
-  "occurredAt": "2024-01-15T10:30:00Z",
-  "version": 1,
-  "payload": {
-    "[field1]": "[type and description]",
-    "[field2]": "[type and description]"
-  },
-  "metadata": {
-    "correlationId": "550e8400-e29b-41d4-a716-446655440002",
-    "causationId": "550e8400-e29b-41d4-a716-446655440003",
-    "userId": "550e8400-e29b-41d4-a716-446655440004"
-  }
+  "eventType": "UserRegistered",
+  "aggregateId": "user.id",
+  "payload": { "role_id": "int", "first_name": "string", "last_name": "string", "email": "string" }
 }
 ```
 
-**Real payload example:**
+---
 
+### Event: RecoveryRequested / RecoveryCompleted
+
+| Field | Value |
+|-------|-------|
+| **Name** | `RecoveryRequested`, `RecoveryCompleted` |
+| **Bounded Context** | Identity and Accounts |
+| **Aggregate** | RecoveryRequest |
+| **Trigger** | A `recovery_request` is created (`status = pending`) / the token moves to `used` (RF2.3) |
+| **Consumers** | Notifications (sending the token via `method`: `email` \| `telephone`) |
+
+---
+
+### Event: EmergencyContactAdded
+
+| Field | Value |
+|-------|-------|
+| **Name** | `EmergencyContactAdded` |
+| **Bounded Context** | Emergency Contacts |
+| **Aggregate** | EmergencyContact |
+| **Trigger** | A record is created in `emergency_contact` (RF2.2) |
+| **Consumers** | Alert Management (to know who to notify via `alert_contact`) |
+
+---
+
+### Event: AlertActivated
+
+| Field | Value |
+|-------|-------|
+| **Name** | `AlertActivated` |
+| **Bounded Context** | Alert Management |
+| **Aggregate** | Alert |
+| **Trigger** | An `alert` is created with `status = 'active'` and an `activation_method` of `panic_button \| widget \| sudden_movement \| physical_button \| discreet_confirmation \| automatic` (RF5) |
+| **Consumers** | Notifications (creates records in `alert_contact` for each `emergency_contact`), Evidence, Administration |
+
+**Payload (actual fields):**
 ```json
 {
-  "eventId": "generated-uuid",
-  "eventType": "[EventName]",
-  "aggregateId": "aggregate-uuid",
-  "aggregateType": "[AggregateName]",
-  "occurredAt": "2024-01-15T10:30:00Z",
-  "version": 1,
+  "eventType": "AlertActivated",
+  "aggregateId": "alert.id",
   "payload": {
-    "[field1]": "example value",
-    "[field2]": 150.00
+    "user_profile_id": "int",
+    "device_id": "int",
+    "alert_type": "main | mini | reminder",
+    "activation_method": "panic_button | widget | sudden_movement | physical_button | discreet_confirmation | automatic",
+    "started_at": "timestamp"
   }
 }
 ```
 
 **What do consumers do with this event?**
 
-| Consuming service | Action | Idempotent? |
-|------------------|--------|-------------|
-| [Service A] | [Updates its data model] | Yes — uses eventId as idempotency key |
-| [Service B] | [Sends notification] | Yes — checks if notification was already sent |
+| Consuming service | Action |
+|------------------|--------|
+| Notifications | Creates an `alert_contact` for each `emergency_contact` of the user, for each applicable channel (`sms`\|`email`\|`call`\|`push`) |
+| Evidence | May start receiving `evidence` associated with the `alert_id` |
+| Alert Management | Starts inserting `location_log` records with `alert_id` while the alert is `active` |
 
 ---
 
-## Standard fields for all events
+### Event: LocationRecorded
 
-All events must include these fields in the envelope:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `eventId` | UUID | Unique event ID (for idempotency) |
-| `eventType` | string | Event name in PascalCase |
-| `aggregateId` | UUID | ID of the aggregate that generated the event |
-| `aggregateType` | string | Aggregate type |
-| `occurredAt` | ISO 8601 | When the business fact occurred |
-| `version` | integer | Schema version (for evolution) |
-| `payload` | object | Event data (specific per type) |
-| `metadata.correlationId` | UUID | For tracing a transaction across services |
-| `metadata.causationId` | UUID | ID of the event or command that caused this event |
-| `metadata.userId` | UUID | User who initiated the chain (if applicable) |
+| Field | Value |
+|-------|-------|
+| **Name** | `LocationRecorded` |
+| **Bounded Context** | Alert Management |
+| **Aggregate** | LocationLog |
+| **Trigger** | A record is inserted in `location_log` (with or without `alert_id`) while the alert is active (RF4.3) |
+| **Consumers** | Emergency contacts (real-time tracking) |
 
 ---
 
-## Event flow: [Flow name]
+### Event: AlertContactNotified
 
-> Document here the event flows for the main business processes.
-> Use the Event Storming format: orange=event, blue=command, green=view/policy, yellow=aggregate.
+| Field | Value |
+|-------|-------|
+| **Name** | `AlertContactNotified` |
+| **Bounded Context** | Alert Management |
+| **Aggregate** | AlertContact |
+| **Trigger** | An `alert_contact` record changes from `status = pending` to `sent` / `delivered` / `failed` / `retrying` |
+| **Consumers** | Administration (send auditing) |
+
+---
+
+### Event: AlertResolved / AlertCancelled / AlertCompleted / AlertFailed
+
+| Field | Value |
+|-------|-------|
+| **Name** | `AlertResolved`, `AlertCancelled`, `AlertCompleted`, `AlertFailed` |
+| **Bounded Context** | Alert Management |
+| **Aggregate** | Alert |
+| **Trigger** | `alert.status` changes from `active` to `resolved` \| `cancelled` \| `completed` \| `failed` (UC3/UC4: the user manually turns off the alarm → `cancelled`) |
+| **Consumers** | Notifications, Administration |
+
+**Payload:**
+```json
+{ "eventType": "AlertCancelled", "aggregateId": "alert.id", "payload": { "cancelled_at": "timestamp" } }
+```
+
+---
+
+### Event: MiniAlertScheduled / MiniAlertSent
+
+| Field | Value |
+|-------|-------|
+| **Name** | `MiniAlertScheduled`, `MiniAlertSent` |
+| **Bounded Context** | Alert Management |
+| **Aggregate** | AlertReminder |
+| **Trigger** | An `alert_reminder` is created (`status = scheduled`) / changes to `sent` when there is no response from the user (RF4.5) |
+| **Consumers** | Notifications |
+
+---
+
+### Event: EvidenceRegistered
+
+| Field | Value |
+|-------|-------|
+| **Name** | `EvidenceRegistered` |
+| **Bounded Context** | Evidence |
+| **Aggregate** | Evidence |
+| **Trigger** | A record is inserted in `evidence` with `media_type = photo \| video \| audio` (RF6.1, RF6.2) |
+| **Consumers** | Administration (lookup via RF13.7) |
+
+---
+
+### Event: NotificationCreated
+
+| Field | Value |
+|-------|-------|
+| **Name** | `NotificationCreated` |
+| **Bounded Context** | Notifications |
+| **Aggregate** | Notification |
+| **Trigger** | A record is inserted in `notification` with `priority = normal \| high \| critical` (RF8.1) |
+| **Consumers** | The user herself (via app/web) |
+
+---
+
+### Event: ZoneRegistered
+
+| Field | Value |
+|-------|-------|
+| **Name** | `ZoneRegistered` |
+| **Bounded Context** | Zones and Help Resources |
+| **Aggregate** | Zone |
+| **Trigger** | A `zone` is created with `zone_type = safe \| risk` (RF9.2) |
+| **Consumers** | Administration (to review/manage, RF13.3) |
+
+---
+
+### Event: ZoneReported ⚠️
+
+| Field | Value |
+|-------|-------|
+| **Name** | `ZoneReported` |
+| **Bounded Context** | Zones and Help Resources |
+| **Aggregate** | ZoneReport |
+| **Trigger** | A `zone_report` is created (`status = pending`) |
+| **Consumers** | Administration (approves/rejects) |
+| **Relationship with the SRS** | RF9.2 only describes registering a zone by whoever creates it; this event covers reclassification by other users, a feature under evaluation by the team |
+
+---
+
+### Event: ResourceCallStarted / ResourceCallEnded ⚠️
+
+| Field | Value |
+|-------|-------|
+| **Name** | `ResourceCallStarted`, `ResourceCallEnded` |
+| **Bounded Context** | Zones and Help Resources |
+| **Aggregate** | ResourceCall |
+| **Trigger** | A `resource_call` is created (`status = started`) / changes to `answered` \| `unanswered` \| `failed` \| `cancelled` |
+| **Consumers** | Administration |
+| **Relationship with the SRS** | RF1.2 (call permission) and RF7.1 (directory) do not require storing a call history; this event covers that record, a feature under evaluation by the team |
+
+---
+
+### Event: UserReported
+
+| Field | Value |
+|-------|-------|
+| **Name** | `UserReported` |
+| **Bounded Context** | Administration and Moderation |
+| **Aggregate** | UserReport |
+| **Trigger** | A `user_report` is created (`status = pending`) (RF13.10) |
+| **Consumers** | Moderation |
+
+---
+
+### Event: ModerationActionRegistered
+
+| Field | Value |
+|-------|-------|
+| **Name** | `ModerationActionRegistered` |
+| **Bounded Context** | Administration and Moderation |
+| **Aggregate** | ModerationAction |
+| **Trigger** | A `moderation_action` is created with `action_type = review \| warn \| block \| unblock \| reject \| close \| escalate` (RF13.10) |
+| **Consumers** | Identity and Accounts (if `action_type = block/unblock`, it affects `account.status`) |
+
+---
+
+### Event: ActionAudited
+
+| Field | Value |
+|-------|-------|
+| **Name** | `ActionAudited` |
+| **Bounded Context** | Administration and Moderation |
+| **Aggregate** | AuditLog |
+| **Trigger** | Any relevant administrative action is inserted into `audit_log` (`entity_type`, `entity_id`, `action`) (RF13.9) |
+| **Consumers** | Admin panel, for traceability and control of operations (RF13.9) |
+
+---
+
+## Event flow: Panic button activation (real, with table names)
 
 ```
-[Actor]
+User
   │
-  │  [CommandA]           [CommandB]           [CommandC]
-  ▼      │                    │                    │
-[AggregateA]          [AggregateB]          [AggregateC]
-  │                        ▲                    ▲
-  │   [EventA]             │   [EventB]         │
-  └──────────────────────▶│──────────────────▶│
-```
-
-### Example: Order creation flow
-
-```
-Customer
-  │
-  │  CreateOrder (command)
+  │  POST /alerts (activation_method: widget|sudden_movement|physical_button|
+  │                discreet_confirmation|panic_button|automatic)
   ▼
-[Aggregate: Order]
+[alert] status = 'active'
   │
-  │  OrderCreated (event)
-  ├──────────────────────────────────┐
-  │                                   ▼
-  │                          [Service: Inventory]
-  │                          Decrements stock
-  │                          StockReserved (event)
+  │  AlertActivated
+  ├──────────────────────────────────────────┐
+  │                                            ▼
+  │                                  [For each emergency_contact]
+  │                                  creates alert_contact (status=pending)
+  │                                  → attempts to send (sms/email/call/push)
+  │                                  → updates status to sent/delivered/failed
   │
-  │  OrderCreated (event)
-  └──────────────────────────────────┐
-                                      ▼
-                            [Service: Notifications]
-                            Sends email to customer
-```
-
----
-
-## Schema evolution strategy
-
-Events are contracts. Changing them in an incompatible way breaks consumers.
-
-### What is a compatible change (does not break)?
-
-```
-✓ Add a new optional field to the payload
-✓ Add a new event type
-✓ Change a required field → optional
-```
-
-### What is an incompatible change (breaks)?
-
-```
-✗ Remove a field from the payload
-✗ Change the type of a field (string → number)
-✗ Change an optional field → required
-✗ Change the event name
-```
-
-### How to evolve a schema without breaking consumers
-
-**Strategy: Version the event**
-
-```
-Step 1: Publish EventV2 (new type with incompatible changes)
-Step 2: Publish both EventV1 and EventV2 during the migration period
-Step 3: Migrate consumers to V2 one by one
-Step 4: Deprecate EventV1 (announce 1 sprint in advance)
-Step 5: Stop publishing EventV1
+  │  LocationRecorded (repeated)
+  │  ────────────────────────────▶ location_log (alert_id = alert.id)
+  │
+  │  (no response from the user within the configured time)
+  │  ────────────────────────────▶ alert_reminder (reminder_type=mini_alert)
+  │
+  │  (the user confirms it was a misunderstanding — UC3/UC4)
+  ▼
+alert.status = 'cancelled', cancelled_at = now()
+  │
+  ▼
+AlertCancelled
 ```
 
 ---
 
 ## Event summary table
 
-| Event | Origin context | Topic | Consumers | Version |
-|-------|---------------|-------|-----------|---------|
-| [EventA] | [ContextA] | `[topic.a]` | [SvcB, SvcC] | v1 |
-| [EventB] | [ContextB] | `[topic.b]` | [SvcA] | v1 |
+| Event | Origin context | Source table |
+|-------|---------------|--------------|
+| UserRegistered | Identity and Accounts | `user`, `account`, `user_profile` |
+| RecoveryRequested / Completed | Identity and Accounts | `recovery_request` |
+| EmergencyContactAdded | Emergency Contacts | `emergency_contact` |
+| AlertActivated | Alert Management | `alert` |
+| LocationRecorded | Alert Management | `location_log` |
+| AlertContactNotified | Alert Management | `alert_contact` |
+| AlertResolved/Cancelled/Completed/Failed | Alert Management | `alert` |
+| MiniAlertScheduled / Sent | Alert Management | `alert_reminder` |
+| EvidenceRegistered | Evidence | `evidence` |
+| NotificationCreated | Notifications | `notification` |
+| ZoneRegistered | Zones and Help Resources | `zone` |
+| ZoneReported ⚠️ | Zones and Help Resources | `zone_report` |
+| ResourceCallStarted/Ended ⚠️ | Zones and Help Resources | `resource_call` |
+| UserReported | Administration and Moderation | `user_report` |
+| ModerationActionRegistered | Administration and Moderation | `moderation_action` |
+| ActionAudited | Administration and Moderation | `audit_log` |
+
+⚠️ = table/event under evaluation for removal by the team (no direct RF in the SRS).
 
 ---
 
 ## Policies — Reactions to events
 
-A **Policy** (or Saga step) describes what happens automatically when an event arrives.
-It is the logic of "whenever X occurs, do Y".
-
-```
-Event:  OrderCreated
-Policy: Whenever an OrderCreated arrives with type=URGENT,
-        emit the command NotifyOperationsTeam
-```
-
-| Trigger event | Policy | Emitted command | Service |
-|--------------|--------|----------------|---------|
-| [EventA] | Whenever [condition], then... | [CommandB] | [ServiceX] |
+| Trigger event | Policy | Result |
+|--------------|--------|----------|
+| AlertActivated | For each `emergency_contact` of the user, create an `alert_contact` per available channel | Multichannel delivery (RF4.2) |
+| AlertContactNotified (`status = failed`) | Retry the send | `attempts` is incremented, moves to `retrying` |
+| AlertReminder (`status = scheduled`, no response from the user) | Send mini alert | Updated to `sent` (RF4.5) |
+| ModerationAction (`action_type = block`) | Block the associated account | `account.status = 'blocked'` |
 
 ---
 
 ## Resilience patterns for events
 
-### At-least-once delivery + Idempotency
-
-The message broker guarantees the event is delivered **at least once** but it may be
-delivered more than once (in case of retries). Consumers must be **idempotent**.
-
-```typescript
-// Idempotent consumer — stores the processed eventId
-async function processOrderCreatedEvent(event: OrderCreated): Promise<void> {
-  // 1. Check if already processed
-  if (await isEventAlreadyProcessed(event.eventId)) {
-    logger.info(`Event ${event.eventId} already processed, ignoring`);
-    return;
-  }
-
-  // 2. Process the event
-  await updateModel(event.payload);
-
-  // 3. Mark as processed (in the same transaction)
-  await markEventProcessed(event.eventId);
-}
-```
-
-### Dead Letter Queue (DLQ)
-
-When an event fails after N retries, it goes to the DLQ.
-
-| Configuration | Recommended value |
-|--------------|------------------|
-| Retries before DLQ | 3-5 |
-| Backoff | Exponential (1s → 2s → 4s → 8s) |
-| DLQ retention | 7 days |
-| Alert | When DLQ has > 0 messages |
-
-> See DLQ runbook in `09-microservices/services/XX-service/runbook.md`
+`alert_contact` models retries at the data level (`attempts`, `status = retrying`, `error_message`), just like `alert_reminder` and `recovery_request` — consistent with the SRS requirement for fault tolerance in sending critical notifications and alerts (section 2.3, RNF007). The maximum number of retries and the backoff time between each one still need to be defined, which the SRS does not set.
