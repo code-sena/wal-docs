@@ -1,127 +1,98 @@
 # System Architecture Overview
 
-> **What to fill in here:** The architectural view is the technical snapshot of the system.
-> It includes the C4 system and container diagram, service list, and architectural principles.
-> This document is created after the main ADRs and guides the implementation.
-
 ---
 
 ## 1. Adopted architectural style
 
-**Style:** [Microservices / Microservices + Event-Driven / Modular Monolith / etc.]
+**Style:** Modular Monolith, with hexagonal architecture (ports and adapters) applied inside the single backend.
 
-**Justification:** [Why this style for this project and these requirements]
+**Justification:** Alerta Mujer runs as one Spring Boot backend organized by business modules (Identity, Contacts, Alerts, Evidence, Notifications, Zones, Administration — the same bounded contexts documented in `02-domain/domain-map.md`), backed by one shared PostgreSQL database (`06-data/models.md`). `ADR-001` already describes the project in terms of "a backend" and "a shared database" (singular), and `pattern-guide.md` explicitly rejects Database per Service, Saga, and CQRS for the current scope. A modular monolith gives each bounded context clear internal boundaries without the operational cost of running and coordinating separate services — appropriate for a single-team academic project with one shared datastore.
 
-**Reference ADR:** [`ADR-001-architectural-style.md`](decisions/records/)
+**Reference ADR:** not yet formalized as its own record — `ADR-001-idiom-documentation.md` is the only ADR the project has so far. This decision is a strong candidate for `ADR-002-architectural-style.md`.
 
 ---
 
 ## 2. C4 Diagram — System Level (Context)
 
-> Shows how the system fits in the world. External actors and external systems.
+```mermaid
+graph TB
+  USR[User<br/>emergency alerts, contacts, zones]
+  ADM[Administrator<br/>users, alerts, zones, moderation]
 
+  subgraph "Alerta Mujer"
+    SYS[Alerta Mujer System]
+  end
+
+  FCM[Firebase Cloud Messaging<br/>push notifications]
+  SMS[SMS provider<br/>e.g. Twilio]
+  MAIL[Email provider]
+
+  USR --> SYS
+  ADM --> SYS
+  SYS --> FCM
+  SYS --> SMS
+  SYS --> MAIL
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        System [Name]                                │
-│                                                                     │
-│  ┌─────────────┐    ┌─────────────┐    ┌────────────────────────┐  │
-│  │ [Service A] │    │ [Service B] │    │ [Service C]            │  │
-│  │             │    │             │    │                        │  │
-│  │ Port: 3001  │    │ Port: 3002  │    │ Port: 3003             │  │
-│  └──────┬──────┘    └──────┬──────┘    └──────────┬─────────────┘  │
-│         │                  │                       │                │
-│         └──────────────────┴───────────────────────┘                │
-│                            │ Message Bus                             │
-└────────────────────────────│────────────────────────────────────────┘
-                             │
-                  ┌──────────┴──────────┐
-                  │                     │
-         ┌────────▼──────┐    ┌─────────▼──────┐
-         │ API Gateway   │    │ Admin Dashboard │
-         │               │    │                 │
-         └────────┬──────┘    └─────────────────┘
-                  │
-         ┌────────▼──────────────┐
-         │    External clients   │
-         │  (Web, Mobile, API)   │
-         └───────────────────────┘
-```
+
+The system has two human actors — the User (RF1–RF11) and the Administrator (RF13) — and three external systems it depends on to deliver an alert: Firebase Cloud Messaging for push, an SMS provider, and an email provider. There is no third-party system Alerta Mujer receives data from; all three external dependencies are outbound-only (sending, not receiving).
 
 ---
 
 ## 3. C4 Diagram — Container Level
 
-> Shows the processes, databases, and main communication channels.
-
-```
-Replace this block with the project-specific diagram.
-
-Recommended tools:
-- PlantUML (see 08-uml/diagrams/source/)
-- Mermaid (natively supported on GitHub)
-- draw.io / Lucidchart
-```
-
-**Mermaid example:**
-
 ```mermaid
 graph TB
-  subgraph "System [Name]"
-    GW[API Gateway<br/>:8080]
-    SA[Service A<br/>:3001]
-    SB[Service B<br/>:3002]
-    BUS[(Message Bus<br/>Kafka/RabbitMQ)]
-    DBA[(Service A DB<br/>PostgreSQL)]
-    DBB[(Service B DB<br/>MongoDB)]
+  subgraph "Alerta Mujer"
+    MOB[Mobile App<br/>React Native + Expo, Android<br/>MVVM by feature]
+    WEB[Web App<br/>Angular<br/>Feature-Based Architecture]
+    BACK[Backend<br/>Spring Boot + Spring Security + Spring Data JPA<br/>Hexagonal architecture by business module]
+    DB[(PostgreSQL<br/>shared database, versioned with Liquibase)]
   end
 
-  WEB[Web App] --> GW
-  MOB[Mobile] --> GW
-  GW --> SA
-  GW --> SB
-  SA --> DBA
-  SB --> DBB
-  SA --> BUS
-  BUS --> SB
+  FCM[Firebase Cloud Messaging]
+  SMS[SMS provider]
+  MAIL[Email provider]
+
+  MOB -->|REST API| BACK
+  WEB -->|REST API| BACK
+  BACK --> DB
+  BACK --> FCM
+  BACK --> SMS
+  BACK --> MAIL
 ```
+
+There is no API Gateway or message bus in the current architecture — both clients talk directly to the single backend over REST, which fully decouples client from server per the SRS. The backend is the only component that talks to PostgreSQL and to the three external notification providers.
 
 ---
 
 ## 4. Service catalog
 
-| # | Service | Responsibility | Port | DB | Communication type |
-|---|---------|---------------|------|-----|-------------------|
-| 1 | [api-gateway] | Routing, auth, rate limiting | 8080 | Redis (cache) | HTTP Proxy |
-| 2 | [auth-service] | Registration, login, JWT tokens | 3001 | PostgreSQL | REST + Events |
-| 3 | [xxx-service] | [responsibility] | 300X | [DB] | [REST/Async] |
+| # | Component | Responsibility | Port | DB | Communication type |
+|---|-----------|----------------|------|-----|-------------------|
+| 1 | alerta-mujer-backend | Identity, contacts, alerts, evidence, notifications, zones, and administration — all business modules of the system | Not yet assigned — the project hasn't reached deployment configuration | PostgreSQL (shared) | REST |
+| 2 | alerta-mujer-mobile | User-facing Android app: panic button, contacts, history, zones, evidence | N/A (client) | — | REST (consumes backend API) |
+| 3 | alerta-mujer-web | Public landing, authenticated user portal, and admin panel | Not yet assigned | — | REST (consumes backend API) |
 
-> Full detail per service in `09-microservices/service-catalog.md`
+There's a single deployable backend today, not a set of independently deployed services — the module breakdown inside it (Identity and Accounts, Emergency Contacts, Alert Management, Evidence, Notifications, Zones and Support Resources, Administration and Moderation) is internal, and is documented per-module in `02-domain/domain-map.md` rather than as separate rows here.
 
 ---
 
 ## 5. Architectural principles
 
-These principles guide the project's technical decisions. Before making an important decision,
-verify it is consistent with these principles.
+### P1: Modular boundaries, shared database
+Each business module (bounded context) owns its own tables and doesn't reach into another module's tables through anything other than the foreign keys already modeled in `06-data/models.md`. This is the monolith's substitute for "Database per Service" — same discipline about ownership, without a separate database per module.
 
-### P1: API-First
-Design the API contract (OpenAPI) before implementing the service.
-Contracts are the source of truth for consumers.
+### P2: Domain independent of the framework (Hexagonal Architecture)
+The domain layer (aggregates, invariants, domain events) has no dependency on Spring, PostgreSQL, or any external provider — those are adapters plugged in through ports, per `05-architecture/hexagonal-architecture.md`.
 
-### P2: Database per Service
-Each service has its own database. No service directly accesses another service's database.
-Communication is always through API or events.
+### P3: Fail Fast, Recover Gracefully — for external providers
+Validate early at the edge of the backend. When FCM, the SMS provider, or the email provider fails or is slow, use a Circuit Breaker (see `pattern-guide.md`) instead of letting the failure cascade into the alert flow. This directly supports the fault-tolerance requirement in the SRS (section 2.3) for notification delivery.
 
-### P3: Fail Fast, Recover Gracefully
-Detect errors early (validation at the edge). When an external service fails,
-use Circuit Breaker to prevent cascades. Always define a fallback.
+### P4: Reliability of the alert path over everything else
+The panic-button flow (`Alert` activation → contact notification → location sharing) is the one path in the system that cannot silently fail. Retries with backoff (`alert_contact`, `alert_reminder`) and the planned Outbox Pattern exist specifically to protect this path, even where other parts of the system don't have the same guarantees yet.
 
-### P4: Observability by Design
-From day 1: structured JSON logs, metrics with Prometheus,
-distributed traces with Jaeger/Zipkin. It is not optional or a story for "later".
-
-### P5: [Additional principle name]
-[Description]
+### P5: Not yet defined
+Observability (structured logging, metrics, tracing) isn't addressed in the SRS or in any architecture document so far — there's no adopted logging format, metrics tool, or tracing solution to state here yet. This principle is a placeholder for whenever the team defines one.
 
 ---
 
@@ -129,48 +100,49 @@ distributed traces with Jaeger/Zipkin. It is not optional or a story for "later"
 
 | Pattern | Adopted | Reference |
 |---------|---------|-----------|
-| API Gateway | Yes | `05-architecture/pattern-guide.md` |
-| Database per Service | Yes | ADR-00X |
-| CQRS | No (review in Q3) | |
-| Event Sourcing | No | |
-| Circuit Breaker | Yes | ADR-00X |
-| Saga (choreographed) | Yes | ADR-00X |
-| Outbox Pattern | Yes | ADR-00X |
+| API Gateway | Only if split into services later | `05-architecture/pattern-guide.md` |
+| Database per Service | No — shared PostgreSQL database | `05-architecture/pattern-guide.md` |
+| CQRS | No, for now | `05-architecture/pattern-guide.md` |
+| Event Sourcing | No | `05-architecture/pattern-guide.md` |
+| Circuit Breaker | Yes — for external providers only | `05-architecture/pattern-guide.md` |
+| Saga (choreographed) | No | `05-architecture/pattern-guide.md` |
+| Outbox Pattern | Yes — once alert delivery moves to async | `05-architecture/pattern-guide.md` |
+| Factory Method | Yes | `05-architecture/pattern-guide.md` |
+| Adapter | Yes | `05-architecture/pattern-guide.md` |
+| Observer / Internal Event Bus | Yes | `05-architecture/pattern-guide.md` |
+| Strategy | Yes | `05-architecture/pattern-guide.md` |
+| Retry with Exponential Backoff | Yes | `05-architecture/pattern-guide.md` |
+
+Full reasoning for every pattern, including the rejected ones, is in `05-architecture/pattern-guide.md`.
 
 ---
 
 ## 7. Cross-cutting concerns
 
-Transversal concerns that apply to ALL services:
-
 | Concern | Adopted solution | Where it is configured |
 |---------|----------------|------------------------|
-| Authentication / Authorization | JWT + validation in API Gateway | `00-governance/security-policy.md` |
-| Logging | Structured JSON + Correlation ID | Shared logger in internal lib |
-| Tracing | OpenTelemetry → Jaeger | Middleware in each service |
-| Health Checks | GET /health (liveness) + GET /health/ready (readiness) | Service template |
-| Error format | Standard ErrorResponse | `07-api/contracts/openapi/_shared.yaml` |
-| Rate Limiting | At the API Gateway | Kong/NGINX configuration |
-| CORS | Configured in API Gateway | |
-| Circuit Breaker | Resiliency4j / opossum per service | Pattern in `pattern-guide.md` |
+| Authentication / Authorization | Spring Security, backed by `account` (credentials) and `role` (user vs administrator) | Backend — exact token strategy (JWT vs session) not detailed in the SRS |
+| Logging | Not defined yet | — |
+| Tracing | Not defined yet | — |
+| Health Checks | Not defined yet | — |
+| Error format | Not defined yet | — |
+| Rate Limiting | Not applicable without an API Gateway | — |
+| CORS | Needed for the Angular web app to call the backend; exact policy not detailed in the SRS | Backend |
+| Circuit Breaker | For FCM, the SMS provider, and the email provider | Pattern in `pattern-guide.md` |
+
+Several rows here don't have an adopted solution yet — that's an accurate account of where the project stands (SRS + architecture docs), not a gap in this document.
 
 ---
 
 ## 8. Registered architectural technical debt
 
-| ID | Description | Impact | Priority | Target sprint |
-|----|-------------|--------|---------|--------------|
-| AT-001 | [description] | [high/medium/low] | [P1/P2/P3] | [Sprint X] |
-
-> See also: `15-project-control/technical-backlog.md`
+No technical debt has been logged yet. This table gets populated as items are opened in `15-project-control/technical-backlog.md`.
 
 ---
 
 ## 9. Planned evolution
 
-| Version | Architectural change | Motivation | Estimated date |
-|---------|---------------------|------------|----------------|
-| v2.0 | [e.g.: Migrate to gRPC for internal communication] | [Latency] | [Q4 2024] |
+No versioned architectural roadmap exists yet — the SRS and current architecture documents describe the target for the first release, not a v2. Candidates that came up while documenting scope (`01-context/scope.md`) — like iOS support, which the SRS explicitly limits to Android — would belong here once the team schedules them.
 
 ---
 
@@ -178,7 +150,6 @@ Transversal concerns that apply to ALL services:
 
 - Domain bounded contexts → `02-domain/domain-map.md`
 - Specific decision ADRs → `05-architecture/decisions/`
-- Hexagonal architecture per service → `05-architecture/hexagonal-architecture.md`
+- Hexagonal architecture per module → `05-architecture/hexagonal-architecture.md`
 - Applied patterns → `05-architecture/pattern-guide.md`
-- Per-service detail → `09-microservices/service-catalog.md`
-- UML diagrams → `08-uml/`
+- Data model → `06-data/models.md`
