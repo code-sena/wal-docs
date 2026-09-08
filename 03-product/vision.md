@@ -1,95 +1,62 @@
-# Product Vision
+# Product Vision — Woman Alert
 
-> The vision is the team's north star. All sprints, design decisions,
-> and trade-offs are evaluated against this vision.
-> It must be ambitious yet achievable, inspiring but specific.
+This is the vision for **Woman Alert**, built using real data from the project's SRS. The only points that remain unresolved are the three KPIs for the strategic pillars, which depend on targets that the team still needs to define.
 
----
+## Vision Statement
 
-## Vision statement
+For women at risk or victims of gender-based violence in Colombia who need a fast, reliable, and effective way to ask for help, **Woman Alert** is a system composed of a mobile application (primary channel) and a supporting web platform that allows users to activate emergency alerts with real-time location, notify their configured trusted contacts through multiple channels (SMS, email, and push notifications), and access available support information.
 
-> Use the Geoffrey Moore template:
+Unlike existing institutional mechanisms — which face limited awareness of response pathways and poorly coordinated channels — our product complements these mechanisms with a panic button, real-time tracking, evidence recording, and an administrative dashboard for management and analysis, reducing response times in situations of risk.
 
-**For** [target customer]
-**who** [has the need / faces the problem]
-**the** [product name]
-**is a** [product category]
-**that** [main benefit / reason to choose]
-**unlike** [competing alternative]
-**our product** [key differentiator].
+## Team Mission
 
----
+Contribute to reducing response times in situations of gender-based violence in Colombia by empowering women with an accessible, secure, and easy-to-use technological tool for moments of high stress. This mission is derived from the introduction and general objective of the SRS.
 
-## Team mission
+## Strategic Pillars
 
-> In 1-2 sentences: why does this team exist? What change in the world does it seek to achieve?
+The SRS itself defines four pillars for the operation of the system; these are adopted here as the product's strategic pillars:
 
----
+| Pillar                  | Description (according to the SRS)                                                       | Success Metrics                                                                           |
+| ----------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Prevention              | Provide useful information, action guidelines, and safety recommendations                | To be defined with the team (e.g., percentage of users who consult the action guide)      |
+| Immediate Response      | Panic button that sends alerts and real-time location to configured contacts             | RNF5 compliance: ≥95% of alerts dispatched within ≤2 seconds                              |
+| Support                 | Alert history and continuous monitoring by configured contacts while the alert is active | To be defined with the team (e.g., percentage of alerts with completed active monitoring) |
+| Management and Analysis | Administrative system that allows visualization of generated data and statistics         | To be defined with the team (e.g., reports generated per period)                          |
 
-## Strategic pillars
+## High-Level Roadmap
 
-Pillars are the focus areas that take us from mission to vision.
-They should be few (3-5) and consistent over time.
+The scope defined in the SRS already serves as a concrete Horizon 1. Horizons 2 and 3 are no longer blank — they were populated with the actual content from `03-product/roadmap.md` once that document was defined:
 
-| Pillar | Description | Success metrics |
-|--------|-------------|----------------|
-| [Pillar 1: e.g. Speed] | [What it means for our product] | [KPIs] |
-| [Pillar 2: e.g. Reliability] | [Description] | [KPIs] |
-| [Pillar 3: e.g. Scale] | [Description] | [KPIs] |
+| Horizon                             | Objective                                        | Modules / Scope                                                                                                                                                                                                                                                                                         | Uncertainty |
+| ----------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| H1 (defined scope)                  | Deliver the core system described in the SRS     | Registration/login, emergency contacts, panic button with multiple activation methods, multi-channel notifications, real-time tracking, evidence (audio/video), history, safe/risk zone map and help directory, language/theme customization, web platform (public website + user portal + admin panel) | Low         |
+| H2 (next = Phase 2 of the roadmap)  | Iterate on the MVP once it is working end-to-end | Evidence (audio/video), zone map and help directory, additional activation methods, reports and audit capabilities in the admin panel, multi-channel retry in case of failures                                                                                                                          | Medium      |
+| H3 (later = Phase 3 of the roadmap) | Continuous improvement based on real-world usage | Evaluate inactivity confirmation (discovery-brief finding), UX adjustments with real users, formal verification of critical NFRs (RNF5, RNF6, RNF7)                                                                                                                                                     | High        |
 
----
+## Product Principles
 
-## High-level roadmap
+Derived from the non-functional requirements already defined in the SRS. These are not new proposals; they are principles that the system is already required to fulfill:
 
-> The roadmap shows how the product evolves over time.
-> Horizon 1 (0-3 months): high certainty, detail in HUs
-> Horizon 2 (3-6 months): medium certainty, epics
-> Horizon 3 (6-12 months): low certainty, focus areas
+1. **Accessible even under stress** (RNF11): The interface must be simple and clear, with large visual elements and contrasting colors, allowing the user to interact without complications during an emergency.
 
-```
-Q1 2024 ──── Q2 2024 ──── Q3 2024 ──── Q4 2024
-     │              │              │              │
-  [MVP]      [Feature A]    [Feature B]   [Scale]
-  Validate    Expand         Deepen        Grow
-  hypothesis  the market     the value
-```
+2. **Activation in the fewest possible steps** (RNF12): The app must provide at least two rapid activation methods outside the main interface, such as a widget, physical button, or touch pattern.
 
-| Horizon | Period | Objective | Epics / Features | Uncertainty |
-|---------|--------|----------|----------------|-------------|
-| H1 (Now) | [Q1] | [Objective] | [Epic 1, Epic 2] | Low |
-| H2 (Next) | [Q2] | [Objective] | [Epic 3, Area X] | Medium |
-| H3 (Later) | [Q3-Q4] | [Objective] | [Area Y, Area Z] | High |
+3. **Privacy and data security by default** (RNF1, RNF8, RNF16): Profile photos must not be publicly accessible, information must be encrypted in transit (HTTPS/TLS) and at rest (AES-256), and access must be restricted according to the user's role.
 
----
+4. **Fault tolerance in alert delivery** (RNF9): If one communication channel fails, the system automatically retries through another available channel.
 
-## Product principles
+## Definition of Done
 
-These principles guide design and prioritization decisions when there are trade-offs.
+**Objective:** Fulfill the core system described in the SRS scope, with the critical non-functional requirements verified.
 
-1. **[Principle 1]:** [description. Example: "New user first — every new feature must be understandable in 2 minutes without onboarding"]
-
-2. **[Principle 2]:** [description. Example: "Opinionated about what matters, flexible on the secondary"]
-
-3. **[Principle 3]:** [description]
-
----
-
-## Product Definition of Done
-
-> The product is "done" when it achieves these OKRs:
-
-**Objective:** [What we want to achieve]
-
-| Key Result | Baseline | Target | Date |
-|------------|---------|--------|------|
-| KR1: [specific metric] | [current value] | [target value] | [date] |
-| KR2: [metric] | [current] | [target] | [date] |
-| KR3: [business metric] | [current] | [target] | [date] |
-
----
+| Key Result                                                        | Baseline | Objective (according to the SRS)                              | Date                             |
+| ----------------------------------------------------------------- | -------- | ------------------------------------------------------------- | -------------------------------- |
+| KR1: Percentage of alerts dispatched within the time limit (RNF5) | —        | ≥95% within ≤2 seconds until delivery to the channel provider | October 20, 2026 (delivery date) |
+| KR2: Location accuracy during an active alert (RNF7)              | —        | 10–20 meters, subject to GPS signal                           | October 20, 2026 (delivery date) |
+| KR3: Device compatibility (RNF10)                                 | —        | Android 10 and later                                          | October 20, 2026 (delivery date) |
 
 ## Correlations
 
-- Problem framing (the why) → `03-product/problem-framing.md`
-- Backlog that implements the vision → `04-requirements/user-stories.md`
-- KPIs in operations → `13-operations/README.md`
+* Problem Framing (the why) → `03-product/problem-framing.md`
+* Backlog implementing the vision → `04-requirements/user-stories.md`
+* KPIs in operations → `13-operations/README.md`
