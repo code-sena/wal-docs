@@ -1,6 +1,7 @@
 # Domain Events
 
 > Catalog of Alerta Mujer's domain events, built from each table's state changes (`status`, `note:` with the allowed values) and from the SRS Functional Requirements that give rise to them.
+> **Updated to match the final 27-table database schema** (adds `AdminProfileRegistered` and renames `*_account_id` fields to `*_admin_profile_id` on the events they appear in).
 
 ---
 
@@ -27,6 +28,27 @@
 
 ---
 
+### Event: AdminProfileRegistered
+
+| Field | Value |
+|-------|-------|
+| **Name** | `AdminProfileRegistered` |
+| **Bounded Context** | Identity and Accounts |
+| **Aggregate** | AdminProfile |
+| **Trigger** | A record is created in `admin_profile`, restricted to an `account` whose `user.role_id` is `administrator` |
+| **Consumers** | Administration and Moderation (this administrator becomes a valid actor for `zone.created_by_admin_profile_id`, `zone_report.reviewed_by_admin_profile_id`, `user_report.reviewed_by_admin_profile_id`, `moderation_action.admin_profile_id`, `system_configuration.updated_by_admin_profile_id`) |
+
+**Payload:**
+```json
+{
+  "eventType": "AdminProfileRegistered",
+  "aggregateId": "admin_profile.id",
+  "payload": { "account_id": "int" }
+}
+```
+
+---
+
 ### Event: RecoveryRequested / RecoveryCompleted
 
 | Field | Value |
@@ -46,7 +68,7 @@
 | **Name** | `EmergencyContactAdded` |
 | **Bounded Context** | Emergency Contacts |
 | **Aggregate** | EmergencyContact |
-| **Trigger** | A record is created in `emergency_contact` (RF2.2) |
+| **Trigger** | A record is created in `emergency_contact` (RF2.2) — requires at least `contact_name` and `telephone` (`telephone` is `NOT NULL`) |
 | **Consumers** | Alert Management (to know who to notify via `alert_contact`) |
 
 ---
@@ -58,7 +80,7 @@
 | **Name** | `AlertActivated` |
 | **Bounded Context** | Alert Management |
 | **Aggregate** | Alert |
-| **Trigger** | An `alert` is created with `status = 'active'` and an `activation_method` of `panic_button \| widget \| sudden_movement \| physical_button \| discreet_confirmation \| automatic` (RF5) |
+| **Trigger** | An `alert` is created with `status = 'active'`, a `device_id` (`NOT NULL`), and an `activation_method` of `panic_button \| widget \| sudden_movement \| physical_button \| discreet_confirmation \| automatic` (RF5) |
 | **Consumers** | Notifications (creates records in `alert_contact` for each `emergency_contact`), Evidence, Administration |
 
 **Payload (actual fields):**
@@ -139,6 +161,19 @@
 
 ---
 
+### Event: AlertActivationMethodToggled
+
+| Field | Value |
+|-------|-------|
+| **Name** | `AlertActivationMethodToggled` |
+| **Bounded Context** | Identity and Accounts |
+| **Aggregate** | AlertActivationSetting |
+| **Trigger** | `alert_activation_setting.is_enabled` changes value for a `device_id` + `activation_method` (RF5) |
+| **Consumers** | Alert Management (an alert can no longer be triggered by a disabled method) |
+| **Business rule tied to this event** | Before applying a toggle to `false`, the Service layer checks that at least one other method for the same `device_id` remains `is_enabled = true`; a database `CHECK` constraint cannot express this because it needs to compare across sibling rows |
+
+---
+
 ### Event: EvidenceRegistered
 
 | Field | Value |
@@ -170,7 +205,7 @@
 | **Name** | `ZoneRegistered` |
 | **Bounded Context** | Zones and Help Resources |
 | **Aggregate** | Zone |
-| **Trigger** | A `zone` is created with `zone_type = safe \| risk` (RF9.2) |
+| **Trigger** | A `zone` is created with `zone_type = safe \| risk`, optionally linked to `created_by_admin_profile_id` (RF9.2) |
 | **Consumers** | Administration (to review/manage, RF13.3) |
 
 ---
@@ -183,7 +218,7 @@
 | **Bounded Context** | Zones and Help Resources |
 | **Aggregate** | ZoneReport |
 | **Trigger** | A `zone_report` is created (`status = pending`) |
-| **Consumers** | Administration (approves/rejects) |
+| **Consumers** | Administration (approves/rejects, via `reviewed_by_admin_profile_id`) |
 | **Relationship with the SRS** | RF9.2 only describes registering a zone by whoever creates it; this event covers reclassification by other users, a feature under evaluation by the team |
 
 ---
@@ -220,8 +255,20 @@
 | **Name** | `ModerationActionRegistered` |
 | **Bounded Context** | Administration and Moderation |
 | **Aggregate** | ModerationAction |
-| **Trigger** | A `moderation_action` is created with `action_type = review \| warn \| block \| unblock \| reject \| close \| escalate` (RF13.10) |
+| **Trigger** | A `moderation_action` is created with `action_type = review \| warn \| block \| unblock \| reject \| close \| escalate`, authored by `admin_profile_id` (RF13.10) |
 | **Consumers** | Identity and Accounts (if `action_type = block/unblock`, it affects `account.status`) |
+
+---
+
+### Event: SystemConfigurationUpdated
+
+| Field | Value |
+|-------|-------|
+| **Name** | `SystemConfigurationUpdated` |
+| **Bounded Context** | Administration and Moderation |
+| **Aggregate** | SystemConfiguration |
+| **Trigger** | The single `system_configuration` row (`singleton_key = 'SYSTEM'`) is updated, tracked via `updated_by_admin_profile_id` |
+| **Consumers** | All contexts that read global settings (`sos_max_duration_minutes`, `emergency_phone_number`, `default_notification_priority`, `default_theme`) |
 
 ---
 
@@ -245,7 +292,7 @@ User
   │  POST /alerts (activation_method: widget|sudden_movement|physical_button|
   │                discreet_confirmation|panic_button|automatic)
   ▼
-[alert] status = 'active'
+[alert] status = 'active', device_id = <required>
   │
   │  AlertActivated
   ├──────────────────────────────────────────┐
@@ -276,6 +323,7 @@ AlertCancelled
 | Event | Origin context | Source table |
 |-------|---------------|--------------|
 | UserRegistered | Identity and Accounts | `user`, `account`, `user_profile` |
+| AdminProfileRegistered | Identity and Accounts | `admin_profile` |
 | RecoveryRequested / Completed | Identity and Accounts | `recovery_request` |
 | EmergencyContactAdded | Emergency Contacts | `emergency_contact` |
 | AlertActivated | Alert Management | `alert` |
@@ -283,6 +331,7 @@ AlertCancelled
 | AlertContactNotified | Alert Management | `alert_contact` |
 | AlertResolved/Cancelled/Completed/Failed | Alert Management | `alert` |
 | MiniAlertScheduled / Sent | Alert Management | `alert_reminder` |
+| AlertActivationMethodToggled | Identity and Accounts | `alert_activation_setting` |
 | EvidenceRegistered | Evidence | `evidence` |
 | NotificationCreated | Notifications | `notification` |
 | ZoneRegistered | Zones and Help Resources | `zone` |
@@ -290,6 +339,7 @@ AlertCancelled
 | ResourceCallStarted/Ended ⚠️ | Zones and Help Resources | `resource_call` |
 | UserReported | Administration and Moderation | `user_report` |
 | ModerationActionRegistered | Administration and Moderation | `moderation_action` |
+| SystemConfigurationUpdated | Administration and Moderation | `system_configuration` |
 | ActionAudited | Administration and Moderation | `audit_log` |
 
 ⚠️ = table/event under evaluation for removal by the team (no direct RF in the SRS).
@@ -304,6 +354,7 @@ AlertCancelled
 | AlertContactNotified (`status = failed`) | Retry the send | `attempts` is incremented, moves to `retrying` |
 | AlertReminder (`status = scheduled`, no response from the user) | Send mini alert | Updated to `sent` (RF4.5) |
 | ModerationAction (`action_type = block`) | Block the associated account | `account.status = 'blocked'` |
+| AlertActivationMethodToggled (would disable the last enabled method) | Reject the toggle | The Service layer blocks the `UPDATE`, since a device must always keep at least one activation method enabled |
 
 ---
 
