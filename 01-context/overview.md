@@ -2,44 +2,44 @@
 
 ---
 
-## What is Alerta Mujer?
+## What is Woman Alert?
 
-Alerta Mujer is a system made up of a mobile application (Android) and a web platform, designed to provide fast, secure, and discreet assistance to women in situations of risk or gender-based violence. It lets a user trigger a panic button that sends alerts with real-time location to trusted contacts configured by the user, through multiple channels (SMS, email, push notifications).
+Alerta Mujer is a system in development that includes a mobile application (Android) and a web platform, designed to provide quick, safe and discreet care to women at risk or gender violence. Allows the user to activate a panic button that sends alerts with real-time location to trusted contacts configured by the user, through multiple channels (SMS, email, push notifications).
 
 ## Problem it solves
 
-**Before the system:** in a situation of gender-based violence, women lack accessible and secure tools to quickly reach their support networks; awareness of care routes is limited and the available channels are poorly connected, so many victims don't receive timely support and remain at risk.
+**In the face of the system:** in a situation of violence, women lack accessible and safe tools to quickly reach their support networks; Knowledge of care routes is limited and available channels are poorly connected, so many victims do not receive timely support and remain at risk.
 
-**With the system:** the user can trigger an emergency alert within seconds (via widget, sudden movement, physical buttons, or a discreet confirmation), share her real-time location with trusted contacts, back up evidence (audio/video), and check a directory of support institutions, safe/unsafe zones, and action guides — reducing emergency response times.
+**With the system:** the user can activate an emergency alert in seconds (via a widget, a sudden movement, physical buttons or a discreet confirmation), share their location in real time with trusted contacts, make backup copies of evidence (audio/video) and consult a directory of support institutions, safe/unsafe zones and action guides, reducing emergency response times.
 
 ## Primary users
 
-| Role | Description | What they do in the system |
+| Role | Description | What do they do in the system |
 |------|-------------|--------------------------|
-| User | A person with basic knowledge of mobile apps and network usage (mobile data or wifi) | Triggers alerts, manages emergency contacts, registers frequent locations, and checks her history, location, and evidence (from the mobile app or from the authenticated-user web portal) |
-| Administrator | Authorized staff for operational management and oversight of the system, with basic knowledge of admin web platforms | Manages users, alerts, zones, reports, devices, system configuration, and moderation, according to their role's permissions |
+| User | A person with basic knowledge of mobile applications and network use (mobile data or Wi-Fi) | Activate alerts, manage emergency contacts, log frequent locations, and check your history, location, and evidence (from the mobile app or authenticated user web portal) |
+| Administrator | Authorized personnel for operational management and supervision of the system, with basic knowledge of web administration platforms | Manage users, alerts, zones, reports, devices, system settings, and moderation, based on your role permissions |
 
-## Tech stack
+## Technology stack
 
-| Layer | Technology | Rationale (per the SRS) |
+| Layer | Technology | Justification (according to SRS) |
 |-------|-----------|---------------|
-| Mobile frontend | React Native + Expo (Android), MVVM architecture organized by feature | Enables access to hardware features and permissions required (background GPS, camera, microphone, sensors) |
-| Web frontend | Angular, Feature-Based Architecture | Separates the user modules (dashboard, contacts, alerts, users), the admin modules, and the public site (landing) |
-| Backend | Spring Boot + Spring Security + Spring Data JPA, adapted hexagonal architecture (ports and adapters) organized by business modules | Builds the server logic, APIs, and database connection; supports multiple concurrent connections and fault tolerance |
-| Database | PostgreSQL, with Liquibase for schema versioning and change control | Relational engine for securely recording events, alerts, and users |
-| External services | Firebase Cloud Messaging (push notifications), SMS messaging service (e.g. Twilio), email service | Sending alerts through multiple channels to increase the chance of delivery |
+| Mobile interface | React Native + Expo (Android), MVVM architecture organized by feature | Allows access to hardware features and necessary permissions (GPS in the background, camera, microphone, sensors) |
+| Web interface | Angular Feature-Based Architecture | Separates the user modules (panel, contacts, alerts, users), the administration modules and the public site (landing) |
+| Server | Spring Boot + Spring Security + Spring Data JPA, adapted hexagonal architecture (ports and adapters) organized by business modules | Create server logic, APIs, and database connection; supports multiple simultaneous connections and fault tolerance |
+| Database | PostgreSQL, with Liquibase for schema versioning and change control | Relational engine to securely log events, alerts and users |
+| External services | Firebase Cloud Messaging (push notifications), SMS messaging service (e.g. Twilio), email service | Sending alerts through multiple channels to increase delivery chances |
 
 ## Current status
 
-- **Phase:** Requirements specification — the current deliverable is the SRS itself (IEEE 830 standard, as referenced in the document's own reference table), which defines what will be built before design and development begin.
-- **Current version:** Not tracked yet — the project is still at the SRS stage, before a first release.
-- **Latest delivery:** The SRS document, covering functional requirements (RF1–RF13), non-functional requirements, and use cases 1–4.
-- **Next milestone:** Moving from requirements to design/development — turning the SRS's functional requirements and entities into the architecture, data model, and UI mockups referenced throughout the document (e.g. "Mockup de perfil de usuaria", "Flujo de localización constante").
+- **Phase:** Requirements Specification: The current deliverable is the SRS itself (IEEE 830 standard, as mentioned in the document's own reference table), which defines what will be built before design and development begins.
+- **Current version:** No follow-up yet: the project is still in the SRS stage, before a first release.
+- **Latest delivery:** The SRS document, covering functional requirements (RF1–RF13), non-functional requirements and use cases 1–4.
+- **Next Milestone:** Move from requirements to design/development: Convert the entities and functional requirements of the SRS into the architecture, data model, and UI mockups referenced throughout the document (e.g., "User Profile Mockup", "Consistent Localization Flow").
 
 ## Project contacts
 
 | Role | Name | Contact |
 |------|------|---------|
-| Project Lead / Backend | Michael Sanchez Castañeda | samaicol777@gmail.com |
-| Database Lead | Justin Daniela Bahamon Baloco | dannybahamon613@gmail.com |
-| Mobile App Design / UI Lead | Jose Sebastian Suarez Cumaco | masquebugs1@gmail.com |
+| Project Leader / Backend | Maicol Sánchez Castañeda | samaicol777@gmail.com |
+| Database Leader | Justin Daniela Bahamón Baloco | dannybahamon613@gmail.com |
+| Mobile App Design / UI Lead | José Sebastián Suárez Cumaco | masquebugs1@gmail.com |
