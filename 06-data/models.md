@@ -86,7 +86,7 @@ Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture org
 
 ---
 
-#### Table: `admin_perfil`
+#### Table: `admin_profile`
 
 **Purpose:** extension of `account` for accounts with the administrator role; separates administrative actions (creating zones, reviewing reports, moderating) from the base account.
 
@@ -367,7 +367,7 @@ Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture org
 | Field | Type | Nullable | Description | Constraints |
 |-------|------|----------|-------------|-------------|
 | id | integer | No | Identifier | PK, auto-increment |
-| created_by_admin_perfil_id | integer | Yes | Administrator who created it | FK → `admin_perfil.id` |
+| created_by_admin_profile_id | integer | Yes | Administrator who created it | FK → `admin_profile.id` |
 | name | varchar(150) | No | Name | — |
 | zone_type | varchar(20) | No | `safe` \| `risk` | — |
 | risk_level | varchar(20) | No | `low` \| `medium` \| `high` \| `critical` | Default `medium` |
@@ -395,7 +395,7 @@ Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture org
 | classification | varchar(20) | No | `safe` \| `dangerous` \| `regular` | — |
 | comment | varchar(500) | Yes | Comment | — |
 | status | varchar(20) | No | `pending` \| `approved` \| `rejected` | Default `pending` |
-| reviewed_by_admin_perfil_id | integer | Yes | Administrator who reviewed it | FK → `admin_perfil.id` |
+| reviewed_by_admin_profile_id | integer | Yes | Administrator who reviewed it | FK → `admin_profile.id` |
 | reviewed_at | timestamp | Yes | Reviewed | — |
 | created_at | timestamp | No | Created | Default `CURRENT_TIMESTAMP` |
 
@@ -477,7 +477,7 @@ Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture org
 | reason | varchar(100) | No | Reason | — |
 | description | varchar(1000) | No | Description | — |
 | status | varchar(20) | No | `pending` \| `under_review` \| `resolved` \| `rejected` \| `closed` | Default `pending` |
-| reviewed_by_admin_perfil_id | integer | Yes | Administrator who reviewed it | FK → `admin_perfil.id` |
+| reviewed_by_admin_profile_id | integer | Yes | Administrator who reviewed it | FK → `admin_profile.id` |
 | reviewed_at | timestamp | Yes | Reviewed | — |
 | resolution_notes | varchar(1000) | Yes | Resolution notes | — |
 | created_at | timestamp | No | Created | Default `CURRENT_TIMESTAMP` |
@@ -493,7 +493,7 @@ Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture org
 |-------|------|----------|-------------|-------------|
 | id | integer | No | Identifier | PK, auto-increment |
 | user_report_id | integer | No | Related report | FK → `user_report.id` |
-| admin_perfil_id | integer | No | Acting administrator | FK → `admin_perfil.id` |
+| admin_profile_id | integer | No | Acting administrator | FK → `admin_profile.id` |
 | action_type | varchar(30) | No | `review` \| `warn` \| `block` \| `unblock` \| `reject` \| `close` \| `escalate` | — |
 | notes | varchar(1000) | Yes | Notes | — |
 | created_at | timestamp | No | Created | Default `CURRENT_TIMESTAMP` |
@@ -514,7 +514,7 @@ Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture org
 | notifications_enabled | boolean | No | Notifications enabled globally | Default `true` |
 | default_notification_priority | varchar(20) | No | `normal` \| `high` \| `critical` | Default `normal` |
 | default_theme | varchar(20) | No | `light` \| `dark` | Default `light` |
-| updated_by_admin_perfil_id | integer | Yes | Administrator who updated it | FK → `admin_perfil.id` |
+| updated_by_admin_profile_id | integer | Yes | Administrator who updated it | FK → `admin_profile.id` |
 | created_at | timestamp | No | Created | Default `CURRENT_TIMESTAMP` |
 | updated_at | timestamp | Yes | Last updated | — |
 
@@ -527,7 +527,7 @@ erDiagram
     ROLE ||--o{ USER : classifies
     USER ||--|| ACCOUNT : has
     USER ||--|| USER_PROFILE : has
-    ACCOUNT ||--o| ADMIN_PERFIL : has
+    ACCOUNT ||--o| ADMIN_PROFILE : has
     ACCOUNT ||--o{ RECOVERY_REQUEST : requests
     ACCOUNT ||--o{ DEVICE : registers
     ACCOUNT ||--o{ DEVICE_SESSION : opens
@@ -547,12 +547,12 @@ erDiagram
     ALERT ||--o{ EVIDENCE : backs
     ALERT ||--o{ LOCATION_LOG : tracks
     EMERGENCY_CONTACT ||--o{ ALERT_CONTACT : receives
-    ADMIN_PERFIL ||--o{ ZONE : creates
+    ADMIN_PROFILE ||--o{ ZONE : creates
     ZONE ||--o{ ZONE_REPORT : receives
     EMERGENCY_RESOURCE ||--o{ RESOURCE_CALL : handles
     USER ||--o{ USER_REPORT : reports
     USER_REPORT ||--o{ MODERATION_ACTION : resolves
-    ADMIN_PERFIL ||--o{ MODERATION_ACTION : executes
+    ADMIN_PROFILE ||--o{ MODERATION_ACTION : executes
     ACCOUNT ||--o{ AUDIT_LOG : audits
 ```
 
