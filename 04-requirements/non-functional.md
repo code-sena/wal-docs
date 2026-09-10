@@ -1,161 +1,62 @@
-# Non-Functional Requirements (NFR)
+# Non-Functional Requirements — Woman Alert
 
-> NFRs define the **qualities of the system** — not what it does but how well it does it.
-> The golden rule: every NFR must have a metric. "The system must be fast" is not an NFR.
-> "The P99 latency of the /orders endpoint must be < 200ms under 500 RPS load" is.
+> The original SRS IDs (RNF1–RNF18) are preserved and organized by category according to the format of this folder. Where the SRS already defines a numerical metric, it is copied exactly as specified. Where the RNF is qualitative (without a numerical value), this is explicitly stated in the "Metric" column instead of inventing a number — this avoids falling into the "The system must be secure" error that this document itself warns against.
 
----
+## Performance
 
-## How to write a measurable NFR?
+| ID   | Requirement          | Metric                                                                                                                                                                                                          | How to Verify                                                                  |
+| ---- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| RNF5 | Alert performance    | Alert dispatch must take a maximum of 5 seconds; at least 95% of alerts must meet this requirement under normal network conditions. | Load testing / backend measurement from activation to delivery to the provider |
+| RNF6 | Battery optimization | GPS/accelerometer usage in the foreground must not exceed 10% battery consumption per hour of continuous use.                                                                                                   | Battery consumption measurement during field testing with the device           |
 
-| Bad | Good |
-|-----|------|
-| "The system must be fast" | "P95 latency must be < 300ms under 1000 concurrent RPS" |
-| "The system must be secure" | "All endpoints require a valid JWT; tokens expire in 1 hour" |
-| "The system must scale" | "The system must support up to 5000 concurrent users without degradation" |
-| "The system must be available" | "Availability SLO: 99.9% monthly (maximum 44 min downtime/month)" |
+## Availability and Fault Tolerance
 
----
+| ID    | Requirement                   | Metric                                                                                                                                                                                                                                                                               | How to Verify                                                                           |
+| ----- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| RNF4  | Internet connectivity         | The application requires internet access to send alerts, location data, and notifications (SMS/email/push); successful delivery also depends on third-party services (FCM, SMS provider, email server) and the status of the receiving device — no SLO metric is defined in the SRS. | Connectivity and integration testing with external providers                            |
+| RNF9  | Alert channel fault tolerance | If a channel (SMS, email, or push) fails, the system must automatically retry using another available channel.                                                                                                                                                                       | Simulated channel failure testing (Chain of Responsibility pattern)                     |
+| RNF13 | Background operation          | The application must send alerts and monitor events even when closed or running in the background, using a Foreground Service, within the manufacturer's power-management limitations.                                                                                               | Testing with the application in the background/closed on different device manufacturers |
 
-## NFR-001: Performance
+## Security
 
-| Attribute | Metric | Test condition |
-|-----------|--------|---------------|
-| P95 latency — critical endpoints | < 300ms | Under [N] RPS load |
-| P99 latency — critical endpoints | < 500ms | Under [N] RPS load |
-| P95 latency — non-critical endpoints | < 1000ms | Normal load |
-| Minimum throughput | [N] RPS | Without degradation |
-| Service startup time | < 30 seconds | Cold start |
+| ID    | Requirement                      | Description                                                                                                                                                                 |
+| ----- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RNF1  | Profile photo privacy            | Profile photos must not be publicly visible; only authorized personnel may access them when necessary to respond to an alert.                                               |
+| RNF8  | Data security and protection     | All personal information, contacts, messages, and location data must be transmitted using HTTPS/TLS encryption and stored using AES-256 encryption.                         |
+| RNF14 | Role-based access control        | The system must restrict functionality according to the authenticated user's role (user / administrator).                                                                   |
+| RNF15 | Web authentication security      | The web platform must protect sessions and credentials through appropriate authentication and authorization mechanisms.                                                     |
+| RNF16 | Sensitive information protection | Personal data, contacts, locations, alerts, and evidence must be restricted according to roles/permissions; one user must not be able to access another user's information. |
 
-**Defined critical endpoints:**
-- `POST /[resource]` — [justification for why it is critical]
-- `GET /[resource]/:id` — [justification]
+## Location and Sensors
 
-**Load testing tools:**
-- k6, Apache JMeter, Locust, Gatling
+| ID   | Requirement                       | Metric                                                                                                                                                                                                        | How to Verify                                              |
+| ---- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| RNF2 | GPS availability                  | The system must maintain access to location data for alerts requiring accurate positioning; if the signal is lost, the last known location must be stored.                                                    | Testing with intermittent GPS signal                       |
+| RNF7 | Location reliability and accuracy | Location accuracy must be between 10 and 20 meters depending on GPS signal quality, with regular updates while the alert is active; if optimal accuracy is unavailable, the last known location must be used. | Comparison of reported coordinates against a GPS reference |
 
-**Where is it validated?** CI/CD in the staging pipeline before production.
+## Usability and Accessibility
 
----
+| ID    | Requirement                 | Description                                                                                                                                                            |
+| ----- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RNF3  | Notification frequency      | The application must allow users to configure notification frequency and type, avoiding notification overload or anxiety.                                              |
+| RNF11 | Accessibility and usability | The interface must be simple, clear, and accessible, with large visual elements and contrasting colors, allowing it to be used effectively under stressful situations. |
+| RNF12 | Rapid emergency activation  | At least two rapid activation methods must be available outside the main interface: floating widget, physical button (volume), or touch pattern (three fingers).       |
 
-## NFR-002: Availability
+## Compatibility
 
-| Environment | SLO | Maintenance window | Max downtime/month |
-|------------|-----|-------------------|-------------------|
-| Production | 99.9% | Sundays 2am-4am | 44 minutes |
-| Staging | 95% | No restriction | 36 hours |
+| ID    | Requirement                    | Description                                                                                                                                                                             |
+| ----- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RNF10 | Device compatibility           | Compatible with Android version 10 and later, providing support for advanced device sensors.                                                                                            |
+| RNF17 | Web compatibility              | Compatible with modern browsers: Google Chrome, Microsoft Edge, and Mozilla Firefox in recent versions.                                                                                 |
+| RNF18 | Web platform usage environment | Primarily oriented toward computers/desktop resolutions, especially for administrative functions; a mobile view may be available, but mobile optimization is not the primary objective. |
 
-**Monthly error budget in production:** 44 minutes
-**Error Budget policy:** If > 50% of the error budget is consumed in the first half of the month,
-feature deploys are frozen until the next month and stability is prioritized.
+## Identified Gaps (Not Invented, Only Flagged)
 
-**Health checks:**
-- `GET /health` — Liveness: responds 200 if the process is alive
-- `GET /health/ready` — Readiness: responds 200 only if it can process traffic (DB connected, dependencies OK)
-
----
-
-## NFR-003: Scalability
-
-| Scenario | Expected behavior |
-|---------|------------------|
-| Gradual load growth | Horizontal auto-scaling activated when CPU > 70% |
-| Sudden spike (Black Friday, etc.) | System scales in < 2 minutes |
-| Load reduction | Scale-down without interrupting active traffic |
-| Horizontal scaling limit | Up to [N] instances per service |
-
-**Strategy:** Stateless horizontal scaling — each instance does not store state in memory.
-State goes in Redis (sessions, cache) or PostgreSQL (persistent data).
-
----
-
-## NFR-004: Security
-
-### Authentication and Authorization
-- All private endpoints require a valid JWT in the `Authorization: Bearer <token>` header
-- JWT tokens expire in **1 hour**
-- Refresh tokens valid for **7 days**
-- RBAC (Role-Based Access Control): roles defined in `00-governance/security-policy.md`
-
-### Data transmission
-- HTTPS mandatory in production (TLS 1.2+)
-- HTTP only in local development
-
-### Sensitive data
-- Passwords: hashing with bcrypt (cost factor ≥ 12) or Argon2id
-- PII (personal data): encrypted at rest
-- Secrets/keys: only in environment variables or vault, **never in code**
-
-### OWASP Top 10
-Code must be reviewed against the OWASP Top 10 on each release.
-Tools: SAST (SonarQube/Snyk), dependency scanning, DAST in staging.
-
-### Regulatory compliance
-- [GDPR / Habeas Data / PCI-DSS / etc.] — as applicable to the project
-
----
-
-## NFR-005: Observability
-
-| Pillar | Requirement | Tool |
-|--------|------------|------|
-| Logs | Structured JSON format + Correlation ID | Winston / Logback |
-| Metrics | RED (Rate, Errors, Duration) per endpoint | Prometheus + Grafana |
-| Traces | End-to-end distributed traces | OpenTelemetry + Jaeger |
-| Alerts | Alert in < 5 min when SLI violates SLO | Alertmanager / PagerDuty |
-
-**Correlation ID:** Each external request generates a UUID correlationId propagated in all logs and spans of that transaction.
-
----
-
-## NFR-006: Maintainability
-
-| Metric | Target |
-|--------|--------|
-| Test coverage | ≥ 80% of lines (≥ 90% in the domain) |
-| Cyclomatic complexity | ≤ 10 per function |
-| Technical debt | Resolution time < 1 sprint from registration |
-| Onboarding time | A new dev can deploy locally in < 1 hour following `10-devops/local-setup.md` |
-| Average build time | < 5 minutes in CI |
-
----
-
-## NFR-007: Portability
-
-- All services are deployed as Docker images
-- Images work in any environment with Kubernetes 1.28+
-- No service depends on the host operating system
-- Environment variables are the only source of environment-specific configuration
-
----
-
-## NFR-008: Disaster Recovery (DR / Recovery)
-
-| Scenario | RTO (Recovery Time Objective) | RPO (Recovery Point Objective) |
-|---------|------------------------------|-------------------------------|
-| Single service failure | < 2 minutes (K8s restart) | 0 (stateless) |
-| Primary database failure | < 5 minutes (failover to replica) | < 1 second (synchronous replication) |
-| Availability zone loss | < 15 minutes | < 5 minutes |
-| Full region disaster | < 4 hours (DR in secondary region) | < 1 hour |
-
----
-
-## NFR priority matrix
-
-| NFR | Priority (P1/P2/P3) | Validated in CI? | Owner |
-|-----|---------------------|-----------------|-------|
-| Performance | P1 | Yes (k6 in staging) | [Tech Lead] |
-| Availability | P1 | Yes (health checks) | [DevOps] |
-| Security | P1 | Yes (SAST + OWASP) | [Security] |
-| Scalability | P2 | Manual (quarterly) | [DevOps] |
-| Observability | P1 | Yes (smoke test in CI) | [Tech Lead] |
-| Maintainability | P2 | Yes (coverage in CI) | [Team] |
-
----
+* The SRS does not define a **scalability** NFR with its own metric (e.g., the number of concurrent users supported). It only states in the constraints (Section 2.3) that "the architecture must support multiple concurrent connections... and simultaneous alerts from multiple users," without specifying a numerical value. If the team defines a target number, it should be added here as a new NFR.
+* The SRS does not define an **observability** NFR (logs, metrics, traces) or a **maintainability** NFR (test coverage, cyclomatic complexity) with specific metrics. These appear in the reference document (NFR-005, NFR-006), but not in the Woman Alert SRS. They are not invented here; they remain pending items to be defined by the team if they decide to adopt them.
 
 ## Correlations
 
-- Detailed SLOs and SLAs → `13-operations/README.md`
-- Pipeline that validates NFRs → `10-devops/README.md`
-- Incidents related to NFR violations → `13-operations/incident-management.md`
-- Security checklist → `00-governance/security-policy.md`
+* Functional requirements → `04-requisitos/functional.md`
+* Architectural decisions that depend on these NFRs → `05-arquitectura/`
+* Traceability matrix → `04-requisitos/traceability-matrix.md`
