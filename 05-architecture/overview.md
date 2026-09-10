@@ -8,7 +8,7 @@
 
 **Justification:** Alerta Mujer runs as one Spring Boot backend organized by business modules (Identity, Contacts, Alerts, Evidence, Notifications, Zones, Administration — the same bounded contexts documented in `02-domain/domain-map.md`), backed by one shared PostgreSQL database (`06-data/models.md`). `ADR-001` already describes the project in terms of "a backend" and "a shared database" (singular), and `pattern-guide.md` explicitly rejects Database per Service, Saga, and CQRS for the current scope. A modular monolith gives each bounded context clear internal boundaries without the operational cost of running and coordinating separate services — appropriate for a single-team academic project with one shared datastore.
 
-**Reference ADR:** not yet formalized as its own record — `ADR-001-idiom-documentation.md` is the only ADR the project has so far. This decision is a strong candidate for `ADR-002-architectural-style.md`.
+**Reference ADR:** [`ADR-002-estilo-arquitectonico.md`](decisions/records/ADR-002-estilo-arquitectonico.md)
 
 ---
 

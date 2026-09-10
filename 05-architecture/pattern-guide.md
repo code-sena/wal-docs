@@ -539,7 +539,10 @@ Kubernetes Pod:
 
 The selections below are based on the actual bounded contexts, aggregates, and domain events already documented for Alerta Mujer (`02-domain/domain-map.md`, `02-domain/entities-and-rules.md`, `02-domain/domain-events.md`) and on the shared PostgreSQL database (`06-data/models.md`). A pattern is only marked as adopted when it solves a concrete problem already present in that model — otherwise it stays out, even if it's common in microservices projects.
 
-None of these decisions have a dedicated ADR yet; only `ADR-001` (language convention) exists so far. Each row below is a candidate for its own ADR once the team formalizes it.
+The overall style (Modular Monolith with hexagonal architecture) is formalized in
+`ADR-002-estilo-arquitectonico.md`. Individual pattern decisions below don't each have a
+dedicated ADR yet — Circuit Breaker and Outbox Pattern are the strongest candidates for their
+own record, since both directly protect the alert-delivery path (see `overview.md` §5, P4).
 
 | Pattern | Adopted? | Justification |
 |---------|---------|---------------|
