@@ -1,14 +1,14 @@
 # Data Models
 
-Alerta Mujer relies on a single backend (Spring Boot, hexagonal architecture organized by business modules) with one shared database — there isn't a database per service, since the project doesn't follow an independent-microservices scheme. Table and column names stay in English following the project's technical convention (ADR-001).
+Alerta Mujer uses four Spring Boot microservices (identity-service, alert-service, resource-service, admin-service) organized by business modules with hexagonal architecture. The services share a PostgreSQL database with logical table ownership per bounded context. Table and column names stay in English following the project's technical convention (ADR-001).
 
 ---
 
-## Service: alerta-mujer-backend
+## Services Overview
 
-**Database engine:** PostgreSQL
+**Database engine:** PostgreSQL (shared across all services)
 
-**Justification:** ACID transactions for critical operations (alert activation, account status changes), strongly typed relationships between users, contacts, alerts, and zones, and schema version control with Liquibase.
+**Justification:** ACID transactions for critical operations (alert activation, account status changes), strongly typed relationships between users, contacts, alerts, and zones, and schema version control with Liquibase. Each service has logical ownership of its assigned tables while sharing the same PostgreSQL instance for the current academic architecture.
 
 ### Actual schema conventions
 

@@ -4,9 +4,9 @@
 
 ## 1. Adopted architectural style
 
-**Style:** Modular Monolith, with hexagonal architecture (ports and adapters) applied inside the single backend.
+**Style:** Four Spring Boot microservices with hexagonal architecture (ports and adapters) applied inside each service.
 
-**Justification:** Alerta Mujer runs as one Spring Boot backend organized by business modules (Identity, Contacts, Alerts, Evidence, Notifications, Zones, Administration — the same bounded contexts documented in `02-domain/domain-map.md`), backed by one shared PostgreSQL database (`06-data/models.md`). `ADR-001` already describes the project in terms of "a backend" and "a shared database" (singular), and `pattern-guide.md` explicitly rejects Database per Service, Saga, and CQRS for the current scope. A modular monolith gives each bounded context clear internal boundaries without the operational cost of running and coordinating separate services — appropriate for a single-team academic project with one shared datastore.
+**Justification:** Alerta Mujer runs as four Spring Boot services (identity-service, alert-service, resource-service, admin-service) organized by business modules (Identity, Contacts, Alerts, Evidence, Notifications, Zones, Administration — the same bounded contexts documented in `02-domain/domain-map.md`), backed by one shared PostgreSQL database (`06-data/models.md`) with logical table ownership per service. This provides independent scaling per service (especially critical for alert-service emergency processing) while maintaining reasonable operational complexity for the academic scope. Hexagonal architecture keeps the domain independent of Spring, PostgreSQL, and external providers in each service.
 
 **Reference ADR:** [`ADR-002-architectural-style.md`](decisions/records/ADR-002-architectural-style.md)
 
@@ -45,7 +45,11 @@ graph TB
   subgraph "Alerta Mujer"
     MOB[Mobile App<br/>React Native + Expo, Android<br/>MVVM by feature]
     WEB[Web App<br/>Angular<br/>Feature-Based Architecture]
-    BACK[Backend<br/>Spring Boot + Spring Security + Spring Data JPA<br/>Hexagonal architecture by business module]
+    GW[API Gateway<br/>Routing, Auth/AuthZ]
+    ID[identity-service<br/>Spring Boot + Hexagonal<br/>Identity and Accounts]
+    AL[alert-service<br/>Spring Boot + Hexagonal<br/>Alerts, Contacts, Evidence, Notifications]
+    RS[resource-service<br/>Spring Boot + Hexagonal<br/>Zones and Emergency Resources]
+    AD[admin-service<br/>Spring Boot + Hexagonal<br/>Administration and Moderation]
     DB[(PostgreSQL<br/>shared database, versioned with Liquibase)]
   end
 
@@ -53,15 +57,22 @@ graph TB
   SMS[SMS provider]
   MAIL[Email provider]
 
-  MOB -->|REST API| BACK
-  WEB -->|REST API| BACK
-  BACK --> DB
-  BACK --> FCM
-  BACK --> SMS
-  BACK --> MAIL
+  MOB -->|REST API| GW
+  WEB -->|REST API| GW
+  GW -->|REST| ID
+  GW -->|REST| AL
+  GW -->|REST| RS
+  GW -->|REST| AD
+  ID --> DB
+  AL --> DB
+  RS --> DB
+  AD --> DB
+  AL --> FCM
+  AL --> SMS
+  AL --> MAIL
 ```
 
-There is no API Gateway or message bus in the current architecture — both clients talk directly to the single backend over REST, which fully decouples client from server per the SRS. The backend is the only component that talks to PostgreSQL and to the three external notification providers.
+The architecture uses an API Gateway to route client requests to the appropriate microservice. All four services share a PostgreSQL database with logical table ownership per bounded context. The alert-service is the only component that talks to the three external notification providers.
 
 ---
 
@@ -69,11 +80,14 @@ There is no API Gateway or message bus in the current architecture — both clie
 
 | # | Component | Responsibility | Port | DB | Communication type |
 |---|-----------|----------------|------|-----|-------------------|
-| 1 | alerta-mujer-backend | Identity, contacts, alerts, evidence, notifications, zones, and administration — all business modules of the system | Not yet assigned — the project hasn't reached deployment configuration | PostgreSQL (shared) | REST |
-| 2 | alerta-mujer-mobile | User-facing Android app: panic button, contacts, history, zones, evidence | N/A (client) | — | REST (consumes backend API) |
-| 3 | alerta-mujer-web | Public landing, authenticated user portal, and admin panel | Not yet assigned | — | REST (consumes backend API) |
+| 1 | identity-service | Identity and Accounts: authentication, users, profiles, administrators, devices, sessions, preferences | Not yet assigned | PostgreSQL (shared) | REST |
+| 2 | alert-service | Alert Management, Emergency Contacts, Evidence, Notifications: emergency processing, contact coordination, evidence metadata, notification coordination | Not yet assigned | PostgreSQL (shared) | REST |
+| 3 | resource-service | Zones and Emergency Resources: safe/risk zones, zone reports, emergency resources, resource calls | Not yet assigned | PostgreSQL (shared) | REST |
+| 4 | admin-service | Administration and Moderation: auditing, moderation, user reports, system configuration | Not yet assigned | PostgreSQL (shared) | REST |
+| 5 | alerta-mujer-mobile | User-facing Android app: panic button, contacts, history, zones, evidence | N/A (client) | — | REST (consumes backend API through Gateway) |
+| 6 | alerta-mujer-web | Public landing, authenticated user portal, and admin panel | Not yet assigned | — | REST (consumes backend API through Gateway) |
 
-There's a single deployable backend today, not a set of independently deployed services — the module breakdown inside it (Identity and Accounts, Emergency Contacts, Alert Management, Evidence, Notifications, Zones and Support Resources, Administration and Moderation) is internal, and is documented per-module in `02-domain/domain-map.md` rather than as separate rows here.
+The backend is deployed as four independently deployable Spring Boot services, each with logical ownership of its assigned tables as documented in `02-domain/domain-map.md`.
 
 ---
 
@@ -100,7 +114,7 @@ Observability (structured logging, metrics, tracing) isn't addressed in the SRS 
 
 | Pattern | Adopted | Reference |
 |---------|---------|-----------|
-| API Gateway | No | `05-architecture/pattern-guide.md` |
+| API Gateway | Yes — routes client requests to microservices | `05-architecture/pattern-guide.md` |
 | Database per Service | No — shared PostgreSQL database | `05-architecture/pattern-guide.md` |
 | CQRS | No, for now | `05-architecture/pattern-guide.md` |
 | Event Sourcing | No | `05-architecture/pattern-guide.md` |
@@ -126,7 +140,7 @@ Full reasoning for every pattern, including the rejected ones, is in `05-archite
 | Tracing | Not defined yet | — |
 | Health Checks | Not defined yet | — |
 | Error format | Not defined yet | — |
-| Rate Limiting | Not applicable without an API Gateway | — |
+| Rate Limiting | Applied at API Gateway level | API Gateway |
 | CORS | Needed for the Angular web app to call the backend; exact policy not detailed in the SRS | Backend |
 | Circuit Breaker | For FCM, the SMS provider, and the email provider | Pattern in `pattern-guide.md` |
 
