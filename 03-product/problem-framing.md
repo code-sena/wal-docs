@@ -72,3 +72,7 @@ These metrics are already defined in the SRS as non-functional requirements (NFR
 * User Stories that implement this solution → `04-requirements/user-stories.md`
 
 * Detailed KPIs → `13-operations/README.md`
+
+* Domain entities discovered through problem framing → `02-domain/entities-and-rules.md`
+
+* Non-functional requirements derived from evidence findings → `04-requirements/non-functional.md`

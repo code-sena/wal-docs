@@ -37,6 +37,8 @@ Articulates the problem before proposing solutions.
 Findings from user research.
 **Fill in:** interviews conducted, insights found, assumptions validated and invalidated.
 
+**Status:** ✅ Completed — Documents written survey (24 students) and oral survey findings with validated assumptions and user personas for Woman Alert.
+
 ### `vision.md` ⭐
 The product's north star in 1-2 sentences.
 **Fill in:** format "For [user], who [need], [system name] is a [product type]
@@ -45,6 +47,8 @@ that [key benefit]. Unlike [alternative], our product [differentiator]."
 ### `roadmap.md`
 Delivery plan over time.
 **Fill in:** milestones per quarter/sprint, which features go into each phase.
+
+**Status:** ✅ Completed — Defines 3-horizon roadmap (MVP, Iteration, Long-term) with feature breakdown and success criteria for Woman Alert.
 
 **Format:**
 ```markdown
@@ -59,6 +63,8 @@ Delivery plan over time.
 ### `product-backlog.md` ⭐
 Prioritized list of everything that must be built.
 **Fill in:** using the `_template-backlog.md` template. Order by user value.
+
+**Status:** ✅ Completed — Contains prioritized user stories (P0-P3) with acceptance criteria, estimation, and technical debt items for Woman Alert MVP and beyond.
 
 ### `_template-prd.md`
 Complete Product Requirements Document.
