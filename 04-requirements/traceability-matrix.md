@@ -105,6 +105,6 @@
 
 ## Correlations
 
-* User Stories → `04-requisitos/user-stories.md`
-* Non-Functional Requirements → `04-requisitos/non-functional.md`
-* Functional Requirements → `04-requisitos/functional.md`
+* User Stories → `04-requirements/user-stories.md`
+* Non-Functional Requirements → `04-requirements/non-functional.md`
+* Functional Requirements → `04-requirements/functional.md`

@@ -88,5 +88,5 @@ section is filled in.
 ## Correlations
 
 - Container-level diagram → `05-architecture/overview.md` §3
-- Architectural style this deployment shape follows from → `ADR-002-estilo-arquitectonico.md`
+- Architectural style this deployment shape follows from → `ADR-002-architectural-style.md`
 - Data model and database engine → `06-data/models.md`

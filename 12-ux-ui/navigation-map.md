@@ -1,44 +1,44 @@
-# Mapa de Navegación - AlertaMujer
+# Navigation Map — AlertaMujer
 
-## 🌳 Árbol de Navegación Unificado
+## 🌳 Unified Navigation Tree
 
-### Móvil (React Native)
+### Mobile (React Native)
 
 ```
-AppNavigator (raíz)
-├── AuthNavigator (público)
+AppNavigator (root)
+├── AuthNavigator (public)
 │   ├── Index
 │   ├── Login
-│   ├── Registro
-│   ├── RecuperarContrasena
-│   ├── PoliticaTerminos
-│   └── PoliticaPrivacidad
+│   ├── Register
+│   ├── RecoverPassword
+│   ├── TermsPolicy
+│   └── PrivacyPolicy
 │
-└── MainNavigator (autenticado)
-    ├── DrawerNavigator (contenedor principal)
-    │   └── TabNavigator (tabs inferiores)
-    │       ├── Inicio
-    │       ├── Mapa
-    │       ├── Asistencia
-    │       ├── Contactos
-    │       └── Historial
+└── MainNavigator (authenticated)
+    ├── DrawerNavigator (main container)
+    │   └── TabNavigator (bottom tabs)
+    │       ├── Home
+    │       ├── Map
+    │       ├── Assistance
+    │       ├── Contacts
+    │       └── History
     │
-    ├── Activacion
-    ├── AlertaActiva
-    ├── TutorialBienvenida
-    ├── TutorialBoton
-    ├── TutorialMensaje
-    ├── TutorialUbicacion
-    ├── TutorialContacto
-    ├── TutorialSeguridad
-    ├── TutorialNotificacion
-    ├── AgregarContacto
-    ├── DetalleAlerta
-    ├── Perfil
-    ├── historialMapa
-    ├── MetodosActivacion
-    ├── ClasificarZona
-    └── UbicacionesGuardadas
+    ├── Activation
+    ├── ActiveAlert
+    ├── WelcomeTutorial
+    ├── ButtonTutorial
+    ├── MessageTutorial
+    ├── LocationTutorial
+    ├── ContactTutorial
+    ├── SecurityTutorial
+    ├── NotificationTutorial
+    ├── AddContact
+    ├── AlertDetail
+    ├── Profile
+    ├── HistoryMap
+    ├── ActivationMethods
+    ├── ClassifyZone
+    └── SavedLocations
 ```
 
 ### Web (Angular)
@@ -48,7 +48,7 @@ AppNavigator (raíz)
 ├── / (Landing Page)
 │   └── LandingHomeComponent
 │
-├── /auth (AUTENTICACIÓN)
+├── /auth (AUTHENTICATION)
 │   ├── /login
 │   │   └── LoginComponent
 │   ├── /register
@@ -62,7 +62,7 @@ AppNavigator (raíz)
 │   └── /reset-password
 │       └── ResetPasswordComponent
 │
-├── /dashboard (USUARIA - Requiere: authGuard + userGuard)
+├── /dashboard (USER — Requires: authGuard + userGuard)
 │   ├── / (redirect → /home)
 │   ├── /home
 │   │   └── Home
@@ -78,13 +78,13 @@ AppNavigator (raíz)
 │   └── /location-history
 │       └── LocationHistoryComponent
 │
-├── /admin (ADMINISTRADOR - Requiere: authGuard + adminGuard)
+├── /admin (ADMINISTRATOR — Requires: authGuard + adminGuard)
 │   ├── / (redirect → /dashboard)
 │   ├── /dashboard
 │   │   └── AdminDashboardComponent
-│   ├── /usuarios
+│   ├── /users
 │   │   └── UserComponent
-│   ├── /alertas
+│   ├── /alerts
 │   │   └── AlertAdminComponent
 │   ├── /zone-management
 │   │   └── ZoneManagementComponent
@@ -102,189 +102,189 @@ AppNavigator (raíz)
 └── /** (wildcard → redirect /auth/login)
 ```
 
-## 📊 Matriz de Pantallas Unificada
+## 📊 Unified Screen Matrix
 
-| Nombre Pantalla | Ruta Móvil | Ruta Web | Componente Móvil | Componente Web | Plataforma | Rol Requerido | API Target |
-|-----------------|------------|----------|------------------|-----------------|-----------|---------------|------------|
-| **Landing Pública** | - | `/` | - | LandingHomeComponent | Web | PUBLIC | - |
-| **Login** | Login | `/auth/login` | LoginScreen | LoginComponent | Móvil/Web | PUBLIC | /auth/login |
-| **Registro** | Registro | `/auth/register` | RegistroScreen | RegisterComponent | Móvil/Web | PUBLIC | /auth/register |
-| **Recuperar Contraseña** | RecuperarContrasena | `/auth/forgot-password` | RecuperarContrasenaScreen | ForgotPasswordComponent | Móvil/Web | PUBLIC | /auth/recover |
-| **Olvidé Teléfono** | - | `/auth/forgot-phone` | - | ForgotPhoneComponent | Web | PUBLIC | /auth/recover-phone |
-| **Verificar Código** | - | `/auth/verify-code` | - | VerifyCodeComponent | Web | PUBLIC | /auth/verify |
-| **Reset Contraseña** | - | `/auth/reset-password` | - | ResetPasswordComponent | Web | PUBLIC | /auth/reset |
-| **Términos y Condiciones** | PoliticaTerminos | - | TerminosScreen | - | Móvil | PUBLIC | - |
-| **Política de Privacidad** | PoliticaPrivacidad | - | PrivacidadScreen | - | Móvil | PUBLIC | - |
-| **Inicio / Home** | Inicio | `/dashboard/home` | Inicio | Home | Móvil/Web | USER | /location, /alerts |
-| **Mapa** | Mapa | - | MapaView | - | Móvil | USER | /location, /zones |
-| **Asistencia** | Asistencia | - | Asistencia | - | Móvil | USER | - |
-| **Contactos** | Contactos | - | Contactos | - | Móvil | USER | /contacts |
-| **Historial** | Historial | `/dashboard/alert-history` | Historial | AlertHistory | Móvil/Web | USER | /alerts |
-| **Perfil** | Perfil | - | PerfilScreen | - | Móvil | USER | /user |
-| **Ubicación Teléfono** | - | `/dashboard/phone-location` | - | PhoneLocationComponent | Web | USER | /phone-location |
-| **Evidencias** | - | `/dashboard/evidence` | - | Evidence | Web | USER | /evidence |
-| **Estado Dispositivo** | - | `/dashboard/device-status` | - | DeviceStatusComponent | Web | USER | /devices |
-| **Historial Ubicaciones** | - | `/dashboard/location-history` | - | LocationHistoryComponent | Web | USER | /location-history |
-| **Activación SOS** | Activacion | - | ActivacionScreen | - | Móvil | USER | /alerts/create |
-| **Alerta Activa** | AlertaActiva | - | AlertaActivaScreen | - | Móvil | USER | /alerts/status |
-| **Agregar Contacto** | AgregarContacto | - | AgregarContactoScreen | - | Móvil | USER | /contacts |
-| **Detalle Alerta** | DetalleAlerta | - | DetalleAlertaScreen | - | Móvil | USER | /alerts/{id} |
-| **Historial Mapa** | historialMapa | - | HistorialMapa | - | Móvil | USER | /alerts |
-| **Métodos Activación** | MetodosActivacion | - | MetodosActivacionScreen | - | Móvil | USER | /user/settings |
-| **Clasificar Zona** | ClasificarZona | - | ClasificarZonaScreen | - | Móvil | USER | /zones |
-| **Ubicaciones Guardadas** | UbicacionesGuardadas | - | UbicacionesGuardadasScreen | - | Móvil | USER | /zones/saved |
-| **Tutorial Bienvenida** | TutorialBienvenida | - | BienvenidaTutorialScreen | - | Móvil | USER | - |
-| **Tutorial Botón** | TutorialBoton | - | BotonTutorialScreen | - | Móvil | USER | - |
-| **Tutorial Mensaje** | TutorialMensaje | - | MensajeTutorialScreen | - | Móvil | USER | - |
-| **Tutorial Ubicación** | TutorialUbicacion | - | UbicacionTutorialScreen | - | Móvil | USER | - |
-| **Tutorial Contacto** | TutorialContacto | - | ContactoTutorialScreen | - | Móvil | USER | - |
-| **Tutorial Seguridad** | TutorialSeguridad | - | SeguridadTutorialScreen | - | Móvil | USER | - |
-| **Tutorial Notificación** | TutorialNotificacion | - | NotificacionTutorialScreen | - | Móvil | USER | - |
-| **Admin Dashboard** | - | `/admin/dashboard` | - | AdminDashboardComponent | Web | ADMIN | /alerts, /users, /zones |
-| **Gestión Usuarios** | - | `/admin/usuarios` | - | UserComponent | Web | ADMIN | /users |
-| **Gestión Alertas** | - | `/admin/alertas` | - | AlertAdminComponent | Web | ADMIN | /alerts |
-| **Gestión Zonas** | - | `/admin/zone-management` | - | ZoneManagementComponent | Web | ADMIN | /zones |
-| **Gestión Reportes** | - | `/admin/report-management` | - | ReportManagementComponent | Web | ADMIN | /reports |
-| **Gestión Emergencias** | - | `/admin/emergency-management` | - | EmergencyManagementComponent | Web | ADMIN | /emergencies |
-| **Gestión Evidencias** | - | `/admin/evidence-management` | - | EvidencesManagementComponent | Web | ADMIN | /evidence |
-| **Gestión Moderadores** | - | `/admin/moderator-management` | - | ModeratorManagementComponent | Web | ADMIN | /users/moderators |
-| **Gestión Dispositivos** | - | `/admin/devices-management` | - | DeviceManagementComponent | Web | ADMIN | /devices |
+| Screen Name | Mobile Route | Web Route | Mobile Component | Web Component | Platform | Required Role | API Target |
+|-------------|-------------|-----------|------------------|----------------|----------|---------------|------------|
+| **Public Landing** | — | `/` | — | LandingHomeComponent | Web | PUBLIC | — |
+| **Login** | Login | `/auth/login` | LoginScreen | LoginComponent | Mobile/Web | PUBLIC | /auth/login |
+| **Register** | Register | `/auth/register` | RegisterScreen | RegisterComponent | Mobile/Web | PUBLIC | /auth/register |
+| **Recover Password** | RecoverPassword | `/auth/forgot-password` | RecoverPasswordScreen | ForgotPasswordComponent | Mobile/Web | PUBLIC | /auth/recover |
+| **Forgot Phone** | — | `/auth/forgot-phone` | — | ForgotPhoneComponent | Web | PUBLIC | /auth/recover-phone |
+| **Verify Code** | — | `/auth/verify-code` | — | VerifyCodeComponent | Web | PUBLIC | /auth/verify |
+| **Reset Password** | — | `/auth/reset-password` | — | ResetPasswordComponent | Web | PUBLIC | /auth/reset |
+| **Terms and Conditions** | TermsPolicy | — | TermsScreen | — | Mobile | PUBLIC | — |
+| **Privacy Policy** | PrivacyPolicy | — | PrivacyScreen | — | Mobile | PUBLIC | — |
+| **Home** | Home | `/dashboard/home` | Home | Home | Mobile/Web | USER | /location, /alerts |
+| **Map** | Map | — | MapView | — | Mobile | USER | /location, /zones |
+| **Assistance** | Assistance | — | Assistance | — | Mobile | USER | — |
+| **Contacts** | Contacts | — | Contacts | — | Mobile | USER | /contacts |
+| **History** | History | `/dashboard/alert-history` | History | AlertHistory | Mobile/Web | USER | /alerts |
+| **Profile** | Profile | — | ProfileScreen | — | Mobile | USER | /user |
+| **Phone Location** | — | `/dashboard/phone-location` | — | PhoneLocationComponent | Web | USER | /phone-location |
+| **Evidence** | — | `/dashboard/evidence` | — | Evidence | Web | USER | /evidence |
+| **Device Status** | — | `/dashboard/device-status` | — | DeviceStatusComponent | Web | USER | /devices |
+| **Location History** | — | `/dashboard/location-history` | — | LocationHistoryComponent | Web | USER | /location-history |
+| **SOS Activation** | Activation | — | ActivationScreen | — | Mobile | USER | /alerts/create |
+| **Active Alert** | ActiveAlert | — | ActiveAlertScreen | — | Mobile | USER | /alerts/status |
+| **Add Contact** | AddContact | — | AddContactScreen | — | Mobile | USER | /contacts |
+| **Alert Detail** | AlertDetail | — | AlertDetailScreen | — | Mobile | USER | /alerts/{id} |
+| **History Map** | HistoryMap | — | HistoryMap | — | Mobile | USER | /alerts |
+| **Activation Methods** | ActivationMethods | — | ActivationMethodsScreen | — | Mobile | USER | /user/settings |
+| **Classify Zone** | ClassifyZone | — | ClassifyZoneScreen | — | Mobile | USER | /zones |
+| **Saved Locations** | SavedLocations | — | SavedLocationsScreen | — | Mobile | USER | /zones/saved |
+| **Welcome Tutorial** | WelcomeTutorial | — | WelcomeTutorialScreen | — | Mobile | USER | — |
+| **Button Tutorial** | ButtonTutorial | — | ButtonTutorialScreen | — | Mobile | USER | — |
+| **Message Tutorial** | MessageTutorial | — | MessageTutorialScreen | — | Mobile | USER | — |
+| **Location Tutorial** | LocationTutorial | — | LocationTutorialScreen | — | Mobile | USER | — |
+| **Contact Tutorial** | ContactTutorial | — | ContactTutorialScreen | — | Mobile | USER | — |
+| **Security Tutorial** | SecurityTutorial | — | SecurityTutorialScreen | — | Mobile | USER | — |
+| **Notification Tutorial** | NotificationTutorial | — | NotificationTutorialScreen | — | Mobile | USER | — |
+| **Admin Dashboard** | — | `/admin/dashboard` | — | AdminDashboardComponent | Web | ADMIN | /alerts, /users, /zones |
+| **User Management** | — | `/admin/users` | — | UserComponent | Web | ADMIN | /users |
+| **Alert Management** | — | `/admin/alerts` | — | AlertAdminComponent | Web | ADMIN | /alerts |
+| **Zone Management** | — | `/admin/zone-management` | — | ZoneManagementComponent | Web | ADMIN | /zones |
+| **Report Management** | — | `/admin/report-management` | — | ReportManagementComponent | Web | ADMIN | /reports |
+| **Emergency Management** | — | `/admin/emergency-management` | — | EmergencyManagementComponent | Web | ADMIN | /emergencies |
+| **Evidence Management** | — | `/admin/evidence-management` | — | EvidencesManagementComponent | Web | ADMIN | /evidence |
+| **Moderator Management** | — | `/admin/moderator-management` | — | ModeratorManagementComponent | Web | ADMIN | /users/moderators |
+| **Device Management** | — | `/admin/devices-management` | — | DeviceManagementComponent | Web | ADMIN | /devices |
 
-## 🔒 Guards de Autenticación
+## 🔒 Authentication Guards
 
-### Móvil (React Native)
+### Mobile (React Native)
 
 **AuthContext:**
-- Verifica token en localStorage
-- Valida expiración del token
-- Redirección a Login si no autenticado
-- Refresco automático de token
+- Verifies token in localStorage
+- Validates token expiration
+- Redirects to Login if not authenticated
+- Automatic token refresh
 
 ### Web (Angular)
 
 #### authGuard
-- **Verifica:** Usuario autenticado (isLoggedIn)
-- **Redirección:** `/auth/login` si no autenticado
-- **Uso:** Protege rutas que requieren login
+- **Verifies:** User is authenticated (isLoggedIn)
+- **Redirect:** `/auth/login` if not authenticated
+- **Use:** Protects routes that require login
 
 #### adminGuard
-- **Verifica:** Rol === 'admin'
-- **Redirección:** `/auth/login` si no es admin
-- **Uso:** Protege panel administrativo
+- **Verifies:** Role === 'admin'
+- **Redirect:** `/auth/login` if not admin
+- **Use:** Protects the administrative panel
 
 #### userGuard
-- **Verifica:** Rol === 'operador' o redirige admins
-- **Redirección:** 
-  - Si admin → `/admin/dashboard` 
-  - Si no autenticado → `/auth/login` 
-- **Uso:** Protege panel de usuaria
+- **Verifies:** Role === 'operator' or redirects admins
+- **Redirect:**
+  - If admin → `/admin/dashboard`
+  - If not authenticated → `/auth/login`
+- **Use:** Protects the user dashboard
 
-## 🔄 Flujos de Usuario Principales
+## 🔄 Main User Flows
 
-### 1. Flujo de Activación de Alerta SOS
+### 1. SOS Alert Activation Flow
 
 ```mermaid
 sequenceDiagram
-    participant U as Usuaria
-    participant M as Móvil (Inicio)
-    participant A as ActivacionScreen
-    participant AA as AlertaActivaScreen
+    participant U as User
+    participant M as Mobile (Home)
+    participant A as ActivationScreen
+    participant AA as ActiveAlertScreen
     participant API as Backend API
-    participant C as Contactos
+    participant C as Contacts
     participant W as Web (Admin)
 
-    U->>M: Long press en botón SOS
-    M->>A: Navegar a ActivacionScreen
-    A->>A: Iniciar cuenta regresiva (5s)
-    A->>U: Mostrar countdown + vibración
-    A->>A: Preparar payload de alerta
-    
-    alt Usuario cancela
-        U->>A: Tocar "Cancelar"
-        A->>M: Volver a Inicio
-    else Usuario no cancela
-        A->>AA: Navegar a AlertaActivaScreen
-        AA->>API: POST /alertas/create
-        API-->>AA: Alerta creada con ID
-        
-        AA->>AA: Iniciar tracking GPS
-        AA->>API: PATCH /alertas/{id}/location
-        Note over AA,API: Cada 5 segundos
-        
-        AA->>AA: Iniciar grabación evidencia
+    U->>M: Long press SOS button
+    M->>A: Navigate to ActivationScreen
+    A->>A: Start countdown (5s)
+    A->>U: Show countdown + vibration
+    A->>A: Prepare alert payload
+
+    alt User cancels
+        U->>A: Tap "Cancel"
+        A->>M: Return to Home
+    else User does not cancel
+        A->>AA: Navigate to ActiveAlertScreen
+        AA->>API: POST /alerts/create
+        API-->>AA: Alert created with ID
+
+        AA->>AA: Start GPS tracking
+        AA->>API: PATCH /alerts/{id}/location
+        Note over AA,API: Every 5 seconds
+
+        AA->>AA: Start evidence recording
         AA->>API: POST /evidence/upload
-        
-        AA->>C: Notificar contactos
-        C->>C: SMS con ubicación
-        C->>C: Llamada automática (opcional)
-        
-        AA->>W: WebSocket: alerta activa
-        W->>W: Mostrar en dashboard admin
-        
-        alt Usuario toca "Estoy bien"
-            U->>AA: Tocar "Estoy bien"
-            AA->>API: PATCH /alertas/{id}/status (cancelada)
-            AA->>M: Volver a Inicio
-        else Admin responde
-            W->>API: PATCH /alertas/{id}/status (atendida)
-            API-->>AA: Estado actualizado
-            AA->>U: Mostrar "Ayuda en camino"
+
+        AA->>C: Notify contacts
+        C->>C: SMS with location
+        C->>C: Automatic call (optional)
+
+        AA->>W: WebSocket: active alert
+        W->>W: Show on admin dashboard
+
+        alt User taps "I'm safe"
+            U->>AA: Tap "I'm safe"
+            AA->>API: PATCH /alerts/{id}/status (cancelled)
+            AA->>M: Return to Home
+        else Admin responds
+            W->>API: PATCH /alerts/{id}/status (attended)
+            API-->>AA: Status updated
+            AA->>U: Show "Help is on the way"
         end
     end
 ```
 
-### 2. Flujo de Registro y Configuración de Contactos
+### 2. Registration and Contact Setup Flow
 
 ```mermaid
 sequenceDiagram
-    participant U as Usuario
-    participant RM as RegistroScreen (Móvil)
+    participant U as User
+    participant RM as RegisterScreen (Mobile)
     participant RC as RegisterComponent (Web)
     participant API as Backend API
     participant T as Tutorial
-    participant AC as AgregarContacto
-    participant C as Contactos
+    participant AC as AddContact
+    participant C as Contacts
 
-    Note over U,API: Opción A: Registro Móvil
-    U->>RM: Completar formulario
-    RM->>RM: Validar campos
-    RM->>RM: Verificar términos aceptados
+    Note over U,API: Option A: Mobile Registration
+    U->>RM: Fill out form
+    RM->>RM: Validate fields
+    RM->>RM: Verify terms accepted
     RM->>API: POST /auth/register
-    API-->>RM: Usuario creado (rol: operador)
-    RM->>RM: Guardar token
-    RM->>T: Iniciar tutorial
+    API-->>RM: User created (role: operator)
+    RM->>RM: Save token
+    RM->>T: Start tutorial
 
-    Note over U,API: Opción B: Registro Web
-    U->>RC: Completar formulario
-    RC->>RC: Validar campos
-    RC->>RC: Verificar términos aceptados
+    Note over U,API: Option B: Web Registration
+    U->>RC: Fill out form
+    RC->>RC: Validate fields
+    RC->>RC: Verify terms accepted
     RC->>API: POST /auth/register
-    API-->>RC: Usuario creado (rol: operador)
-    RC->>RC: Guardar token
-    RC->>U: Redirigir a dashboard
+    API-->>RC: User created (role: operator)
+    RC->>RC: Save token
+    RC->>U: Redirect to dashboard
 
-    Note over T: Tutorial Móvil
-    T->>T: Bienvenida
-    T->>T: Botón SOS
-    T->>T: Mensajes
-    T->>T: Ubicación
-    T->>T: Contactos
-    T->>T: Seguridad
-    T->>T: Notificaciones
-    T->>RM: Ir a Inicio
+    Note over T: Mobile Tutorial
+    T->>T: Welcome
+    T->>T: SOS Button
+    T->>T: Messages
+    T->>T: Location
+    T->>T: Contacts
+    T->>T: Security
+    T->>T: Notifications
+    T->>RM: Go to Home
 
-    RM->>RM: Tab Contactos
-    U->>AC: Agregar contacto
-    AC->>AC: Selector de foto
-    AC->>AC: Formulario (nombre, parentesco, teléfono)
+    RM->>RM: Contacts Tab
+    U->>AC: Add contact
+    AC->>AC: Photo selector
+    AC->>AC: Form (name, relationship, phone)
     AC->>API: POST /contacts
-    API-->>AC: Contacto creado
-    AC->>C: Actualizar lista
-    C->>C: Mostrar contactos
-    C->>C: Indicador "disponible"
+    API-->>AC: Contact created
+    AC->>C: Update list
+    C->>C: Show contacts
+    C->>C: "Available" indicator
 ```
 
-### 3. Flujo de Monitoreo de Alertas de Emergencia (Admin)
+### 3. Emergency Alert Monitoring Flow (Admin)
 
 ```mermaid
 sequenceDiagram
@@ -294,139 +294,139 @@ sequenceDiagram
     participant AS as AlertsService
     participant US as UsersService
     participant ZS as ZonesService
-    participant M as Móvil (Usuaria)
+    participant M as Mobile (User)
 
-    A->>WD: Acceder /admin/dashboard
+    A->>WD: Access /admin/dashboard
     WD->>AS: getAll()
-    AS->>API: GET /alertas
-    API-->>AS: Lista alertas
-    AS-->>WD: Alertas recibidas
-    
+    AS->>API: GET /alerts
+    API-->>AS: Alert list
+    AS-->>WD: Alerts received
+
     WD->>US: getAll()
-    US->>API: GET /usuarios
-    API-->>US: Lista usuarios
-    US-->>WD: Usuarios recibidos
-    
-    WD->>ZS: getZonas()
+    US->>API: GET /users
+    API-->>US: User list
+    US-->>WD: Users received
+
+    WD->>ZS: getZones()
     ZS->>API: GET /zones
-    API-->>ZS: Lista zonas
-    ZS-->>WD: Zonas recibidas
-    
-    WD->>WD: Calcular estadísticas
-    WD->>WD: Mostrar alertas activas
-    WD->>WD: Mostrar zonas críticas
-    
-    Note over WD,API: WebSocket: alertas en tiempo real
-    M->>API: POST /alertas/create
-    API-->>WD: Nueva alerta recibida
-    WD->>WD: Actualizar dashboard (polling 30s)
-    
-    A->>WD: Click en alerta pendiente
+    API-->>ZS: Zone list
+    ZS-->>WD: Zones received
+
+    WD->>WD: Calculate statistics
+    WD->>WD: Show active alerts
+    WD->>WD: Show critical zones
+
+    Note over WD,API: WebSocket: real-time alerts
+    M->>API: POST /alerts/create
+    API-->>WD: New alert received
+    WD->>WD: Update dashboard (30s polling)
+
+    A->>WD: Click on pending alert
     WD->>AS: getById(id)
-    AS->>API: GET /alertas/{id}
-    API-->>AS: Detalles alerta
-    AS-->>WD: Mostrar detalles
-    
-    A->>WD: Cambiar estado a "Atendida"
-    WD->>AS: updateEstado(id, 'Atendida')
-    AS->>API: PATCH /alertas/{id}
-    API-->>AS: Actualizado
-    API-->>M: Notificación a usuaria
-    WD->>WD: Actualizar interfaz
-    
-    A->>WD: Agregar notas de respuesta
-    WD->>AS: updateNotas(id, notas)
-    AS->>API: PATCH /alertas/{id}/notas
-    API-->>AS: Notas guardadas
-    
-    alt Múltiples alertas misma zona
-        WD->>WD: Destacar zona en mapa
-        WD->>WD: Mostrar alerta "caliente"
+    AS->>API: GET /alerts/{id}
+    API-->>AS: Alert details
+    AS-->>WD: Show details
+
+    A->>WD: Change status to "Attended"
+    WD->>AS: updateStatus(id, 'Attended')
+    AS->>API: PATCH /alerts/{id}
+    API-->>AS: Updated
+    API-->>M: Notification to user
+    WD->>WD: Update interface
+
+    A->>WD: Add response notes
+    WD->>AS: updateNotes(id, notes)
+    AS->>API: PATCH /alerts/{id}/notes
+    API-->>AS: Notes saved
+
+    alt Multiple alerts in same zone
+        WD->>WD: Highlight zone on map
+        WD->>WD: Show "hot" alert
     end
-    
-    alt Alerta sin respuesta > 5 min
-        WD->>WD: Indicador de urgencia
-        WD->>WD: Prioridad en lista
+
+    alt Alert without response > 5 min
+        WD->>WD: Urgency indicator
+        WD->>WD: Priority in list
     end
 ```
 
-## 🎯 Layouts por Ruta
+## 🎯 Layouts by Route
 
-### Móvil
+### Mobile
 
 **DrawerLayout:**
-- Rutas: DrawerHome (contenedor principal)
-- Componentes: DrawerNavigator, TabNavigator
-- Estilo: Navegación lateral con menú, tabs inferiores
+- Routes: DrawerHome (main container)
+- Components: DrawerNavigator, TabNavigator
+- Style: Side navigation with menu, bottom tabs
 
 **AuthLayout:**
-- Rutas: AuthNavigator
-- Componentes: Cards de autenticación centradas
-- Estilo: Fondo con gradiente, orbes decorativos
+- Routes: AuthNavigator
+- Components: Centered auth cards
+- Style: Gradient background, decorative orbs
 
 **StackLayout:**
-- Rutas: Pantallas modales (Activacion, AlertaActiva, Tutoriales)
-- Componentes: Navegación tipo stack
-- Estilo: Pantalla completa con header
+- Routes: Modal screens (Activation, ActiveAlert, Tutorials)
+- Components: Stack navigation
+- Style: Full screen with header
 
 ### Web
 
 **PublicLayout:**
-- Rutas: `/` (landing)
-- Componentes: LandingNavbar
-- Estilo: Navbar público, footer landing
+- Routes: `/` (landing)
+- Components: LandingNavbar
+- Style: Public navbar, landing footer
 
 **DashboardLayout:**
-- Rutas: `/dashboard/*`
-- Componentes: Sidebar, Topbar, BottomNav
-- Estilo: Layout con navegación lateral y superior
+- Routes: `/dashboard/*`
+- Components: Sidebar, Topbar, BottomNav
+- Style: Layout with side and top navigation
 
 **AdminLayout:**
-- Rutas: `/admin/*`
-- Componentes: Sidebar admin, Topbar admin
-- Estilo: Layout administrativo con navegación completa
+- Routes: `/admin/*`
+- Components: Admin sidebar, Admin topbar
+- Style: Administrative layout with full navigation
 
-**Sin Layout (Auth):**
-- Rutas: `/auth/*`
-- Componentes: Cards de autenticación
-- Estilo: Página centrada con orbes de fondo
+**No Layout (Auth):**
+- Routes: `/auth/*`
+- Components: Auth cards
+- Style: Centered page with background orbs
 
-## 📡 Servicios API por Ruta
+## 📡 API Services by Route
 
-### Móvil
+### Mobile
 
-| Servicio | Endpoints | Rutas que lo usan |
-|----------|-----------|-------------------|
-| AuthService | login, registrarUsuaria, logout | Login, Registro |
-| AlertsService | getAll, getByUsuario, create, update, updateEstado, delete | Inicio, Historial, Activacion, AlertaActiva |
-| UsersService | getById, update | Perfil |
-| DevicesService | getByUsuario, update | DeviceStatus |
-| EvidenceService | getByUsuario, create, update | Evidencia |
-| RiskZonesService | getZonas, createZona, updateZona, deleteZona, getPuntos | Mapa, ClasificarZona |
-| PhoneLocationService | getLocation, getHistory | Mapa, LocationHistory |
-| ContactsService | getAll, create, update, delete | Contactos, AgregarContacto |
+| Service | Endpoints | Routes that use it |
+|---------|-----------|-------------------|
+| AuthService | login, registerUser, logout | Login, Register |
+| AlertsService | getAll, getByUser, create, update, updateStatus, delete | Home, History, Activation, ActiveAlert |
+| UsersService | getById, update | Profile |
+| DevicesService | getByUser, update | DeviceStatus |
+| EvidenceService | getByUser, create, update | Evidence |
+| RiskZonesService | getZones, createZone, updateZone, deleteZone, getPoints | Map, ClassifyZone |
+| PhoneLocationService | getLocation, getHistory | Map, LocationHistory |
+| ContactsService | getAll, create, update, delete | Contacts, AddContact |
 
 ### Web
 
-| Servicio | Endpoints | Rutas que lo usan |
-|----------|-----------|-------------------|
-| AuthService | login, registrarUsuaria, logout | /auth/* |
-| AlertsService | getAll, getByUsuario, create, update, updateEstado, delete | /dashboard/home, /dashboard/alert-history, /admin/alertas, /admin/dashboard |
-| UsersService | getAll, getById, create, update, updateEstado, delete | /admin/usuarios, /admin/dashboard |
-| DevicesService | getAll, getByUsuario, create, update, updateEstado, delete | /dashboard/device-status, /admin/devices-management |
-| EvidenceService | getAll, getByUsuario, create, update, updateEstado, delete | /dashboard/evidence, /admin/evidence-management |
-| RiskZonesService | getZonas, createZona, updateZona, deleteZona, getPuntos | /dashboard/home, /admin/zone-management |
+| Service | Endpoints | Routes that use it |
+|---------|-----------|-------------------|
+| AuthService | login, registerUser, logout | /auth/* |
+| AlertsService | getAll, getByUser, create, update, updateStatus, delete | /dashboard/home, /dashboard/alert-history, /admin/alerts, /admin/dashboard |
+| UsersService | getAll, getById, create, update, updateStatus, delete | /admin/users, /admin/dashboard |
+| DevicesService | getAll, getByUser, create, update, updateStatus, delete | /dashboard/device-status, /admin/devices-management |
+| EvidenceService | getAll, getByUser, create, update, updateStatus, delete | /dashboard/evidence, /admin/evidence-management |
+| RiskZonesService | getZones, createZone, updateZone, deleteZone, getPoints | /dashboard/home, /admin/zone-management |
 | PhoneLocationService | getLocation, getHistory | /dashboard/phone-location, /dashboard/location-history |
 | ReportService | generate, download | /admin/report-management |
 | EmergencyService | dispatch, updateStatus | /admin/emergency-management |
 
 ## 🔗 Lazy Loading
 
-### Móvil
-Todas las pantallas se cargan bajo demanda a través de React Navigation.
+### Mobile
+All screens are loaded on demand through React Navigation.
 
 ### Web
-Las siguientes rutas usan carga diferida para optimización:
+The following routes use lazy loading for optimization:
 - `/auth/forgot-password`
 - `/auth/forgot-phone`
 - `/auth/verify-code`
@@ -438,8 +438,8 @@ Las siguientes rutas usan carga diferida para optimización:
 - `/dashboard/device-status`
 - `/dashboard/location-history`
 - `/admin/dashboard`
-- `/admin/usuarios`
-- `/admin/alertas`
+- `/admin/users`
+- `/admin/alerts`
 - `/admin/zone-management`
 - `/admin/report-management`
 - `/admin/emergency-management`
@@ -447,93 +447,93 @@ Las siguientes rutas usan carga diferida para optimización:
 - `/admin/moderator-management`
 - `/admin/devices-management`
 
-# 🌐 Internacionalización (i18n)
+## 🌐 Internationalization (i18n)
 
-## Móvil (React Native)
-**Archivo:** `src/contexts/LocaleContext.tsx`
+### Mobile (React Native)
+**File:** `src/contexts/LocaleContext.tsx`
 
-*   **Idiomas soportados (4):** Español (`es`), Inglés (`en`), Portugués (`pt`), Francés (`fr`).
-*   **Mecanismo:** Context API (`LocaleContext`) con hook personalizado `useLocale()`.
-*   **Persistencia:** Guardado automático en `AsyncStorage` (`user_locale`).
+- **Supported languages (4):** Spanish (`es`), English (`en`), Portuguese (`pt`), French (`fr`)
+- **Mechanism:** Context API (`LocaleContext`) with custom hook `useLocale()`
+- **Persistence:** Automatically saved to `AsyncStorage` (`user_locale`)
 
-### Uso en Componentes
+### Usage in Components
 ```typescript
 const { t, locale, setLocale } = useLocale();
 
-// Cambio de idioma en tiempo de ejecución
+// Runtime language switch
 setLocale('pt'); // 'es' | 'en' | 'pt' | 'fr'
 
-// Acceso a claves traducidas
-t.menu.inicio        // "Inicio" / "Home" / "Início" / "Accueil"
-t.login.titulo       // "Iniciar Sesión" / "Sign In" / "Entrar" / "Se connecter"
-t.contactos.titulo   // "Mis Contactos" / "My Contacts" / "Meus Contatos" / "Mes Contacts"
+// Access translated keys
+t.menu.home          // "Inicio" / "Home" / "Início" / "Accueil"
+t.login.title        // "Iniciar Sesión" / "Sign In" / "Entrar" / "Se connecter"
+t.contacts.title     // "Mis Contactos" / "My Contacts" / "Meus Contatos" / "Mes Contacts"
+```
 
+**Implementation:** Angular i18n (pending implementation)
 
-**Implementación:** i18n Angular (pendiente de implementación)
+## 🔄 Navigation States
 
-## 🔄 Estados de Navegación
-
-### Móvil
-- **Auth:** Estado de autenticación en AuthContext
-- **Tutorial:** Estado de completitud en localStorage
-- **PendingRoute:** Ruta pendiente después de login
-- **DrawerState:** Estado abierto/cerrado del drawer
+### Mobile
+- **Auth:** Authentication state in AuthContext
+- **Tutorial:** Completion state in localStorage
+- **PendingRoute:** Pending route after login
+- **DrawerState:** Open/closed state of the drawer
 
 ### Web
-- **Auth:** Estado de autenticación en AuthService
-- **Theme:** Estado de tema (light/dark) en ThemeService
-- **Role:** Estado de rol (user/admin) en token JWT
+- **Auth:** Authentication state in AuthService
+- **Theme:** Theme state (light/dark) in ThemeService
+- **Role:** Role state (user/admin) in JWT token
 
 ## 📱 Deep Links
 
-### Móvil
-**Formato:** `alertamujer://ruta/parametros`
+### Mobile
+**Format:** `alertamujer://route/params`
 
-**Deep links soportados:**
-- `alertamujer://inicio` - Ir a inicio
-- `alertamujer://mapa` - Ir a mapa
-- `alertamujer://alertas/{id}` - Ver detalle de alerta
-- `alertamujer://contactos` - Ir a contactos
-- `alertamujer://sos` - Activar alerta SOS
-
-### Web
-**Formato:** `https://alertamujer.com/ruta`
-
-**URLs soportadas:**
-- `https://alertamujer.com/` - Landing
-- `https://alertamujer.com/auth/login` - Login
-- `https://alertamujer.com/dashboard/home` - Dashboard usuaria
-- `https://alertamujer.com/admin/dashboard` - Dashboard admin
-
-## 🔐 Seguridad en Navegación
-
-### Móvil
-- Token JWT en AsyncStorage
-- Refresh token automático
-- Logout limpio de tokens
-- Protección de rutas sensibles
+**Supported deep links:**
+- `alertamujer://home` — Go to home
+- `alertamujer://map` — Go to map
+- `alertamujer://alerts/{id}` — View alert detail
+- `alertamujer://contacts` — Go to contacts
+- `alertamujer://sos` — Activate SOS alert
 
 ### Web
-- Token JWT en localStorage
-- Refresh token automático
-- Guards de autenticación
-- Protección de rutas por rol
-- CSRF tokens en forms
+**Format:** `https://alertamujer.com/route`
 
-## 📊 Métricas de Navegación
+**Supported URLs:**
+- `https://alertamujer.com/` — Landing
+- `https://alertamujer.com/auth/login` — Login
+- `https://alertamujer.com/dashboard/home` — User dashboard
+- `https://alertamujer.com/admin/dashboard` — Admin dashboard
 
-### Móvil
+## 🔐 Navigation Security
+
+### Mobile
+- JWT token in AsyncStorage
+- Automatic token refresh
+- Clean logout (token removal)
+- Sensitive route protection
+
+### Web
+- JWT token in localStorage
+- Automatic token refresh
+- Authentication guards
+- Role-based route protection
+- CSRF tokens in forms
+
+## 📊 Navigation Metrics
+
+### Mobile
 - Time to Interactive: < 3s
 - First Paint: < 1.5s
-- Transiciones: 300ms
-- Bundle size: Optimizado
+- Transitions: 300ms
+- Bundle size: Optimized
 
 ### Web
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3s
 - Route transitions: 200ms
-- Bundle size: Code splitting por ruta
+- Bundle size: Code splitting by route
 
 ---
 
-Este mapa de navegación unifica la arquitectura de ambas plataformas (móvil y web) para mantener consistencia en la experiencia de usuario y facilitar el mantenimiento del sistema.
+This navigation map unifies the architecture of both platforms (mobile and web) to maintain consistency in the user experience and facilitate system maintenance.

@@ -1,6 +1,6 @@
 # Entities, Value Objects, and Business Rules
 
-> Catalog of entities, attributes, and business rules for Alerta Mujer, organized by bounded context according to the SRS Functional Requirements (RF1–RF13) and use cases 1–4.
+> Catalog of entities, attributes, and business rules for Woman Alert, organized by bounded context according to the SRS Functional Requirements (RF1–RF13) and use cases 1–4.
 > **Updated to match the final 27-table database schema.**
 
 ---

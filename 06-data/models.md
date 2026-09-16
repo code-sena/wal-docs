@@ -1,6 +1,6 @@
 # Data Models
 
-Alerta Mujer uses four Spring Boot microservices (identity-service, alert-service, resource-service, admin-service) organized by business modules with hexagonal architecture. The services share a PostgreSQL database with logical table ownership per bounded context. Table and column names stay in English following the project's technical convention (ADR-001).
+Woman Alert uses four Spring Boot microservices (identity-service, alert-service, resource-service, admin-service) organized by business modules with hexagonal architecture. The services share a PostgreSQL database with logical table ownership per bounded context. Table and column names stay in English following the project's technical convention (ADR-001).
 
 **See also:**
 - Data dictionary with field definitions and privacy classifications → `06-data/data-dictionary.md`

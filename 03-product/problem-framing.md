@@ -1,6 +1,6 @@
 # Problem Framing — Woman Alert
 
-This document describes the problem that Alerta Mujer addresses, using real data taken from the project's SRS and from the team's own research (written survey and oral round). A few points remain undefined because they depend on a team decision rather than an existing source — these are marked as "pending" instead of being filled in with an invented number.
+This document describes the problem that Woman Alert addresses, using real data taken from the project's SRS and from the team's own research (written survey and oral round). A few points remain undefined because they depend on a team decision rather than an existing source — these are marked as "pending" instead of being filled in with an invented number.
 
 ## 1. The problem in one sentence
 

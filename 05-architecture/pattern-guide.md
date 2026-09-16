@@ -537,10 +537,10 @@ Kubernetes Pod:
 ---
 ## Patterns adopted in this project
 
-The selections below are based on the actual bounded contexts, aggregates, and domain events already documented for Alerta Mujer (`02-domain/domain-map.md`, `02-domain/entities-and-rules.md`, `02-domain/domain-events.md`) and on the shared PostgreSQL database (`06-data/models.md`). A pattern is only marked as adopted when it solves a concrete problem already present in that model — otherwise it stays out, even if it's common in microservices projects.
+The selections below are based on the actual bounded contexts, aggregates, and domain events already documented for Woman Alert (`02-domain/domain-map.md`, `02-domain/entities-and-rules.md`, `02-domain/domain-events.md`) and on the shared PostgreSQL database (`06-data/models.md`). A pattern is only marked as adopted when it solves a concrete problem already present in that model — otherwise it stays out, even if it's common in microservices projects.
 
 The overall style (Modular Monolith with hexagonal architecture) is formalized in
-`ADR-002-estilo-arquitectonico.md`. Individual pattern decisions below don't each have a
+`ADR-002-architectural-style.md`. Individual pattern decisions below don't each have a
 dedicated ADR yet — Circuit Breaker and Outbox Pattern are the strongest candidates for their
 own record, since both directly protect the alert-delivery path (see `overview.md` §5, P4).
 
@@ -548,12 +548,12 @@ own record, since both directly protect the alert-delivery path (see `overview.m
 |---------|---------|---------------|
 | **Factory Method** | Yes | Controlled creation of aggregates that need validation before they exist. The `Alert` aggregate is the clearest case: it shouldn't be constructable without a valid `activation_method`, an originating `device`, and an initial `active` status — the same shape as the `activar()` behavior already described in `entities-and-rules.md`. |
 | **Adapter** | Yes | Isolates the domain from external providers: FCM for push, the SMS provider, the email provider, and cloud storage for evidence backup. The domain depends on internal ports (e.g. a notification-sending port); each provider gets its own adapter behind that port. |
-| **Observer / Internal Event Bus** | Yes | This is the backbone of the domain-event model already built. `AlertaActivada` needs to reach Notifications, Evidence, and Administration without the `Alert` aggregate depending on any of them directly — same for `AlertaCancelada`, `AlertaContactoNotificado`, `EvidenciaRegistrada`. |
+| **Observer / Internal Event Bus** | Yes | This is the backbone of the domain-event model already built. `AlertActivated` needs to reach Notifications, Evidence, and Administration without the `Alert` aggregate depending on any of them directly — same for `AlertCancelled`, `AlertContactNotified`, `EvidenceRegistered`. |
 | **Strategy** | Yes | The notification channel (`sms` \| `email` \| `call` \| `push` — the same enum as `alert_contact.channel`) is chosen at send time depending on what's configured and available. New channels can be added without touching the alert-activation logic. |
 | **Retry with Exponential Backoff** | Yes | `alert_contact` already models retry at the data level (`attempts`, `status = retrying`, `error_message`), and so does `alert_reminder` and `recovery_request`. The pattern gives that data a concrete sending policy: bounded attempts with exponential backoff, so a failing provider isn't hammered. |
 | **API Gateway** | Yes — once the system is split into services | Alerta Mujer is currently one backend, so there's no gateway to route between services yet. It becomes relevant the day the modules in `02-domain/domain-map.md` (Identity, Alerts, Zones, etc.) are split into independently deployed services. |
 | **Circuit Breaker** | Yes — for external providers only | Protects the alert flow from a slow or unavailable SMS/email/push provider. Not applied to calls within the same backend — there the overhead isn't worth it. |
-| **Outbox Pattern** | Yes — once alerts move to async delivery | Guarantees that saving an `alert` row and publishing `AlertaActivada` happen atomically, so a crash between the two doesn't silently drop the notification fan-out. Relevant once notification delivery moves off the same request/response cycle it likely runs on today. |
+| **Outbox Pattern** | Yes — once alerts move to async delivery | Guarantees that saving an `alert` row and publishing `AlertActivated` happen atomically, so a crash between the two doesn't silently drop the notification fan-out. Relevant once notification delivery moves off the same request/response cycle it likely runs on today. |
 | **Database per Service** | No | The project uses one shared PostgreSQL database (per `06-data/models.md` and `ADR-001`, which describes "a backend" and "a shared database", singular). Tables are logically grouped by bounded context, but splitting the database itself isn't justified at the current scope. |
 | **Saga (choreographed)** | No | No business transaction today spans independent databases — everything alert-related lives in the same PostgreSQL instance and can use a normal ACID transaction. Saga would add coordination overhead with nothing to coordinate. |
 | **CQRS** | No — for now | The admin panel's read needs (RF13) are more demanding than the mobile app's, but not yet different enough from the write model to justify separate read/write paths. Worth revisiting if reporting (RF13.4) grows into heavy aggregation queries. |

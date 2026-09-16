@@ -7,7 +7,7 @@
 
 ## 1. Domain overview
 
-Alerta Mujer manages the complete lifecycle of a gender-based violence emergency: from the registration of the user, her account, and her device, through the activation of an alert that shares real-time location and notifies trusted contacts and help centers, to the recording of evidence, the map of risk/safe zones, the resource directory, and administrative oversight (auditing, user reports, moderation) from a web panel.
+Woman Alert manages the complete lifecycle of a gender-based violence emergency: from the registration of the user, her account, and her device, through the activation of an alert that shares real-time location and notifies trusted contacts and help centers, to the recording of evidence, the map of risk/safe zones, the resource directory, and administrative oversight (auditing, user reports, moderation) from a web panel.
 
 ---
 

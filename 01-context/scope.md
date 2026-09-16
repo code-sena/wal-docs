@@ -38,7 +38,7 @@ The SRS defines a single-target technology stack (React Native/Expo, Angular, Sp
 
 ---
 
-## Out of reach
+## Out of scope
 
 The SRS does not include an explicit "out of scope" section, but its wording itself sets some limits:
 
@@ -48,7 +48,7 @@ The SRS does not include an explicit "out of scope" section, but its wording its
 
 ### What another system/team handles (and why not us)
 
-Not described in the SRS: the document discusses Alerta Mujer as a standalone mobile + web + backend system, without naming any adjacent systems it depends on or works with.
+Not described in the SRS: the document discusses Woman Alert as a standalone mobile + web + backend system, without naming any adjacent systems it depends on or works with.
 
 ---
 
