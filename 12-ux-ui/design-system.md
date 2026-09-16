@@ -654,6 +654,10 @@ tabBarStyle: {
 
 ## ♿ Accessibility and UX Rules
 
+> These accessibility rules directly implement **RNF11** (accessible interface, large elements,
+> contrasting colors for use under stress) and **RNF12** (rapid activation methods outside the
+> main interface). See `04-requirements/non-functional.md` for the full definitions.
+
 ### Color Contrast (WCAG AA)
 
 **Implemented standards:**

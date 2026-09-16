@@ -148,5 +148,5 @@ res.status(500).json({
 
 - Security policy (management, access, vault) → `00-governance/security-policy.md`
 - System threat model → `05-architecture/security-threat-model.md`
-- Authentication and JWT → `07-api/authentication.md`
+- Authentication and JWT → `05-architecture/cross-cutting.md` (§1 — open auth/token decision)
 - Observability and security logs → `13-operations/observability.md`

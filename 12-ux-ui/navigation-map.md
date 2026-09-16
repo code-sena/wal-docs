@@ -173,7 +173,7 @@ AppNavigator (root)
 - **Use:** Protects the administrative panel
 
 #### userGuard
-- **Verifies:** Role === 'operator' or redirects admins
+- **Verifies:** Role === 'user' or redirects admins
 - **Redirect:**
   - If admin → `/admin/dashboard`
   - If not authenticated → `/auth/login`
@@ -250,7 +250,7 @@ sequenceDiagram
     RM->>RM: Validate fields
     RM->>RM: Verify terms accepted
     RM->>API: POST /auth/register
-    API-->>RM: User created (role: operator)
+    API-->>RM: User created (role: user)
     RM->>RM: Save token
     RM->>T: Start tutorial
 
@@ -259,7 +259,7 @@ sequenceDiagram
     RC->>RC: Validate fields
     RC->>RC: Verify terms accepted
     RC->>API: POST /auth/register
-    API-->>RC: User created (role: operator)
+    API-->>RC: User created (role: user)
     RC->>RC: Save token
     RC->>U: Redirect to dashboard
 
@@ -537,3 +537,13 @@ t.contacts.title     // "Mis Contactos" / "My Contacts" / "Meus Contatos" / "Mes
 ---
 
 This navigation map unifies the architecture of both platforms (mobile and web) to maintain consistency in the user experience and facilitate system maintenance.
+
+---
+
+## Correlations
+
+- User stories that define what each screen implements → `04-requirements/user-stories.md`
+- Functional requirements implemented by these screens → `04-requirements/functional.md`
+- Accessibility and UX standards applied → `12-ux-ui/design-system.md`
+- RBAC roles and access control policy → `00-governance/security-policy.md`
+- Domain entities displayed across these screens → `02-domain/entities-and-rules.md`

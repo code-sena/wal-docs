@@ -3,10 +3,10 @@
 | Field | Value |
 |-------|-------|
 | **ID** | ADR-001 |
-| **Date** | 2024-01-10 |
+| **Date** | 2026-09-19 |
 | **Status** | Accepted |
-| **Authors** | María García — Tech Lead |
-| **Reviewers** | Carlos Méndez, Sofía Torres, Andrés Ruiz — Development team |
+| **Authors** | Maicol Sánchez Castañeda (menticio) — Tech Lead / Backend |
+| **Reviewers** | José Sebastián Suárez Cumaco (JoseSebastianSuarezCumaco) — UI Lead; Justin Daniela Bahamón Baloco (JustinDanielaBahamon) — Database Leader |
 
 ---
 

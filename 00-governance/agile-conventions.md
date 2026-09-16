@@ -108,4 +108,4 @@
 - Definition of Ready → `00-governance/definition-of-ready.md`
 - Definition of Done → `00-governance/definition-of-done.md`
 - Risk management → `15-project-control/risks.md`
-- Technical debt backlog → `15-project-control/tech-backlog.md`
+- Technical debt backlog → `15-project-control/technical-backlog.md`

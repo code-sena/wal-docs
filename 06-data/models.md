@@ -569,16 +569,20 @@ erDiagram
 
 **Tool:** Liquibase, per the architecture section of the SRS.
 
+**Changelog location:** `src/main/resources/db/changelog/` in each Spring Boot service.
+
 **Changelog naming convention:**
 
 ```
-V{number}__{description_in_snake_case}.xml
+NNN-description-in-kebab-case.xml
 
 Examples:
-  V001__create_user_and_role_tables.xml
-  V002__create_account_and_device_tables.xml
-  V003__create_alert_module_tables.xml
+  001-create-user-and-role-tables.xml
+  002-create-account-and-device-tables.xml
+  003-create-alert-module-tables.xml
 ```
+
+See full migration strategy, rollback policy, and deployment procedures ? `06-data/migration-strategy.md`  
 
 **Rules:**
 
@@ -591,5 +595,5 @@ Examples:
 ## Correlations
 
 - Domain entities mapped to these tables → `02-domain/entities-and-rules.md`
-- Technical language convention (English) → `05-architecture/decisions/records/ADR-001-idiom-documentation.md`
+- Technical language convention (English) → `05-architecture/decisions/records/ADR-001-language-documentation.md`
 - Data exposed by the API → `07-api/contracts/`

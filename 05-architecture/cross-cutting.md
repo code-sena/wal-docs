@@ -1,7 +1,9 @@
 # Cross-Cutting Concerns
 
-> Concerns that apply across every business module inside `alerta-mujer-backend`, not owned by
-> any single bounded context. This expands on the summary table in `overview.md` §7.
+> Concerns that apply across all four backend services (identity-service, alert-service,
+> resource-service, admin-service) and the API Gateway. No single bounded context owns these —
+> they are configured at the infrastructure layer. This expands on the summary table in
+> `overview.md` §8.
 
 ---
 
@@ -32,9 +34,10 @@ explicitly cannot let fail silently (`overview.md` §5, P4).
 
 ## 3. Tracing
 
-**Status:** not defined yet. Not urgent under the current Modular Monolith style (ADR-002) —
-distributed tracing solves cross-service call chains, and there's only one backend process today.
-Revisit if a module is ever extracted into its own service.
+**Status:** not defined yet. Distributed tracing is now **high priority** given the four-service
+architecture (ADR-002) — cross-service call chains between identity-service, alert-service,
+resource-service, and admin-service will be difficult to debug without it. Must be defined
+before the first staging deployment.
 
 ---
 
@@ -54,26 +57,28 @@ consumed by the mobile and web apps.
 
 ## 6. Rate Limiting
 
-**Status:** not applicable in the current architecture — there is no API Gateway (`overview.md`
-§3), and rate limiting at the application layer hasn't been discussed. Worth revisiting if abuse
-of the panic-button endpoint (repeated false alerts) becomes a concern.
+**Status:** to be configured at the API Gateway layer (ADR-002). The API Gateway sits in front
+of all four services and is the right place for rate limiting — particularly on the alert
+activation endpoint to prevent abuse (repeated false alerts) and accidental DoS of the one path
+that cannot fail (`overview.md` §6, P4).
 
 ---
 
 ## 7. CORS
 
-**Status:** needed, not yet configured. The Angular web app and the Spring Boot backend run as
-separate origins, so CORS has to allow the web app's origin to call the backend API. Exact policy
-(allowed origins, methods, credentials) is not detailed in the SRS.
+**Status:** to be configured at the API Gateway layer. The API Gateway is the single entry
+point for both the Angular web app and the mobile app, so CORS policy (allowed origins,
+methods, credentials) is defined once there rather than per service.
 
 ---
 
 ## 8. Circuit Breaker
 
 **Status:** adopted, scope defined. Applies specifically to the three external notification
-providers — Firebase Cloud Messaging, the SMS provider, and the email provider — per
-`pattern-guide.md`. Not applied to in-process calls between business modules, since the overhead
-isn't justified inside a single backend (ADR-002).
+providers — Firebase Cloud Messaging, the SMS provider, and the email provider — called by
+`alert-service`, per `pattern-guide.md`. Not applied to inter-service calls between
+identity-service, alert-service, resource-service, and admin-service for now; those calls
+go through the API Gateway over the internal network with low expected latency.
 
 ---
 

@@ -6,7 +6,7 @@
 
 | ID   | Requirement          | Metric                                                                                                                                                                                                          | How to Verify                                                                  |
 | ---- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| RNF5 | Alert performance    | Alert dispatch must take a maximum of 5 seconds; at least 95% of alerts must meet this requirement under normal network conditions. | Load testing / backend measurement from activation to delivery to the provider |
+| RNF5 | Alert performance    | Alert dispatch must take a maximum of 2 seconds; at least 95% of alerts must meet this requirement under normal network conditions. | Load testing / backend measurement from activation to delivery to the provider |
 | RNF6 | Battery optimization | GPS/accelerometer usage in the foreground must not exceed 10% battery consumption per hour of continuous use.                                                                                                   | Battery consumption measurement during field testing with the device           |
 
 ## Availability and Fault Tolerance

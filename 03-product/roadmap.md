@@ -4,11 +4,11 @@ This roadmap defines the delivery plan over three horizons, from MVP to long-ter
 
 ---
 
-## Horizon 1 — MVP (Sprint 1-4)
+## Horizon 1 — MVP (Sprint 1-2)
 
 **Objective:** Deliver the core system described in the SRS with essential emergency response capabilities.
 
-**Timeline:** Sprint 1 (Sep 19–25), Sprint 2 (Sep 26 – Oct 2), Sprint 3 (Oct 3–9), Sprint 4 (Oct 10–16)
+**Timeline:** Sprint 1 (Sep 19 – Oct 2), Sprint 2 (Oct 3 – Oct 16)
 
 ### Modules and features
 
@@ -63,11 +63,11 @@ This roadmap defines the delivery plan over three horizons, from MVP to long-ter
 
 ---
 
-## Horizon 2 — Iteration (Sprint 5-8)
+## Horizon 2 — Iteration (Sprint 3-4)
 
 **Objective:** Enhance the MVP based on user feedback and operational learnings.
 
-**Timeline:** Sprint 5 (Oct 17–23), Sprint 6 (Oct 24–30), Sprint 7 (Oct 31 – Nov 6), Sprint 8 (Nov 7–13)
+**Timeline:** Sprint 3 (Oct 17 – Oct 30), Sprint 4 (Oct 31 – Nov 13)
 
 ### Enhancements
 
@@ -103,11 +103,11 @@ This roadmap defines the delivery plan over three horizons, from MVP to long-ter
 
 ---
 
-## Horizon 3 — Long-term Evolution (Sprint 9+)
+## Horizon 3 — Long-term Evolution (Sprint 5+)
 
 **Objective:** Continuous improvement based on real-world usage and stakeholder feedback.
 
-**Timeline:** Ongoing, based on user feedback and organizational priorities
+**Timeline:** Ongoing from Sprint 5, based on user feedback and organizational priorities
 
 ### Future considerations
 

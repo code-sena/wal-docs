@@ -10,6 +10,13 @@
 No service should access another service's database directly. If it needs data from another
 service, it requests it via API or receives it via event. This principle guarantees independence.
 
+> ⚠️ **Project-specific note:** Woman Alert deliberately uses a **shared PostgreSQL instance**
+> for all services, with logical table ownership per bounded context (see `ADR-002` and
+> `06-data/models.md`). This is an explicit trade-off for the academic scope: the discipline of
+> ownership is maintained at the application layer, not through separate database engines.
+> The "Database per Service" approach described in the sections below represents the general
+> ideal and a candidate evolution path — it is **not** the current project choice.
+
 ---
 
 ## What is here and how to fill it in

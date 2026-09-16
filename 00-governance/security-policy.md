@@ -46,10 +46,21 @@
 
 ### RBAC (Role-Based Access Control)
 
+> **Implementation note:** The `role` table in the database (`06-data/models.md`) stores two
+> values: `user` and `administrator`. The four roles below are **application-layer concepts**
+> that map onto those two DB values as follows:
+> - `SUPER_ADMIN` → stored as `administrator`; distinguished at the application layer by a
+>   dedicated `admin_profile` record and permissions granted in the service layer.
+> - `ADMIN` → stored as `administrator`; same DB role, different permission scope enforced in code.
+> - `USER` → stored as `user`.
+> - `VIEWER` → stored as `user`; read-only access enforced by the service layer, not the DB.
+>
+> The `12-ux-ui/navigation-map.md` guards use `user` and `admin` to match the JWT claim values.
+
 | Role | Description | Permissions |
 |------|-------------|------------|
 | `SUPER_ADMIN` | System technical administrator (menticio) | All system permissions, user management, configuration |
-| `ADMIN` | Administrative panel user (organization staff) | View alerts, manage zones, moderate reports, view statistics |
+| `ADMIN` | Administrative panel user (organization staff) | View alerts, manage zones, moderate reports, view statistics, **block/warn/unblock users, review user reports, execute moderation actions** (FR13.10) |
 | `USER` | Regular app user (women using the service) | Manage own profile, contacts, alerts, evidence, frequent locations |
 | `VIEWER` | Read-only auditor (external review) | View-only access to non-sensitive data for compliance |
 
@@ -229,4 +240,4 @@ const SECURITY_EVENTS = [
 - Security non-functional requirements → `04-requirements/non-functional.md`
 - ADR on authentication → `05-architecture/decisions/`
 - Security event observability → `13-operations/observability.md`
-- RBAC implemented in → `09-microservices/services/XX-auth-service/`
+- RBAC implemented in → `09-microservices/services/02-auth-service/`

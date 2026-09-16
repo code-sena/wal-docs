@@ -84,3 +84,4 @@ Given the profile of this system, these are the gaps most worth closing first, i
 - Domain rules for `Alert` state transitions → `02-domain/entities-and-rules.md`
 - Circuit Breaker and Retry patterns → `05-architecture/pattern-guide.md`
 - Open authentication/authorization decision → `05-architecture/cross-cutting.md` §1
+- RBAC roles, JWT policy, and security event definitions → `00-governance/security-policy.md`

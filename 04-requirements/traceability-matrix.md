@@ -23,6 +23,7 @@
 | FR12.2      | Profile viewing (web)                                                          | HU-WEB-USUARIA-001 | Pending               | features/dashboard (web)            | 🟡 Under Reconstruction |
 | FR12.3      | Alert viewing (web)                                                            | HU-WEB-USUARIA-001 | Pending               | features/dashboard (web)            | 🟡 Under Reconstruction |
 | FR12.4      | History viewing (web)                                                          | HU-WEB-USUARIA-001 | Pending               | features/dashboard (web)            | 🟡 Under Reconstruction |
+| FR12.5      | View location and alert information (web)                                      | HU-WEB-USUARIA-001 | Pending               | features/dashboard (web)            | 🟡 Under Reconstruction |
 | FR12.6      | Evidence visualization (web)                                                   | HU-WEB-USUARIA-001 | Pending               | features/dashboard (web)            | 🟡 Under Reconstruction |
 | FR13.1      | User management (admin)                                                        | HU-WEB-ADMIN-001   | Pending               | features/admin (web)                | 🟡 Under Reconstruction |
 | FR13.2      | Administrative alert management                                                | HU-WEB-ADMIN-001   | Pending               | features/admin (web)                | 🟡 Under Reconstruction |
@@ -51,12 +52,26 @@
 
 ## NFR Validation Matrix
 
-| NFR ID | Description                        | How It Is Validated                  | Tool                     | Status     |
-| ------ | ---------------------------------- | ------------------------------------ | ------------------------ | ---------- |
-| RNF5   | Alert dispatch ≤2s in 95% of cases | Load testing                         | To be defined (e.g., k6) | 🔴 Pending |
-| RNF7   | Location accuracy of 10–20m        | Comparison against GPS reference     | To be defined            | 🔴 Pending |
-| RNF8   | HTTPS/TLS + AES-256 encryption     | Security test / configuration review | To be defined            | 🔴 Pending |
-| RNF14  | Role-based access control          | Authorization test (user vs. admin)  | To be defined            | 🔴 Pending |
+| NFR ID | Description                                        | How It Is Validated                                 | Tool                     | Status     |
+| ------ | -------------------------------------------------- | --------------------------------------------------- | ------------------------ | ---------- |
+| RNF1   | Profile photo privacy (not publicly visible)       | Access control test on photo endpoint               | To be defined            | 🔴 Pending |
+| RNF2   | GPS availability / last known location on loss     | Testing with intermittent GPS signal                | To be defined            | 🔴 Pending |
+| RNF3   | Configurable notification frequency                | Manual UX test on notification settings             | To be defined            | 🔴 Pending |
+| RNF4   | Internet connectivity dependency                   | Connectivity and integration testing                | To be defined            | 🔴 Pending |
+| RNF5   | Alert dispatch ≤2s in 95% of cases                 | Load testing                                        | To be defined (e.g., k6) | 🔴 Pending |
+| RNF6   | Battery ≤10% per hour of continuous GPS use        | Battery consumption measurement on device           | To be defined            | 🔴 Pending |
+| RNF7   | Location accuracy of 10–20m                        | Comparison against GPS reference                    | To be defined            | 🔴 Pending |
+| RNF8   | HTTPS/TLS + AES-256 encryption                     | Security test / configuration review                | To be defined            | 🔴 Pending |
+| RNF9   | Alert channel fault tolerance (retry on failure)   | Simulated channel failure test                      | To be defined            | 🔴 Pending |
+| RNF10  | Android 10+ compatibility                          | Device compatibility testing                        | To be defined            | 🔴 Pending |
+| RNF11  | Accessibility: simple UI, large elements, contrast | Manual UX review + WCAG AA automated audit          | To be defined            | 🔴 Pending |
+| RNF12  | ≥2 rapid activation methods outside main UI        | Manual test: widget, physical button, touch pattern | To be defined            | 🔴 Pending |
+| RNF13  | Background alert operation (Foreground Service)    | Testing with app closed on multiple manufacturers   | To be defined            | 🔴 Pending |
+| RNF14  | Role-based access control (user vs. admin)         | Authorization test (user vs. admin)                 | To be defined            | 🔴 Pending |
+| RNF15  | Web authentication security                        | Authentication and session security review          | To be defined            | 🔴 Pending |
+| RNF16  | Sensitive data restricted by role/user             | Cross-user data access test                         | To be defined            | 🔴 Pending |
+| RNF17  | Web browser compatibility (Chrome, Edge, Firefox)  | Cross-browser manual/automated test                 | To be defined            | 🔴 Pending |
+| RNF18  | Web platform primarily desktop-oriented            | Responsive design review at desktop resolution      | To be defined            | 🔴 Pending |
 
 ## Reverse Traceability: US → FR
 
@@ -71,7 +86,7 @@
 | HU-MOVIL-007       | View the Home Guide and System Notifications  | FR3.1, FR3.2, FR3.3                                           | To be defined |
 | HU-MOVIL-008       | Customize App Language and Theme              | FR10.1, FR11.1                                                | To be defined |
 | HU-MOVIL-009       | Receive High-Priority Emergency Notifications | FR8.1, FR8.2                                                  | To be defined |
-| HU-WEB-USUARIA-001 | View History and Status from the Web Portal   | FR12.1, FR12.2, FR12.3, FR12.4, FR12.6                        | To be defined |
+| HU-WEB-USUARIA-001 | View History and Status from the Web Portal   | FR12.1, FR12.2, FR12.3, FR12.4, FR12.5, FR12.6                | To be defined |
 | HU-WEB-ADMIN-001   | Manage Users, Alerts, and Reports             | FR13.1, FR13.2, FR13.4, FR13.9                                | To be defined |
 | HU-WEB-ADMIN-002   | Manage Zones and Their Risk Level             | FR13.3                                                        | To be defined |
 | HU-WEB-ADMIN-003   | View a User's Contacts, Devices, and Evidence | FR13.5, FR13.6, FR13.7                                        | To be defined |
