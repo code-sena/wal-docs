@@ -13,6 +13,8 @@ main        ← Production. Merge from release only. Always stable.
         └── hotfix/[description]  ← Urgent fixes directly to main
 ```
 
+**Woman Alert team note:** Currently all work is in `main` with feature branches. Transition to `dev` branch will happen once CI/CD pipeline is established.
+
 **Rules:**
 - Nobody commits directly to `main` or `dev`
 - Every task = one branch + one Pull Request

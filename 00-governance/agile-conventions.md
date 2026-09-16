@@ -9,25 +9,25 @@
 
 | Field | Value |
 |-------|-------|
-| Duration | [1 week / 2 weeks / 3 weeks] |
-| Sprint start | [Monday / Tuesday / Wednesday] |
-| Sprint end | [Friday of week N] |
-| Current sprint | Sprint [N] — [start date] to [end date] |
-| Estimated capacity | [N story points per sprint] |
+| Duration | 2 weeks |
+| Sprint start | Monday |
+| Sprint end | Friday of week 2 |
+| Current sprint | Sprint 1 — September 19, 2026 to October 2, 2026 |
+| Estimated capacity | 20 story points per sprint (4 team members × 5 SP average) |
 
 ---
 
 ## Ceremonies
 
 ### Sprint Planning
-- **When:** First day of the sprint — [time]
-- **Duration:** Maximum [1h per week of sprint]
-- **Who:** Entire team
+- **When:** First day of the sprint — 9:00 AM
+- **Duration:** Maximum 2 hours (1h per week of sprint)
+- **Who:** Entire team (menticio, JoseSebastianSuarezCumaco, JustinDanielaBahamon)
 - **Goal:** Select and commit to sprint user stories, break down into technical tasks
-- **Output artifact:** Sprint Backlog updated in [tool: Jira / Linear / GitHub Issues]
+- **Output artifact:** Sprint Backlog updated in GitHub Projects
 
 ### Daily Stand-up
-- **When:** Every day — [time]
+- **When:** Every day — 9:30 AM
 - **Duration:** Maximum 15 minutes
 - **Format:**
   1. What did I do yesterday?
@@ -36,20 +36,20 @@
 - **Rule:** Technical discussions happen after the daily, not during it
 
 ### Sprint Review
-- **When:** Last day of the sprint — [time]
-- **Duration:** Maximum [30 min]
-- **Who:** Team + Product Owner (+ stakeholders if applicable)
+- **When:** Last day of the sprint — 3:00 PM
+- **Duration:** Maximum 30 minutes
+- **Who:** Team + Product Owner (menticio as PO proxy)
 - **Goal:** Show what was built and collect feedback
 
 ### Sprint Retrospective
-- **When:** Last day of the sprint — after the review
-- **Duration:** Maximum [45 min]
-- **Format:** [What went well / What to improve / Action commitments]
+- **When:** Last day of the sprint — after the review (3:30 PM)
+- **Duration:** Maximum 45 minutes
+- **Format:** What went well / What to improve / Action commitments
 - **Rule:** Each retro produces at least 1 improvement action with an owner and due date
 
 ### Backlog Refinement
-- **When:** [Wednesday of the second week / mid-sprint]
-- **Duration:** Maximum [1h]
+- **When:** Wednesday of the second week — 2:00 PM
+- **Duration:** Maximum 1 hour
 - **Goal:** Detail and estimate user stories for the next sprint
 - **Exit criterion:** The user story meets the Definition of Ready
 
@@ -67,8 +67,8 @@
 | 8 | Very large — should be split |
 | 13 | Epic — MUST be split before the sprint |
 
-**Technique:** [Planning Poker / T-shirt sizing]
-**Tool:** [tool name]
+**Technique:** Planning Poker
+**Tool:** GitHub Projects (with estimation field)
 
 ### Estimation rule
 - If there is disagreement of 2+ levels (e.g., someone says 3 and another says 8), discuss before voting again.
@@ -78,8 +78,8 @@
 
 ## Backlog tool
 
-**Tool:** [Jira / Linear / GitHub Projects / Trello]
-**Board URL:** [URL]
+**Tool:** GitHub Projects
+**Board URL:** To be created in GitHub organization
 
 ### Board columns
 | Column | Meaning |
@@ -96,10 +96,10 @@
 
 | Sprint | Story points completed | Notes |
 |--------|----------------------|-------|
-| Sprint 1 | — | — |
-| Sprint 2 | — | — |
-| Sprint 3 | — | — |
-| Average | — | — |
+| Sprint 1 | TBD | First sprint (Sep 19 – Oct 2) |
+| Sprint 2 | TBD | Second sprint (Oct 3 – Oct 16) |
+| Sprint 3 | TBD | Third sprint (Oct 17 – Oct 30) |
+| Average | TBD | Will be calculated after Sprint 3 |
 
 ---
 
