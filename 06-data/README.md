@@ -41,24 +41,32 @@ Exact meaning of each important field in the system.
 
 **Format:**
 ```markdown
-| Field | Service | Table | Type | Detailed description | Possible values |
-|-------|---------|-------|------|---------------------|-----------------|
-| status | scheduling | schedule | ENUM | Current status of the schedule | ACTIVE, CANCELLED, PENDING |
+| Field | Service | Table | Type | Detailed description | Possible values | Privacy |
+|-------|---------|-------|------|---------------------|-----------------|---------|
+| status | scheduling | schedule | ENUM | Current status of the schedule | ACTIVE, CANCELLED, PENDING | Low |
 ```
+
+**Status:** ✅ Completed — Includes comprehensive field definitions with privacy classifications for Woman Alert's sensitive data (evidence, location, PII).
 
 ### `modeling-conventions.md`
 Naming and style conventions for the project's databases.
 **Fill in:** naming (snake_case or camelCase), use of UUIDs vs sequential, standard timestamps,
 soft delete vs hard delete, auditing (created_at, updated_at, created_by).
 
+**Status:** ✅ Completed — Defines comprehensive naming conventions, data type standards, constraint rules, and audit trail conventions for Woman Alert.
+
 ### `normalization-assessment.md`
 Analysis of the normalization level and justification for denormalizations.
 **Fill in:** for each intentional denormalization, explain why (performance, simplification).
+
+**Status:** ✅ Completed — Analyzes 3NF compliance across all modules and documents intentional denormalizations (alert table, location log, notifications) with performance justifications for Woman Alert.
 
 ### `migration-strategy.md`
 Strategy for migrating data between schema versions.
 **Fill in:** migration tool (Flyway, Liquibase, Alembic), rollback policy,
 how to handle migrations with data in production.
+
+**Status:** ✅ Completed — Defines Liquibase-based migration strategy with rollback policies, data migration patterns, and production deployment procedures for Woman Alert.
 
 ---
 
