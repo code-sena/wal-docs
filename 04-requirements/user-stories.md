@@ -1,6 +1,6 @@
 # User Stories — Woman Alert
 
-> Formalization of the user stories (US) that were already included in `03-producto/product-backlog.md`, using the Gherkin format of this folder. There are no sprint dates yet (see `03-producto/roadmap.md`), so "Target Sprint" remains pending until the team defines it.
+> Formalization of the user stories (US) that were already included in `03-product/product-backlog.md`, using the Gherkin format of this folder. There are no sprint dates yet (see `03-product/roadmap.md`), so "Target Sprint" remains pending until the team defines it.
 
 ## Backlog Status
 
@@ -89,7 +89,7 @@ Scenario 2: Delete a contact
 | Target Sprint       | To Be Defined                                            |
 | Status              | Done                                                     |
 | Dependencies        | None                                                     |
-| Affected Service(s) | Contacts module (backend), `features/contactos` (mobile) |
+| Affected Service(s) | Contacts module (backend), `features/contacts` (mobile) |
 
 ---
 

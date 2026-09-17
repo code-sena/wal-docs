@@ -205,7 +205,7 @@ const SECURITY_EVENTS = [
 ```
 
 **Required fields in security logs:**
-- `userId` (or `ANONYMOUS` if not authenticated)
+- `accountId` (or `ANONYMOUS` if not authenticated) — maps to `account.id` in the database
 - `sourceIp`
 - `action`
 - `resource`

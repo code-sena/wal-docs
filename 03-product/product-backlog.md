@@ -425,5 +425,5 @@ Prioritized list of user stories and technical tasks to be implemented, ordered 
 ## Correlations
 
 * User Stories with acceptance criteria → `04-requirements/user-stories.md`
-* Technical backlog → `15-project-control/technical-backlog.md`
+* Technical backlog → `15-project-control/technical-backlog.md` (to be created)
 * Sprint planning based on this backlog → `00-governance/agile-conventions.md`

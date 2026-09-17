@@ -574,12 +574,11 @@ erDiagram
 **Changelog naming convention:**
 
 ```
-NNN-description-in-kebab-case.xml
+NNN-description.xml
 
 Examples:
-  001-create-user-and-role-tables.xml
-  002-create-account-and-device-tables.xml
-  003-create-alert-module-tables.xml
+  001-create-user-table.xml
+  002-add-email-unique-constraint.xml
 ```
 
 See full migration strategy, rollback policy, and deployment procedures ? `06-data/migration-strategy.md`  

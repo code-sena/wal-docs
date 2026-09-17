@@ -191,4 +191,4 @@ This roadmap defines the delivery plan over three horizons, from MVP to long-ter
 
 * Product Vision → `03-product/vision.md`
 * User Stories implementing roadmap → `04-requirements/user-stories.md`
-* Technical backlog for deferred features → `15-project-control/technical-backlog.md`
+* Technical backlog for deferred features → `15-project-control/technical-backlog.md` (to be created)

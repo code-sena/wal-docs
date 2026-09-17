@@ -19,8 +19,8 @@ graph TB
   USR[User<br/>emergency alerts, contacts, zones]
   ADM[Administrator<br/>users, alerts, zones, moderation]
 
-  subgraph "Alerta Mujer"
-    SYS[Alerta Mujer System]
+  subgraph "Woman Alert"
+    SYS[Woman Alert System]
   end
 
   FCM[Firebase Cloud Messaging<br/>push notifications]
@@ -89,8 +89,8 @@ Both clients communicate exclusively through the API Gateway — no direct servi
 | 3 | **resource-service** | Zones and Help Resources | Safe/risk zones, zone reports, emergency resource directory, call records | `zone`, `zone_report`, `emergency_resource`, `resource_call` |
 | 4 | **admin-service** | Administration and Moderation | User management, moderation actions, audit log, system-wide reports, system configuration | `audit_log`, `user_report`, `moderation_action`, `system_configuration` |
 | 5 | **API Gateway** | — | JWT validation, request routing to services, rate limiting, CORS | — |
-| 6 | **alerta-mujer-mobile** | — | User-facing Android app: panic button, contacts, history, zones, evidence | — |
-| 7 | **alerta-mujer-web** | — | Public landing, authenticated user portal, admin panel | — |
+| 6 | **woman-alert-mobile** | — | User-facing Android app: panic button, contacts, history, zones, evidence | — |
+| 7 | **woman-alert-web** | — | Public landing, authenticated user portal, admin panel | — |
 
 ---
 
