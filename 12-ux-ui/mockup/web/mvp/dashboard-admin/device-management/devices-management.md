@@ -1,44 +1,44 @@
-# Wireframe: Gestión de Dispositivos (Admin)
+# Wireframe: Device Management (Admin)
 
-**Ruta:** `/admin/devices-management`  
-**Componente:** `DeviceManagementComponent`  
-**Layout:** `AdminLayout` (Sidebar admin + Topbar admin)  
-**Rol requerido:** ADMIN  
+**Route:** `/admin/devices-management`  
+**Component:** `DeviceManagementComponent`  
+**Layout:** `AdminLayout` (Admin Sidebar + Admin Topbar)  
+**Required Role:** ADMIN  
 **Guards:** `authGuard` + `adminGuard`  
-**Lazy loading:** sí  
-**Estado:** ✅ Implementada  
+**Lazy loading:** Yes  
+**Status:** ✅ Implemented  
 
 ---
 
-## Layout ASCII — Vista Principal
+## ASCII Layout — Main View
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  ☰  AlertaMujer Admin        [🔔]  [☀️/🌙]  [ Admin ▼ ]        │
 ├──────────┬──────────────────────────────────────────────────────┤
 │          │                                                        │
-│  📊 Dash │   📱 Gestión de Dispositivos                          │
+│  📊 Dash │   📱 Device Management                          │
 │  👥 Usuar│                                                        │
 │  🔔 Alert│   ┌──────────────┐ ┌──────────────┐ ┌─────────────┐  │
-│  🗺️ Zonas│   │  TOTAL       │ │  CONECTADOS  │ │ DESCONECTAD.│  │
+│  🗺️ Zonas│   │  TOTAL       │ │  CONNECTED  │ │ DISCONNECTED│  │
 │  🚨 Emerg│   │              │ │              │ │             │  │
 │  📋 Moder│   │     342      │ │     298      │ │     44      │  │
-│  📱 Disp.│   │ dispositivos │ │  en línea    │ │  sin señal  │  │
+│  📱 Disp.│   │ devices │ │  online    │ │  no signal  │  │
 │          │   └──────────────┘ └──────────────┘ └─────────────┘  │
 │          │                                                        │
 │          │   ┌─────────────────────────────────────────────────┐ │
-│          │   │  FILTROS                                        │ │
-│          │   │  [ 🔍 Buscar por UUID, modelo, usuaria... ]     │ │
+│          │   │  FILTERS                                        │ │
+│          │   │  [ 🔍 Search by UUID, model, user... ]     │ │
 │          │   │                                                  │ │
-│          │   │  [app-chip: Todos●] [app-chip: Conectados]      │ │
-│          │   │  [app-chip: Desconectados] [app-chip: Inactivos]│ │
+│          │   │  [app-chip: All●] [app-chip: Connected]      │ │
+│          │   │  [app-chip: Disconnected] [app-chip: Inactive]│ │
 │          │   └─────────────────────────────────────────────────┘ │
 │          │                                                        │
 │          │   ┌─────────────────────────────────────────────────┐ │
-│          │   │  DISPOSITIVOS  (342 registros) [➕ REGISTRAR]   │ │
+│          │   │  DEVICES  (342 records) [➕ REGISTER]   │ │
 │          │   │                                                  │ │
 │          │   │  ┌───┬──────────────┬──────────┬───────┬──────┐ │ │
-│          │   │  │ # │ UUID / Modelo│ Usuaria  │ 🔋/GPS│ Est. │ │ │
+│          │   │  │ # │ UUID / Model│ User  │ 🔋/GPS│ Status │ │ │
 │          │   │  ├───┼──────────────┼──────────┼───────┼──────┤ │ │
 │          │   │  │ 1 │ a1b2… S21    │ Ana G.   │ 85%💪 │ ✅Co.│ │ │
 │          │   │  │ 2 │ c3d4… A52    │ María L. │ 72%💪 │ ✅Co.│ │ │
@@ -47,7 +47,7 @@
 │          │   │  │ 5 │ abcd… A12    │ Sofía R. │ —     │ ⚫In.│ │ │
 │          │   │  └───┴──────────────┴──────────┴───────┴──────┘ │ │
 │          │   │                                                  │ │
-│          │   │  [ < Anterior ]   Pág. 1 / 69  [ Siguiente > ]  │ │
+│          │   │  [ < Previous ]   Page 1 / 69  [ Next > ]  │ │
 │          │   └─────────────────────────────────────────────────┘ │
 │          │                                                        │
 └──────────┴──────────────────────────────────────────────────────┘
@@ -55,150 +55,150 @@
 
 ---
 
-## Layout ASCII — Modal Detalle / Editar Dispositivo
+## ASCII Layout — Device Detail / Edit Modal
 
 ```
                   ┌──────────────────────────────────────┐
-                  │  📱 Dispositivo a1b2c3d4              │  [✕]
+                  │  📱 Device a1b2c3d4              │  [✕]
                   │                                       │
                   │  UUID:        a1b2c3d4-e5f6-7890      │
-                  │  Modelo:      Samsung Galaxy S21      │
+                  │  Model:      Samsung Galaxy S21      │
                   │  OS:          Android 13              │
-                  │  Versión App: 2.1.0                   │
+                  │  App Version: 2.1.0                   │
                   │                                       │
-                  │  Usuaria:     Ana García              │
-                  │  Correo:      ana@gmail.com           │
+                  │  User:     Ana García              │
+                  │  Email:      ana@gmail.com           │
                   │                                       │
-                  │  Estado:   ● Conectado                │
-                  │  Batería:  85%  ████████████░░        │
-                  │  GPS:      Fuerte  ◉◉◉◉○              │
-                  │  Última sync: Hoy, 10:32 am           │
+                  │  Status:   ● Connected                │
+                  │  Battery:  85%  ████████████░░        │
+                  │  GPS:      Strong  ◉◉◉◉○              │
+                  │  Last sync: Hoy, 10:32 am           │
                   │                                       │
-                  │  ─── Actualizar estado ───────────    │
-                  │  ● Conectado  ○ Desconectado          │
+                  │  ─── Update status ───────────    │
+                  │  ● Connected  ○ Disconnected          │
                   │  ○ Inactivo                           │
                   │                                       │
-                  │  [ CANCELAR ]  [ 💾 ACTUALIZAR ]      │
+                  │  [ CANCEL ]  [ 💾 UPDATE ]      │
                   └──────────────────────────────────────┘
 ```
 
 ---
 
-## Layout ASCII — Modal Registrar Dispositivo
+## Layout ASCII — Modal Registrar Device
 
 ```
                   ┌──────────────────────────────────────┐
-                  │  ➕ Registrar dispositivo             │  [✕]
+                  │  ➕ Register device             │  [✕]
                   │                                       │
-                  │  UUID del dispositivo *               │
+                  │  Device UUID *               │
                   │  [ a1b2c3d4-e5f6-7890              ] │
-                  │  Formato: xxxxxxxx-xxxx-xxxx          │
+                  │  Format: xxxxxxxx-xxxx-xxxx          │
                   │                                       │
-                  │  Usuaria asignada *                   │
-                  │  [ Buscar usuaria...        ▼       ] │
+                  │  User asignada *                   │
+                  │  [ Search user...        ▼       ] │
                   │                                       │
-                  │  Modelo (opcional)                    │
+                  │  Model (opcional)                    │
                   │  [ Samsung Galaxy S21               ] │
                   │                                       │
-                  │  Estado inicial:                      │
+                  │  Status inicial:                      │
                   │  ● Activo   ○ Inactivo                │
                   │                                       │
-                  │  [ CANCELAR ]   [ 💾 REGISTRAR ]      │
+                  │  [ CANCEL ]   [ 💾 REGISTER ]      │
                   └──────────────────────────────────────┘
 ```
 
 ---
 
-## Campos del Formulario
+## Form Fields
 
-### Registrar dispositivo
+### Register device
 
-| Campo | Tipo | Requerido | Validación |
+| Field | Type | Required | Validation |
 |-------|------|-----------|------------|
-| UUID | `text` | ✅ | Formato UUID v4 (`/^[0-9a-f]{8}-[0-9a-f]{4}-/i`) |
-| Usuaria asignada | `select` con búsqueda | ✅ | Usuario existente en sistema |
-| Modelo | `text` | ❌ | Máx. 100 caracteres |
-| Estado inicial | `radio` | ✅ | `Activo` / `Inactivo` |
+| UUID | `text` | ✅ | Format UUID v4 (`/^[0-9a-f]{8}-[0-9a-f]{4}-/i`) |
+| User asignada | `select` with search | ✅ | Existing user in the system |
+| Model | `text` | ❌ | Max. 100 characters |
+| Status inicial | `radio` | ✅ | `Activo` / `Inactivo` |
 
-### Editar dispositivo (modal detalle)
+### Edit Device (Detail Modal)
 
-| Campo | Tipo | Requerido |
+| Field | Type | Required |
 |-------|------|-----------|
-| Estado | `radio` | ✅ | `Conectado` / `Desconectado` / `Inactivo` |
+| Status | `radio` | ✅ | `Connected` / `Disconnected` / `Inactivo` |
 
-### Filtros
+### Filters
 
-| Filtro | Tipo | Valores |
+| Filtro | Type | Valores |
 |--------|------|---------|
-| Búsqueda | `text` | UUID, modelo, nombre de usuaria |
-| Estado | `app-chip` | Todos · Conectados · Desconectados · Inactivos |
+| Search | `text` | UUID, modelo, user name |
+| Status | `app-chip` | All · Connected · Disconnected · Inactive |
 
 ---
 
-## Validaciones
+## Validations
 
 ```typescript
-// Formulario registrar dispositivo
+// Register device form
 uuid     : required, pattern UUID v4
-usuaria  : required, debe existir en UsersService
+usuaria  : required, must exist in UsersService
 modelo   : optional, maxLength(100)
 estado   : required, enum['Activo','Inactivo']
 
-// Editar estado
-estado   : required, enum['Conectado','Desconectado','Inactivo']
+// Edit status
+estado   : required, enum['Connected','Disconnected','Inactivo']
 ```
 
 ---
 
-## Estados
+## Statuss
 
-| Estado | Descripción | UI |
+| Status | Description | UI |
 |--------|-------------|-----|
-| `cargando` | Obteniendo dispositivos | Skeleton stat cards + tabla |
-| `listo` | Datos cargados | Stat cards + tabla paginada |
-| `filtrado` | Chips / búsqueda | Tabla actualizada |
-| `modal-registrar` | Modal nuevo | Formulario vacío |
-| `modal-detalle` | Click en fila | Modal con detalles + edición de estado |
-| `guardando` | POST/PUT en progreso | Botón con spinner |
-| `bateria-critica` | Batería < 20% | Icono y texto en rojo en tabla |
-| `error` | Fallo API | Toast rojo |
+| `cargando` | Obteniendo devices | Skeleton stat cards + tabla |
+| `listo` | Data loaded | Stat cards + tabla paginada |
+| `filtrado` | Chips / búsqueda | Updated table |
+| `modal-registrar` | New device modal | Empty form |
+| `modal-detalle` | Row click | Modal with details + status editing |
+| `guardando` | POST/PUT in progress | Button with spinner |
+| `bateria-critica` | Battery < 20% | Red icon and text in table |
+| `error` | API failure | Red toast |
 
 ---
 
-## Flujo
+## Flow
 
 ```
 /admin/devices-management
   ├── onInit → DevicesService.getAll()
-  │             → Stat cards (total / conectados / desconectados)
+  │             → Stat cards (total / connected / disconnected)
   │             → Tabla paginada
   │
-  ├── Búsqueda / Chips
+  ├── Search / Chips
   │     → DevicesService.getAll(filtros)
-  │     → Actualiza tabla
+  │     → Updates table
   │
   ├── [➕ Registrar]
-  │     → Modal formulario vacío
+  │     → Empty form modal
   │     → [Registrar] → DevicesService.create(datos)
-  │     → Toast éxito → tabla refresca
+  │     → Success toast → table refreshes
   │
-  ├── Click en fila
-  │     → DevicesService.getByUsuario(usuarioId) → pre-carga modal
-  │     → Modal con detalle completo (lectura + editar estado)
+  ├── Row click
+  │     → DevicesService.getByUsuario(usuarioId) → preloads modal
+  │     → Modal with complete details (read-only + edit status)
   │
-  ├── [💾 Actualizar] estado en modal
-  │     → DevicesService.updateEstado(id, nuevoEstado)
-  │     → Badge actualizado en tabla; toast éxito
+  ├── [💾 Actualizar] status in modal
+  │     → DevicesService.updateStatus(id, newStatus)
+  │     → Badge updated in table; success toast
   │
-  └── [🗑️ Eliminar] (dentro del modal detalle)
-        → Modal danger: "¿Eliminar dispositivo UUID?"
+  └── [🗑️ Delete] (dentro del modal detalle)
+        → Modal danger: "¿Delete dispositivo UUID?"
         → DevicesService.delete(id)
-        → Fila eliminada de tabla
+        → Row removed from table
 ```
 
 ---
 
-## Estilos Aplicados
+## Applied Styles
 
 ```css
 background: var(--bg-base);
@@ -209,12 +209,12 @@ border: 1.5px solid var(--border);
 border-radius: var(--dash-radius-card);
 box-shadow: var(--dash-shadow-card);
 
-/* Badges estado dispositivo */
+/* Device status badges */
 --estado-conectado    : background var(--green-pale)  / color var(--green);
 --estado-desconectado : background var(--red-pale)    / color var(--red);
 --estado-inactivo     : background #f3f4f6 / color var(--text-dim);
 
-/* Batería crítica (< 20%) */
+/* Battery crítica (< 20%) */
 color: var(--red); font-weight: 600;
 
 /* GPS */
@@ -222,73 +222,73 @@ color: var(--red); font-weight: 600;
 --gps-moderada : color var(--amber);
 --gps-debil    : color var(--red);
 
-/* UUID en tabla */
+/* UUID in table */
 font-family: monospace; font-size: 0.8rem; color: var(--text-dim);
 
-/* Fila hover */
+/* Row hover */
 background: var(--bg-card-hover); cursor: pointer;
 ```
 
 ---
 
-## Componentes Utilizados
+## Components Used
 
-| Componente | Variante/Config | Uso |
+| Component | Variant/Config | Usage |
 |------------|----------------|-----|
 | `app-card` | — | Stat cards, filtros, tabla |
-| `app-chip` | `active: boolean` | Filtros de estado |
+| `app-chip` | `active: boolean` | Status filters |
 | `app-button` | `primary`, `sm` | "➕ Registrar" |
-| `app-modal` | `md`, `default` | Modal registrar + detalle/editar |
-| `app-modal` | `sm`, `danger` | Confirmar eliminar dispositivo |
-| `app-spinner` | `sm`, `inline` | Estados loading |
+| `app-modal` | `md`, `default` | Register + detail/edit modal |
+| `app-modal` | `sm`, `danger` | Confirm device deletion |
+| `app-spinner` | `sm`, `inline` | Statuss loading |
 
 ---
 
 ## Responsive
 
-| Breakpoint | Comportamiento |
+| Breakpoint | Behavior |
 |------------|---------------|
-| Desktop `>1024px` | Stat cards 3 columnas; tabla completa con UUID |
-| Tablet `760–1024px` | Stat cards 2 columnas; UUID truncado |
-| Mobile `<760px` | Stat cards apiladas; tabla scroll horizontal; UUID oculto |
+| Desktop `>1024px` | Stat cards 3 columns; full table with UUID |
+| Tablet `760–1024px` | Stat cards 2 columns; truncated UUID |
+| Mobile `<760px` | Stacked stat cards; horizontal table scrolling; UUID hidden |
 
 ---
 
-## Accesibilidad
+## Accessibility
 
-- Tabla con `<caption>` "Lista de dispositivos registrados"
-- UUID con `aria-label="Identificador único del dispositivo"` y `title` completo
-- Batería crítica con `aria-label="Batería crítica: 15%"`
-- Stat card "Desconectados" con `aria-live="polite"` para actualizaciones
-- Modal con `role="dialog"`, `aria-modal="true"`, foco atrapado
+- Tabla con `<caption>` "Lista de devices registrados"
+- UUID with `aria-label="Unique device identifier"` and full `title`
+- Battery crítica con `aria-label="Battery crítica: 15%"`
+- Stat card "Disconnected" con `aria-live="polite"` para actualizaciones
+- Modal con `role="dialog"`, `aria-modal="true"`, focus trapped
 
 ---
 
-## Integración con Servicios
+## Service Integration
 
 ```typescript
-// DevicesService — métodos utilizados
+// DevicesService — methods used
 
-DevicesService.getAll(): Observable<Dispositivo[]>
+DevicesService.getAll(): Observable<Device[]>
 // GET /devices
 
-DevicesService.getByUsuario(usuarioId: number): Observable<Dispositivo>
+DevicesService.getByUsuario(usuarioId: number): Observable<Device>
 // GET /devices?usuarioId=:id
 
-DevicesService.create(datos: Partial<Dispositivo>): Observable<Dispositivo>
+DevicesService.create(datos: Partial<Device>): Observable<Device>
 // POST /devices
 
-DevicesService.update(id: number, datos: Partial<Dispositivo>): Observable<Dispositivo>
+DevicesService.update(id: number, datos: Partial<Device>): Observable<Device>
 // PUT /devices/:id
 
-DevicesService.updateEstado(id: number, estado: string): Observable<Dispositivo>
+DevicesService.updateStatus(id: number, estado: string): Observable<Device>
 // PATCH /devices/:id/estado
 
 DevicesService.delete(id: number): Observable<void>
 // DELETE /devices/:id
 
-// Modelo de datos
-interface Dispositivo {
+// Model de datos
+interface Device {
   id          : number;
   usuarioId   : number;
   uuid        : string;
@@ -296,22 +296,22 @@ interface Dispositivo {
   os          : string;
   versionApp  : string;
   battery     : number;
-  gpsSignal   : 'Fuerte' | 'Moderada' | 'Débil';
-  estado      : 'Conectado' | 'Desconectado' | 'Inactivo';
+  gpsSignal   : 'Strong' | 'Moderada' | 'Débil';
+  estado      : 'Connected' | 'Disconnected' | 'Inactivo';
   lastSync    : string;
 }
 ```
 
 ---
 
-## Casos de Uso
+## Casos de Usage
 
-| # | Actor | Acción | Resultado |
+| # | Actor | Action | Result |
 |---|-------|--------|-----------|
-| 1 | Admin | Navega a `/admin/devices-management` | Ve stat cards + tabla de todos los dispositivos |
-| 2 | Admin | Filtra por "Desconectados" | Solo dispositivos sin señal activa |
-| 3 | Admin | Busca por UUID parcial | Tabla filtra el dispositivo específico |
-| 4 | Admin | Click "➕ Registrar" | Modal con formulario para vincular nuevo dispositivo |
-| 5 | Admin | Click en fila | Modal con detalle completo del dispositivo + usuaria |
-| 6 | Admin | Cambia estado a "Inactivo" en modal | Badge actualizado; dispositivo no recibirá notificaciones |
-| 7 | Admin | Dispositivo con batería < 20% | Batería en rojo con indicador de alerta |
+| 1 | Admin | Navigates to `/admin/devices-management` | Ve stat cards + tabla de todos los devices |
+| 2 | Admin | Filtra por "Disconnected" | Solo devices no signal activa |
+| 3 | Admin | Searches by partial UUID | Table filters the specific device |
+| 4 | Admin | Clicks "➕ Register" | Modal with form to link a new device |
+| 5 | Admin | Row click | Modal with complete device + user details |
+| 6 | Admin | Changes status to "Inactive" in modal | Badge actualizado; device will not receive notifications |
+| 7 | Admin | Device con batería < 20% | Battery en rojo con indicador de alerta |
