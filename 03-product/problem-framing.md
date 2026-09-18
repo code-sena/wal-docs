@@ -1,6 +1,6 @@
 # Problem Framing — Woman Alert
 
-This document describes the problem that Alerta Mujer addresses, using real data taken from the project's SRS and from the team's own research (written survey and oral round). A few points remain undefined because they depend on a team decision rather than an existing source — these are marked as "pending" instead of being filled in with an invented number.
+This document describes the problem that Woman Alert addresses, using real data taken from the project's SRS and from the team's own research (written survey and oral round). A few points remain undefined because they depend on a team decision rather than an existing source — these are marked as "pending" instead of being filled in with an invented number.
 
 ## 1. The problem in one sentence
 
@@ -72,3 +72,7 @@ These metrics are already defined in the SRS as non-functional requirements (NFR
 * User Stories that implement this solution → `04-requirements/user-stories.md`
 
 * Detailed KPIs → `13-operations/README.md`
+
+* Domain entities discovered through problem framing → `02-domain/entities-and-rules.md`
+
+* Non-functional requirements derived from evidence findings → `04-requirements/non-functional.md`

@@ -1,6 +1,6 @@
 # Functional Requirements — Woman Alert
 
-> All FRs come from the SRS (Section 3.2). The "Source (US)" column indicates whether a user story already exists in `03-producto/product-backlog.md`; where it says "Pending", it represents a real gap — an FR without a user story yet, not invented data. For the actual implementation status of each FR (done / in progress / under reconstruction / pending), see `04-requisitos/traceability-matrix.md` — this table does not repeat it to avoid having the same data in two locations that could become out of sync.
+> All FRs come from the SRS (Section 3.2). The "Source (US)" column indicates whether a user story already exists in `03-product/product-backlog.md`; where it says "Pending", it represents a real gap — an FR without a user story yet, not invented data. For the actual implementation status of each FR (done / in progress / under reconstruction / pending), see `04-requirements/traceability-matrix.md` — this table does not repeat it to avoid having the same data in two locations that could become out of sync.
 
 ## Mobile (primary channel)
 
@@ -71,6 +71,6 @@ The SRS explicitly clarifies that there is no FR dedicated to "anonymity": the p
 
 ## Correlations
 
-* Formalized user stories → `04-requisitos/user-stories.md`
-* Non-functional requirements → `04-requisitos/non-functional.md`
-* Traceability matrix → `04-requisitos/traceability-matrix.md`
+* Formalized user stories → `04-requirements/user-stories.md`
+* Non-functional requirements → `04-requirements/non-functional.md`
+* Traceability matrix → `04-requirements/traceability-matrix.md`

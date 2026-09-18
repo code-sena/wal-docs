@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlertaMujer - Mi Ubicación (/dashboard/phone-location)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <style>
+    :root {
+      /* Tokens oficiales AlertaMujer */
+      --bg-base: #f5f4ff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f0eeff;
+      --border: #c4b5fd;
+      --text-primary: #1e1a3c;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+      
+      --purple-deep: #7c3aed;
+      --purple-mid: #a78bfa;
+      --purple-light: #c4b5fd;
+      --purple-pale: #ede9fe;
+      --purple-pale-hover: #e0d8fc;
+      --pink: #ec4899;
+      --pink-magenta: #db079c;
+      
+      --green: #16a34a;
+      --green-pale: #dcfce7;
+      --amber: #d97706;
+      --amber-pale: #fef3c7;
+      --red: #dc2626;
+      --red-pale: #fee2e2;
+      --blue: #3b82f6;
+      --blue-pale: #dbeafe;
+      
+      --gradient-btn: linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%);
+      --shadow-btn: 0 8px 24px rgba(101, 13, 201, 0.32);
+      --dash-radius-card: 12px;
+      --dash-shadow-card: 0 0 0 1.5px var(--border), 0 4px 16px rgba(124, 58, 237, 0.08);
+      --radius-btn: 50px;
+      --font-family: 'Plus Jakarta Sans', 'Nunito', sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg-base: #14101f;
+      --bg-card: #1e1833;
+      --bg-card-hover: #241d3d;
+      --border: #4c3a80;
+      --text-primary: #ede9fe;
+      --text-muted: #a8a0c4;
+      --text-dim: #766e94;
+      --purple-deep: #9d6ff0;
+      --purple-mid: #b79bf5;
+      --purple-light: #6d4fae;
+      --purple-pale: #2b204a;
+      --green: #4ade80;
+      --red: #f87171;
+      --amber: #fbbf24;
+      --dash-shadow-card: 0 0 0 1.5px var(--border), 0 4px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    [data-theme="dark"] .leaflet-layer,
+    [data-theme="dark"] .leaflet-pane {
+      filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout: Sidebar + Main */
+    .dashboard-layout {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-card);
+      border-right: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .brand-header {
+      padding: 24px 20px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(196, 181, 253, 0.35);
+    }
+
+    .brand-logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-size: 1.22rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.15;
+    }
+
+    .brand-name span {
+      color: #db079c;
+    }
+
+    .brand-tagline {
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--purple-deep);
+      margin-top: 2px;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item a:hover {
+      background: var(--bg-card-hover);
+      color: var(--purple-deep);
+    }
+
+    .nav-item.active a {
+      background: var(--purple-pale);
+      color: var(--purple-deep);
+      font-weight: 700;
+      box-shadow: inset 3px 0 0 var(--purple-deep);
+    }
+
+    .nav-item .icon {
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+    }
+
+    .sidebar-footer {
+      padding: 18px 16px;
+      border-top: 1px solid rgba(196, 181, 253, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .status-badge-custody {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--purple-pale);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .dot-pulse {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-stealth {
+      width: 100%;
+      padding: 9px 12px;
+      background: transparent;
+      border: 1.5px dashed var(--purple-light);
+      border-radius: 8px;
+      color: var(--purple-deep);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-stealth:hover {
+      background: var(--purple-pale);
+      border-style: solid;
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 70px;
+      background: var(--bg-card);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      flex-shrink: 0;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .breadcrumb span.current {
+      color: var(--purple-deep);
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .network-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--purple-deep);
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 12px 5px 6px;
+      border-radius: 50px;
+      background: var(--purple-pale);
+      border: 1px solid var(--purple-light);
+    }
+
+    .avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--purple-deep);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-info {
+      line-height: 1.15;
+    }
+
+    .user-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .user-id {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    /* Content Area */
+    .content-container {
+      padding: 24px 28px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .header-quick-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    /* Card Component */
+    .app-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--dash-radius-card);
+      box-shadow: var(--dash-shadow-card);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1.5px solid rgba(196, 181, 253, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .icon-pin {
+      color: var(--purple-deep);
+    }
+
+    /* Map Section */
+    .map-container-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    #current-location-map {
+      height: 320px;
+      width: 100%;
+      background: #e5e7eb;
+      z-index: 10;
+    }
+
+    /* Map Overlay Badges */
+    .map-floating-overlay {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-badge-status {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] .map-badge-status {
+      background: rgba(30, 24, 51, 0.9);
+      color: var(--text-primary);
+    }
+
+    /* Telemetry Metrics Bar below map */
+    .telemetry-bar {
+      padding: 18px 24px;
+      display: grid;
+      grid-template-columns: 2fr 1.1fr 1fr 1fr 1.3fr auto;
+      gap: 16px;
+      align-items: center;
+      background: var(--bg-card);
+      border-top: 1.5px solid rgba(196, 181, 253, 0.35);
+    }
+
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .telemetry-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .telemetry-value {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Signal Chips */
+    .gps-chip {
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
+    }
+
+    .gps-strong {
+      background: var(--green-pale);
+      color: var(--green);
+    }
+
+    .gps-moderate {
+      background: var(--amber-pale);
+      color: var(--amber);
+    }
+
+    .gps-weak {
+      background: var(--red-pale);
+      color: var(--red);
+    }
+
+    /* Battery progress inline */
+    .battery-visual {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .battery-bar-container {
+      width: 54px;
+      height: 9px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    [data-theme="dark"] .battery-bar-container {
+      background: #373059;
+    }
+
+    .battery-fill {
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .battery-fill.high {
+      background: var(--green);
+      width: 85%;
+    }
+
+    .battery-fill.medium {
+      background: var(--amber);
+      width: 45%;
+    }
+
+    .battery-fill.low {
+      background: var(--red);
+      width: 15%;
+    }
+
+    /* Button Primary */
+    .btn-update {
+      background: var(--gradient-btn);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-btn);
+      padding: 10px 20px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-btn);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-update:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 28px rgba(101, 13, 201, 0.42);
+    }
+
+    .btn-update:active {
+      transform: translateY(0);
+    }
+
+    .btn-update.updating {
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .btn-update.updating .icon-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Historial Section */
+    .period-selector-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--purple-pale);
+      border: 1px solid var(--purple-light);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--purple-deep);
+      cursor: pointer;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .history-table caption {
+      text-align: left;
+      padding: 14px 24px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(196, 181, 253, 0.25);
+    }
+
+    .history-table th {
+      padding: 12px 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      background: rgba(245, 244, 255, 0.6);
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    [data-theme="dark"] .history-table th {
+      background: rgba(30, 24, 51, 0.8);
+    }
+
+    .history-table td {
+      padding: 14px 20px;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      border-bottom: 1px solid rgba(196, 181, 253, 0.3);
+      vertical-align: middle;
+      transition: background 0.15s ease;
+    }
+
+    .history-row {
+      cursor: pointer;
+    }
+
+    .history-row:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .history-row.selected td {
+      background: var(--purple-pale);
+    }
+
+    .history-row.selected td:first-child {
+      border-left: 3px solid var(--purple-deep);
+    }
+
+    .row-index {
+      font-weight: 700;
+      color: var(--purple-deep);
+      width: 48px;
+    }
+
+    .row-time {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .row-time .sub {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .row-address {
+      font-weight: 600;
+    }
+
+    .row-coords {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: block;
+      font-family: monospace;
+      margin-top: 2px;
+    }
+
+    .action-btn-mini {
+      padding: 5px 10px;
+      border: 1px solid var(--purple-light);
+      background: #fff;
+      color: var(--purple-deep);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    [data-theme="dark"] .action-btn-mini {
+      background: var(--bg-card);
+      border-color: var(--border);
+    }
+
+    .action-btn-mini:hover {
+      background: var(--purple-deep);
+      color: #fff;
+    }
+
+    /* Table Pagination */
+    .table-footer {
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(196, 181, 253, 0.35);
+      background: var(--bg-card);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-page {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .btn-page:hover:not(:disabled) {
+      background: var(--bg-card-hover);
+      border-color: var(--purple-deep);
+      color: var(--purple-deep);
+    }
+
+    .btn-page.active {
+      background: var(--purple-deep);
+      border-color: var(--purple-deep);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .btn-page:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Custom Leaflet Marker Styling */
+    .custom-gps-pin {
+      width: 24px;
+      height: 24px;
+      background: #7c3aed;
+      border: 3px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 14px rgba(124, 58, 237, 0.65);
+      position: relative;
+    }
+
+    .custom-gps-pin::after {
+      content: '';
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.25);
+      top: -13px;
+      left: -13px;
+      animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.6); opacity: 0.9; }
+      80%, 100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    /* Toast Notification */
+    .toast-feedback {
+      position: fixed;
+      bottom: 24px;
+      right: 28px;
+      background: var(--text-primary);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-feedback.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 80px;
+      }
+      .brand-title-wrap, .brand-tagline, .nav-item span.text, .sidebar-footer, .user-info {
+        display: none;
+      }
+      .brand-header {
+        justify-content: center;
+        padding: 20px 10px;
+      }
+      .nav-item a {
+        justify-content: center;
+        padding: 14px;
+      }
+      .telemetry-bar {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .btn-update {
+        grid-column: span 2;
+        justify-content: center;
+      }
+      #current-location-map {
+        height: 260px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        display: none;
+      }
+      .topbar {
+        padding: 0 16px;
+      }
+      .content-container {
+        padding: 16px;
+        gap: 16px;
+      }
+      #current-location-map {
+        height: 200px;
+      }
+      .page-title {
+        font-size: 1.5rem;
+      }
+      .telemetry-bar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .btn-update {
+        grid-column: span 1;
+      }
+      .history-table th:nth-child(4),
+      .history-table td:nth-child(4) {
+        display: none; /* Hide GPS col on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar Oficial AlertaMujer -->
+    <aside class="sidebar" aria-label="Menú principal de navegación">
+      <div class="brand-header">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwgYqSuuhsd2-iXde0yOdTSA36rVlwlMR1_X8XAaw82H6nTS35SzYSo4uQCvP5YM9Og3BvaFF-YnbE98Tk2pwu3V46Wd-LbWkdjss4szxI4kgCNM1ijYQsi33T6UaUPuUKy3m4vW2585pdCaXPVNbTkW2K4N8KZEe75ZRa7_JbLAX2kjRjT-a4v-Dw9RxQAnYa7v0Pis9NPicG66I5bZGvVF82cCBIiwx-4eP0-kZXm3OeydIxM-cIkls6mSACh9RBlQ" alt="Isotipo Oficial AlertaMujer" class="brand-logo-img">
+        <div class="brand-title-wrap">
+          <div class="brand-name">Alerta<span>Mujer</span></div>
+          <div class="brand-tagline">SEGURIDAD PARA TODAS</div>
+        </div>
+      </div>
+
+      <ul class="nav-list" role="navigation">
+        <li class="nav-item">
+          <a href="/dashboard/home">
+            <span class="icon">🏠</span>
+            <span class="text">Home</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a href="/dashboard/phone-location" aria-current="page">
+            <span class="icon">📍</span>
+            <span class="text">Ubicación</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/alert-history">
+            <span class="icon">🔔</span>
+            <span class="text">Alertas y SOS</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/evidence">
+            <span class="icon">🎬</span>
+            <span class="text">Evidencias</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/device-status">
+            <span class="icon">📱</span>
+            <span class="text">Dispositivo</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/emergency-contacts">
+            <span class="icon">👥</span>
+            <span class="text">Contactos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/assistance">
+            <span class="icon">🛡️</span>
+            <span class="text">Asistencia</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="status-badge-custody">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="dot-pulse"></div>
+            <span>Custodia Activa</span>
+          </div>
+          <span style="font-size:0.7rem; color:var(--purple-deep);">ALM-94827</span>
+        </div>
+        <button class="btn-stealth" title="Ocultar interfaz inmediatamente" onclick="triggerStealthMode()">
+          <span>👁️‍🗨️</span> Modo Sigilo (Escape)
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="breadcrumb">
+          <span>DASHBOARD</span>
+          <span>/</span>
+          <span>MONITOREO GPS</span>
+          <span>/</span>
+          <span class="current">UBICACIÓN DEL TELÉFONO</span>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="network-badge" role="status" aria-live="polite">
+            <span style="width:7px; height:7px; background:#10b981; border-radius:50%; display:inline-block;"></span>
+            <span>Red Segura Activa</span>
+          </div>
+
+          <button class="btn-icon" id="theme-toggle-btn" title="Alternar Modo Oscuro / Claro" aria-label="Cambiar tema">
+            <span id="theme-icon">☀️</span>
+          </button>
+
+          <button class="btn-icon" title="Notificaciones activas" aria-label="Notificaciones" style="position:relative;">
+            <span>🔔</span>
+            <span style="position:absolute; top:4px; right:4px; width:7px; height:7px; background:var(--pink-magenta); border-radius:50%;"></span>
+          </button>
+
+          <div class="user-pill">
+            <div class="avatar-circle">AG</div>
+            <div class="user-info">
+              <div class="user-name">Ana García</div>
+              <div class="user-id">ID: ALM-94827</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="content-container">
+        
+        <!-- Page Title & Header -->
+        <div class="page-header">
+          <div class="page-title-wrap">
+            <h1 class="page-title">
+              <span>📍</span> Ubicación del Teléfono
+            </h1>
+            <p class="page-subtitle">Monitoreo satelital en tiempo real con geocerca perimetral y precisión nanométrica.</p>
+          </div>
+
+          <div class="header-quick-telemetry">
+            <div class="badge-chip" style="background:var(--purple-pale); color:var(--purple-deep); border:1px solid var(--purple-light);">
+              <span>🛰️</span> GPS Dual L1/L5 Activo
+            </div>
+            <div class="badge-chip" style="background:var(--green-pale); color:var(--green); border:1px solid #86efac;">
+              <span>🛡️</span> Geocerca Segura: Chapinero
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 1: Ubicación Actual -->
+        <section class="app-card" aria-label="Card Ubicación Actual">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="icon-pin">📍</span> Ubicación Actual del Dispositivo
+            </div>
+            <div style="font-size:0.8rem; font-weight:600; color:var(--purple-deep); background:var(--purple-pale); padding:4px 10px; border-radius:6px;">
+              Transmisión en vivo · cada 5s
+            </div>
+          </div>
+
+          <div class="map-container-wrapper">
+            <div id="current-location-map" role="region" aria-label="Mapa de ubicación actual del dispositivo"></div>
+            
+            <div class="map-floating-overlay">
+              <div class="map-badge-status">
+                <span style="width:8px; height:8px; border-radius:50%; background:#7c3aed;"></span>
+                <span>Margen de precisión: ± 3.5 metros</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Datos de Ubicación Actual debajo del mapa -->
+          <div class="telemetry-bar">
+            
+            <!-- Dirección -->
+            <div class="telemetry-item">
+              <span class="telemetry-label">📌 DIRECCIÓN ACTUAL</span>
+              <span class="telemetry-value" id="current-address">Cra 7 # 34-12, Teusaquillo</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Bogotá D.C. · Localidad Teusaquillo</span>
+            </div>
+
+            <!-- Hora -->
+            <div class="telemetry-item">
+              <span class="telemetry-label">🕐 ÚLTIMO REPORTE</span>
+              <span class="telemetry-value" id="current-time">Hoy, 10:32:45 AM</span>
+              <span style="font-size:0.75rem; color:var(--green); font-weight:600;">Sincronizado hace 12s</span>
+            </div>
+
+            <!-- Señal GPS -->
+            <div class="telemetry-item">
+              <span class="telemetry-label">📶 SEÑAL GPS</span>
+              <div class="gps-chip gps-strong" id="current-gps-chip" aria-label="Señal GPS: Fuerte">
+                <span>●</span> Fuerte (±3m)
+              </div>
+            </div>
+
+            <!-- Batería -->
+            <div class="telemetry-item">
+              <span class="telemetry-label">🔋 BATERÍA DISPOSITIVO</span>
+              <div class="battery-visual">
+                <span class="telemetry-value" id="current-battery-text" style="color:var(--green);">85%</span>
+                <div class="battery-bar-container" title="Batería al 85%">
+                  <div class="battery-fill high" id="current-battery-bar"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lat/Lng -->
+            <div class="telemetry-item">
+              <span class="telemetry-label">📐 COORDENADAS</span>
+              <span class="telemetry-value" style="font-family:monospace; font-size:0.84rem;" id="current-coords">4.6221° N, 74.0671° W</span>
+              <span style="font-size:0.72rem; color:var(--text-muted);">Datum WGS84 · Alt: 2625m</span>
+            </div>
+
+            <!-- Botón Actualizar Ubicación -->
+            <div>
+              <button class="btn-update" id="btn-refresh-location" aria-label="Actualizar ubicación ahora" onclick="handleRefreshLocation()">
+                <span class="icon-spin" id="refresh-icon">🔄</span>
+                <span id="refresh-btn-text">ACTUALIZAR UBICACIÓN</span>
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Card 2: Historial de Ubicaciones -->
+        <section class="app-card" aria-label="Card Historial de Ubicaciones">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🕐</span> Historial de Ubicaciones
+              <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-left:6px;">(18 registros hoy)</span>
+            </div>
+
+            <!-- app-period-badge Dropdown -->
+            <div class="period-selector-dropdown" id="period-dropdown" role="button" tabindex="0" aria-label="Seleccionar período de tiempo" onclick="togglePeriodSelector()">
+              <span>📅 Período:</span>
+              <strong id="selected-period-label">Hoy · 24 Octubre</strong>
+              <span>▼</span>
+            </div>
+          </div>
+
+          <!-- Tabla Historial -->
+          <div class="table-container">
+            <table class="history-table" role="table">
+              <caption>Historial cronológico de telemetría y coordenadas GPS registradas para Ana García</caption>
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Fecha / Hora</th>
+                  <th scope="col">Dirección & Coordenadas</th>
+                  <th scope="col">Señal GPS</th>
+                  <th scope="col">Batería</th>
+                  <th scope="col" style="text-align:right;">Inspección</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                
+                <!-- Fila 1 (Seleccionada) -->
+                <tr class="history-row selected" data-lat="4.6221" data-lng="-74.0671" data-address="Cra 7 # 34-12, Teusaquillo" data-time="10:32 AM" data-battery="85%" data-gps="Fuerte" onclick="selectRow(this)">
+                  <td class="row-index">1</td>
+                  <td class="row-time">
+                    Hoy, 10:32 AM
+                    <span class="sub">Hace 3 minutos</span>
+                  </td>
+                  <td class="row-address">
+                    Cra 7 # 34-12, Teusaquillo
+                    <span class="row-coords">4.6221° N, 74.0671° W (±3.5m)</span>
+                  </td>
+                  <td>
+                    <span class="gps-chip gps-strong" aria-label="Señal GPS: Fuerte">
+                      <span>●</span> Fuerte
+                    </span>
+                  </td>
+                  <td>
+                    <div class="battery-visual">
+                      <span style="font-weight:700; color:var(--green);">85%</span>
+                      <div class="battery-bar-container"><div class="battery-fill high" style="width:85%;"></div></div>
+                    </div>
+                  </td>
+                  <td style="text-align:right;">
+                    <button class="action-btn-mini" title="Volar a este punto en el mapa">📍 Ver en mapa</button>
+                  </td>
+                </tr>
+
+                <!-- Fila 2 -->
+                <tr class="history-row" data-lat="4.6395" data-lng="-74.0898" data-address="Av. El Dorado # 45-10, Salitre" data-time="10:27 AM" data-battery="84%" data-gps="Fuerte" onclick="selectRow(this)">
+                  <td class="row-index">2</td>
+                  <td class="row-time">
+                    Hoy, 10:27 AM
+                    <span class="sub">Hace 8 minutos</span>
+                  </td>
+                  <td class="row-address">
+                    Av. El Dorado # 45-10, Salitre
+                    <span class="row-coords">4.6395° N, 74.0898° W (±4.0m)</span>
+                  </td>
+                  <td>
+                    <span class="gps-chip gps-strong" aria-label="Señal GPS: Fuerte">
+                      <span>●</span> Fuerte
+                    </span>
+                  </td>
+                  <td>
+                    <div class="battery-visual">
+                      <span style="font-weight:700; color:var(--green);">84%</span>
+                      <div class="battery-bar-container"><div class="battery-fill high" style="width:84%;"></div></div>
+                    </div>
+                  </td>
+                  <td style="text-align:right;">
+                    <button class="action-btn-mini" title="Volar a este punto en el mapa">📍 Ver en mapa</button>
+                  </td>
+                </tr>
+
+                <!-- Fila 3 -->
+                <tr class="history-row" data-lat="4.6180" data-lng="-74.0722" data-address="Calle 26 con Cra 19, Centro" data-time="10:15 AM" data-battery="82%" data-gps="Moderada" onclick="selectRow(this)">
+                  <td class="row-index">3</td>
+                  <td class="row-time">
+                    Hoy, 10:15 AM
+                    <span class="sub">Hace 20 minutos</span>
+                  </td>
+                  <td class="row-address">
+                    Calle 26 con Cra 19, Centro Internacional
+                    <span class="row-coords">4.6180° N, 74.0722° W (±6.8m)</span>
+                  </td>
+                  <td>
+                    <span class="gps-chip gps-moderate" aria-label="Señal GPS: Moderada">
+                      <span>●</span> Moderada
+                    </span>
+                  </td>
+                  <td>
+                    <div class="battery-visual">
+                      <span style="font-weight:700; color:var(--green);">82%</span>
+                      <div class="battery-bar-container"><div class="battery-fill high" style="width:82%;"></div></div>
+                    </div>
+                  </td>
+                  <td style="text-align:right;">
+                    <button class="action-btn-mini" title="Volar a este punto en el mapa">📍 Ver en mapa</button>
+                  </td>
+                </tr>
+
+                <!-- Fila 4 -->
+                <tr class="history-row" data-lat="4.6362" data-lng="-74.0815" data-address="Cra 30 # 45-03, Palermo" data-time="09:50 AM" data-battery="80%" data-gps="Fuerte" onclick="selectRow(this)">
+                  <td class="row-index">4</td>
+                  <td class="row-time">
+                    Hoy, 09:50 AM
+                    <span class="sub">Hace 45 minutos</span>
+                  </td>
+                  <td class="row-address">
+                    Cra 30 # 45-03, Palermo
+                    <span class="row-coords">4.6362° N, 74.0815° W (±3.0m)</span>
+                  </td>
+                  <td>
+                    <span class="gps-chip gps-strong" aria-label="Señal GPS: Fuerte">
+                      <span>●</span> Fuerte
+                    </span>
+                  </td>
+                  <td>
+                    <div class="battery-visual">
+                      <span style="font-weight:700; color:var(--green);">80%</span>
+                      <div class="battery-bar-container"><div class="battery-fill high" style="width:80%;"></div></div>
+                    </div>
+                  </td>
+                  <td style="text-align:right;">
+                    <button class="action-btn-mini" title="Volar a este punto en el mapa">📍 Ver en mapa</button>
+                  </td>
+                </tr>
+
+                <!-- Fila 5 -->
+                <tr class="history-row" data-lat="4.6584" data-lng="-74.0934" data-address="Parque Simón Bolívar, Acceso Norte" data-time="09:30 AM" data-battery="79%" data-gps="Fuerte" onclick="selectRow(this)">
+                  <td class="row-index">5</td>
+                  <td class="row-time">
+                    Hoy, 09:30 AM
+                    <span class="sub">Hace 1h 5m</span>
+                  </td>
+                  <td class="row-address">
+                    Parque Metropolitano Simón Bolívar, Acceso Norte
+                    <span class="row-coords">4.6584° N, 74.0934° W (±2.5m)</span>
+                  </td>
+                  <td>
+                    <span class="gps-chip gps-strong" aria-label="Señal GPS: Fuerte">
+                      <span>●</span> Fuerte
+                    </span>
+                  </td>
+                  <td>
+                    <div class="battery-visual">
+                      <span style="font-weight:700; color:var(--green);">79%</span>
+                      <div class="battery-bar-container"><div class="battery-fill high" style="width:79%;"></div></div>
+                    </div>
+                  </td>
+                  <td style="text-align:right;">
+                    <button class="action-btn-mini" title="Volar a este punto en el mapa">📍 Ver en mapa</button>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div class="table-footer">
+            <div>
+              Mostrando <strong style="color:var(--text-primary);">1 - 5</strong> de <strong>18</strong> ubicaciones registradas
+            </div>
+
+            <div class="pagination-controls">
+              <button class="btn-page" disabled aria-label="Página anterior">&lt; Anterior</button>
+              <button class="btn-page active" aria-label="Página 1">1</button>
+              <button class="btn-page" aria-label="Página 2">2</button>
+              <button class="btn-page" aria-label="Página 3">3</button>
+              <button class="btn-page" aria-label="Página 4">4</button>
+              <button class="btn-page" aria-label="Página siguiente">Siguiente &gt;</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notification Feedback -->
+  <div id="toast-message" class="toast-feedback" role="alert" aria-live="assertive">
+    <span id="toast-icon">✅</span>
+    <span id="toast-text">Coordenadas actualizadas con éxito desde el satélite.</span>
+  </div>
+
+  <!-- Script interactivo de inicialización Leaflet y estados -->
+  <script>
+    let map;
+    let currentMarker;
+    let accuracyCircle;
+    
+    // Coordenadas iniciales (Bogotá - Teusaquillo / Chapinero)
+    const initialLat = 4.6221;
+    const initialLng = -74.0671;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initLeafletMap();
+      setupThemeToggle();
+    });
+
+    function initLeafletMap() {
+      // Inicializar mapa centrado en Teusaquillo
+      map = L.map('current-location-map', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([initialLat, initialLng], 15);
+
+      // Tiles CartoDB Positron claros
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        subdomains: 'abcd'
+      }).addTo(map);
+
+      // Icono custom para el marcador principal (#7c3aed)
+      const customIcon = L.divIcon({
+        className: 'custom-gps-pin',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      // Marcador en posición actual
+      currentMarker = L.marker([initialLat, initialLng], { icon: customIcon }).addTo(map);
+
+      // Círculo de precisión #a78bfa con opacidad 0.25 (radio 80m representativo)
+      accuracyCircle = L.circle([initialLat, initialLng], {
+        radius: 85,
+        color: '#7c3aed',
+        fillColor: '#a78bfa',
+        fillOpacity: 0.25,
+        weight: 1.5
+      }).addTo(map);
+
+      // Popup informativo inicial
+      currentMarker.bindPopup(`
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; padding:4px;">
+          <strong style="color:#7c3aed; font-size:0.95rem;">📍 Posición Actual de Ana</strong>
+          <div style="font-size:0.82rem; color:#374151; margin-top:3px;">Cra 7 # 34-12, Teusaquillo</div>
+          <div style="font-size:0.75rem; color:#6b7280; margin-top:2px;">Margen de precisión: ±3.5m</div>
+        </div>
+      `).openPopup();
+    }
+
+    // Manejador de click en fila de historial (flyTo)
+    function selectRow(rowElement) {
+      // Desmarcar otras filas
+      document.querySelectorAll('.history-row').forEach(row => row.classList.remove('selected'));
+      rowElement.classList.add('selected');
+
+      const lat = parseFloat(rowElement.dataset.lat);
+      const lng = parseFloat(rowElement.dataset.lng);
+      const address = rowElement.dataset.address;
+      const time = rowElement.dataset.time;
+      const battery = rowElement.dataset.battery;
+      const gps = rowElement.dataset.gps;
+
+      // Volar al punto con animación suave
+      if (map) {
+        map.flyTo([lat, lng], 16, {
+          duration: 1.2,
+          easeLinearity: 0.25
+        });
+
+        // Mover marcador y círculo
+        currentMarker.setLatLng([lat, lng]);
+        accuracyCircle.setLatLng([lat, lng]);
+
+        currentMarker.setPopupContent(`
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; padding:4px;">
+            <strong style="color:#7c3aed; font-size:0.95rem;">📍 Punto Inspeccionado: ${time}</strong>
+            <div style="font-size:0.82rem; color:#374151; margin-top:3px;">${address}</div>
+            <div style="font-size:0.75rem; color:#6b7280; margin-top:2px;">Batería: ${battery} · GPS: ${gps}</div>
+          </div>
+        `).openPopup();
+      }
+
+      showToast(`📍 Centrando mapa en: ${address}`);
+    }
+
+    // Actualizar Ubicación (Botón Principal)
+    function handleRefreshLocation() {
+      const btn = document.getElementById('btn-refresh-location');
+      const icon = document.getElementById('refresh-icon');
+      const btnText = document.getElementById('refresh-btn-text');
+
+      btn.classList.add('updating');
+      btnText.textContent = 'CONSULTANDO GPS...';
+
+      setTimeout(() => {
+        btn.classList.remove('updating');
+        btnText.textContent = 'ACTUALIZAR UBICACIÓN';
+
+        // Actualizar hora en UI
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('current-time').textContent = `Hoy, ${timeString}`;
+        
+        // Simular ligero ajuste de precisión
+        if (map && currentMarker) {
+          map.flyTo([initialLat, initialLng], 16, { duration: 0.8 });
+          currentMarker.openPopup();
+        }
+
+        showToast('✅ Telemetría sincronizada con satélite GPS exitosamente.');
+      }, 1000);
+    }
+
+    // Toast de notificación
+    function showToast(message) {
+      const toast = document.getElementById('toast-message');
+      const toastText = document.getElementById('toast-text');
+      toastText.textContent = message;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // Toggle Modo Oscuro / Claro
+    function setupThemeToggle() {
+      const toggleBtn = document.getElementById('theme-toggle-btn');
+      const themeIcon = document.getElementById('theme-icon');
+
+      toggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+          document.documentElement.removeAttribute('data-theme');
+          themeIcon.textContent = '☀️';
+          showToast('Modo Claro activado.');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          themeIcon.textContent = '🌙';
+          showToast('Modo Oscuro activado (filtro invertido en mapa).');
+        }
+      });
+    }
+
+    // Selector de Período
+    function togglePeriodSelector() {
+      const label = document.getElementById('selected-period-label');
+      if (label.textContent.includes('Hoy')) {
+        label.textContent = 'Última semana';
+        showToast('📅 Historial filtrado: Última semana (64 registros)');
+      } else if (label.textContent.includes('semana')) {
+        label.textContent = 'Último mes';
+        showToast('📅 Historial filtrado: Último mes (182 registros)');
+      } else {
+        label.textContent = 'Hoy · 24 Octubre';
+        showToast('📅 Historial filtrado: Registros de hoy');
+      }
+    }
+
+    // Modo Sigilo (Escape)
+    function triggerStealthMode() {
+      showToast('⚠️ Modo Sigilo: Simulando salida discreta a pantalla neutra...');
+      setTimeout(() => {
+        window.location.href = 'https://www.google.com';
+      }, 1200);
+    }
+  </script>
+</body>
+</html>

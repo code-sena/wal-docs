@@ -57,6 +57,6 @@
 
 ## Correlations
 
-* Functional requirements → `04-requisitos/functional.md`
-* Architectural decisions that depend on these NFRs → `05-arquitectura/`
-* Traceability matrix → `04-requisitos/traceability-matrix.md`
+* Functional requirements → `04-requirements/functional.md`
+* Architectural decisions that depend on these NFRs → `05-architecture/`
+* Traceability matrix → `04-requirements/traceability-matrix.md`

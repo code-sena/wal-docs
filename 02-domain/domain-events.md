@@ -1,6 +1,6 @@
 # Domain Events
 
-> Catalog of Alerta Mujer's domain events, built from each table's state changes (`status`, `note:` with the allowed values) and from the SRS Functional Requirements that give rise to them.
+> Catalog of Woman Alert's domain events, built from each table's state changes (`status`, `note:` with the allowed values) and from the SRS Functional Requirements that give rise to them.
 > **Updated to match the final 27-table database schema** (adds `AdminProfileRegistered` and renames `*_account_id` fields to `*_admin_profile_id` on the events they appear in).
 
 ---

@@ -1,12 +1,12 @@
-# Sistema de Diseño - AlertaMujer
+# Design System — AlertaMujer
 
 ## 🎨 Design Tokens
 
-### Paleta de Colores - Móvil (React Native)
+### Color Palette — Mobile (React Native)
 
-#### Tema LIGHT (Por defecto - Morado/Lila)
+#### LIGHT Theme (Default — Purple/Lilac)
 ```typescript
-// Colores Principales
+// Primary Colors
 headerBackground: rgb(202,171,222)      // #CAABDD
 headerText: #1a1a1a
 background: #f5f0fa
@@ -16,14 +16,14 @@ card: #ffffff
 tabBackground: rgb(202,171,222)
 tabActiveColor: #45046b
 tabInactiveColor: rgb(255, 255, 255)
-icono: #9b009b
+icon: #9b009b
 headercolor1: #c4a8d6
 headercolor2: #7b1db2
 
-// Colores de Contactos
+// Contact Colors
 contactCardBg: #ffffff
 contactCardBorder: #e0d0f0
-contactNombre: #2a0045
+contactName: #2a0045
 contactSubtext: #7a6090
 contactAccent: #7B1FA2
 contactBadgeBg: #F3E5F5
@@ -36,29 +36,29 @@ contactIconCallColor: #7B1FA2
 contactIconWaBg: #E8F5E9
 contactIconLocBg: #E8EAF6
 contactIconLocColor: #3949AB
-contactBotonEditar: #F3E5F5
-contactBotonEditarIcon: #7B1FA2
-contactSugerenciaBg: #FAF7FF
-contactSugerenciaBorder: #CE93D8
-contactSugerenciaIcon: #AB47BC
-contactBotonAgregarBg: #7B1FA2
-contactFlotanteBg: #7B1FA2
+contactEditButton: #F3E5F5
+contactEditButtonIcon: #7B1FA2
+contactSuggestionBg: #FAF7FF
+contactSuggestionBorder: #CE93D8
+contactSuggestionIcon: #AB47BC
+contactAddButtonBg: #7B1FA2
+contactFloatingBg: #7B1FA2
 contactCousserBg: #F3E5F5
 contactCousserIcon: #7B1FA2
-contactBuscadorBg: #F3EEF8
-contactBuscadorText: #2a0045
+contactSearchBg: #F3EEF8
+contactSearchText: #2a0045
 
-// Gradientes de Asistencia
-asistenciaEmergenciaGradiente: ["#c4a8d6", "#7b1db2"]
-asistenciaViolenciaGradiente: ["rgb(240, 87, 87)", "rgb(132, 0, 255)"]
-asistenciaMentalGradiente: ["rgb(142, 189, 255)", "rgb(255, 0, 191)"]
-asistenciaIconoUserBg: "purple"
-asistenciaIconoBombilloBg: "rgba(205, 117, 230, 0.29)"
-asistenciaIconoBombilloColor: "#1E1228"
-asistenciaIconoEstrellaBg: "purple"
+// Assistance Gradients
+assistanceEmergencyGradient: ["#c4a8d6", "#7b1db2"]
+assistanceViolenceGradient: ["rgb(240, 87, 87)", "rgb(132, 0, 255)"]
+assistanceMentalGradient: ["rgb(142, 189, 255)", "rgb(255, 0, 191)"]
+assistanceUserIconBg: "purple"
+assistanceBulbIconBg: "rgba(205, 117, 230, 0.29)"
+assistanceBulbIconColor: "#1E1228"
+assistanceStarIconBg: "purple"
 ```
 
-#### Tema DARK
+#### DARK Theme
 ```typescript
 headerBackground: #000000
 headerText: #fefeff
@@ -69,14 +69,14 @@ card: #2e2e38
 tabBackground: #000000
 tabActiveColor: #9718ff
 tabInactiveColor: rgba(230, 217, 247, 0.89)
-icono: #c084fc
+icon: #c084fc
 headercolor1: #030303
 headercolor2: #200138
 
-// Contactos Dark
+// Contacts Dark
 contactCardBg: #28282f
 contactCardBorder: #3d3d50
-contactNombre: #e8d5ff
+contactName: #e8d5ff
 contactSubtext: #9e8fbb
 contactAccent: #c084fc
 contactBadgeBg: #3a2d55
@@ -89,20 +89,20 @@ contactIconCallColor: #c084fc
 contactIconWaBg: #1a2e22
 contactIconLocBg: #1a233a
 contactIconLocColor: #60a5fa
-contactBotonEditar: #2d2040
-contactBotonEditarIcon: #c084fc
-contactSugerenciaBg: #22202e
-contactSugerenciaBorder: #5b21b6
-contactSugerenciaIcon: #a78bfa
-contactBotonAgregarBg: #7c3aed
-contactFlotanteBg: #7c3aed
+contactEditButton: #2d2040
+contactEditButtonIcon: #c084fc
+contactSuggestionBg: #22202e
+contactSuggestionBorder: #5b21b6
+contactSuggestionIcon: #a78bfa
+contactAddButtonBg: #7c3aed
+contactFloatingBg: #7c3aed
 contactCousserBg: #2d2040
 contactCousserIcon: #c084fc
-contactBuscadorBg: #232330
-contactBuscadorText: #e8d5ff
+contactSearchBg: #232330
+contactSearchText: #e8d5ff
 ```
 
-#### Tema ROSA
+#### PINK Theme
 ```typescript
 headerBackground: #cf3389
 background: #fce4f0
@@ -110,12 +110,12 @@ containerBackground: #fffbfe
 text: #3a0020
 card: #fff0f7
 tabBackground: #cf3389
-icono: #eb0a86
+icon: #eb0a86
 headercolor1: #cf3389
 headercolor2: #860e52
 ```
 
-#### Tema VINO
+#### WINE Theme
 ```typescript
 headerBackground: #770736
 background: #fff5f5
@@ -123,12 +123,12 @@ containerBackground: #ffffff
 text: #2a0000
 card: #fff0f0
 tabBackground: #770736
-icono: #770736
+icon: #770736
 headercolor1: #770736
 headercolor2: #4a0020
 ```
 
-#### Tema AZUL
+#### BLUE Theme
 ```typescript
 headerBackground: #0b013b
 background: #f0f0ff
@@ -136,12 +136,12 @@ containerBackground: #ffffff
 text: #0b013b
 card: #eef2ff
 tabBackground: #0b013b
-icono: #1565C0
+icon: #1565C0
 headercolor1: #0b013b
 headercolor2: #1a237e
 ```
 
-#### Tema MAGENTA
+#### MAGENTA Theme
 ```typescript
 headerBackground: #490449
 background: #fdf0fd
@@ -149,45 +149,45 @@ containerBackground: #ffffff
 text: #2a002a
 card: #fce8fc
 tabBackground: #490449
-icono: #6a0572
+icon: #6a0572
 headercolor1: #490449
 headercolor2: #860386
 ```
 
-### Paleta de Colores - Web (Angular)
+### Color Palette — Web (Angular)
 
-#### Modo Claro - :root
+#### Light Mode — :root
 ```css
-/* Púrpuras */
+/* Purples */
 --color-purple-dark   : #c205b8;
 --color-purple        : #c900ae;
 --color-purple-mid    : #c52dca;
 --color-purple-light  : #b502bb;
 
-/* Rosas / Pinks */
+/* Pinks */
 --color-pink          : #a70ac7;
 --color-pink-hot      : #ae10df;
 --color-pink-light    : #410166;
 
-/* Textos */
+/* Text */
 --color-text-dark     : #2d1457;
 --color-text-mid      : #000000;
 --color-text-muted    : #570ea0;
 
-/* Superficies */
+/* Surfaces */
 --color-white         : #680ca5;
 --color-card-bg       : rgba(142, 10, 160, 0.918);
 --color-input-bg      : #5509ac;
 
-/* Bordes */
+/* Borders */
 --color-border        : rgba(124, 58, 237, 0.322);
 --color-border-focus  : var(--color-purple-light);
 
-/* Gradientes */
+/* Gradients */
 --gradient-bg  : linear-gradient(135deg, #db079c 0%, #af0763 35%, #9a07a7 70%, #430261 100%);
 --gradient-btn : linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%);
 
-/* Panel Admin / Dashboard */
+/* Admin Panel / Dashboard */
 --bg-base       : #f5f4ff;
 --bg-card       : #ffffff;
 --bg-card-hover : #f0eeff;
@@ -203,7 +203,7 @@ headercolor2: #860386
 --purple-pale-hover : #e0d8fc;
 --pink              : #ec4899;
 
-/* Colores Semánticos */
+/* Semantic Colors */
 --green         : #16a34a;
 --green-pale    : #dcfce7;
 --red           : #dc2626;
@@ -214,7 +214,7 @@ headercolor2: #860386
 --amber-pale    : #fef3c7;
 ```
 
-#### Modo Oscuro - [data-theme="dark"]
+#### Dark Mode — [data-theme="dark"]
 ```css
 --bg-base       : #14101f;
 --bg-card       : #1e1833;
@@ -241,45 +241,45 @@ headercolor2: #860386
 --amber-pale    : #3a2a0a;
 ```
 
-### Colores Semánticos Universales
+### Universal Semantic Colors
 
-| Propósito | Móvil | Web (Claro) | Web (Oscuro) |
-|-----------|-------|-------------|--------------|
-| Éxito | #27ae60 | #16a34a | #4ade80 |
+| Purpose | Mobile | Web (Light) | Web (Dark) |
+|---------|--------|-------------|------------|
+| Success | #27ae60 | #16a34a | #4ade80 |
 | Error | #e74c3c | #dc2626 | #f87171 |
-| Advertencia | rgb(255, 189, 65) | #d97706 | #fbbf24 |
+| Warning | rgb(255, 189, 65) | #d97706 | #fbbf24 |
 | Info | #7B2CBF | #3b82f6 | #60a5fa |
-| Primario | #7B1FA2 | #7c3aed | #9d6ff0 |
-| Secundario | #3949AB | #a78bfa | #b79bf5 |
+| Primary | #7B1FA2 | #7c3aed | #9d6ff0 |
+| Secondary | #3949AB | #a78bfa | #b79bf5 |
 
-## 📝 Sistema de Tipografía
+## 📝 Typography System
 
-### Móvil (React Native)
+### Mobile (React Native)
 
-**Fuentes por plataforma:**
-- Android: Roboto (sistema)
+**Fonts by platform:**
+- Android: Roboto (system font)
 
-| Uso | Tamaño | Peso | Línea | Letter Spacing |
-|-----|--------|------|-------|---------------|
-| Títulos de card | 24px | 700 | 32px | -0.5px |
-| Subtítulos | 14-16px | 400-600 | 18-22px | 0px |
-| Texto cuerpo | 13-14px | 400-500 | 20-22px | 0px |
-| Texto pequeño | 10-12px | 500-700 | 14-16px | 0.2px |
-| Botones primarios | 16px | 700 | 20px | 0.5px |
-| Botones secundarios | 16px | 600 | 20px | 0.5px |
+| Use | Size | Weight | Line Height | Letter Spacing |
+|-----|------|--------|-------------|----------------|
+| Card titles | 24px | 700 | 32px | -0.5px |
+| Subtitles | 14–16px | 400–600 | 18–22px | 0px |
+| Body text | 13–14px | 400–500 | 20–22px | 0px |
+| Small text | 10–12px | 500–700 | 14–16px | 0.2px |
+| Primary buttons | 16px | 700 | 20px | 0.5px |
+| Secondary buttons | 16px | 600 | 20px | 0.5px |
 | Input text | 16px | 400 | 20px | 0px |
-| Header títulos | 22-24px | bold | 28px | -0.5px |
+| Header titles | 22–24px | bold | 28px | -0.5px |
 | Tab labels | 11px | 700 | 14px | 0.5px |
-| Números grandes | 32-42px | bold | 48px | -1px |
+| Large numbers | 32–42px | bold | 48px | -1px |
 
 ### Web (Angular)
 
-**Fuente base:** Nunito, sans-serif
+**Base font:** Nunito, sans-serif
 
-| Uso | Tamaño | Peso | Línea | Letter Spacing |
-|-----|--------|------|-------|---------------|
+| Use | Size | Weight | Line Height | Letter Spacing |
+|-----|------|--------|-------------|----------------|
 | H1 Landing | 2.5rem | 800 | 3rem | -0.02em |
-| H2 Secciones | 2rem | 700 | 2.5rem | -0.01em |
+| H2 Sections | 2rem | 700 | 2.5rem | -0.01em |
 | H3 Cards | 1.5rem | 600 | 2rem | 0px |
 | Body text | 1rem | 400 | 1.6rem | 0px |
 | Small text | 0.875rem | 400 | 1.4rem | 0px |
@@ -288,64 +288,63 @@ headercolor2: #860386
 | Nav links | 0.85rem | 500 | 1.2rem | 0.5px |
 | Tagline | 0.62rem | 700 | 1rem | 0.1em |
 
-## 📐 Sistema de Espaciado y Grid
+## 📐 Spacing and Grid System
 
-### Móvil (React Native)
+### Mobile (React Native)
 
-**Base:** Sistema de 4px
+**Base:** 4px grid system
 
-| Propósito | Valor |
-|-----------|-------|
-| Espacio mínimo | 4px |
-| Espacio pequeño | 8px |
-| Espacio medio | 12-16px |
-| Espacio grande | 20-24px |
-| Espacio extra grande | 30-40px |
-| Padding de cards | 20-24px |
-| Margin horizontal | 16-20px |
-| Gap entre elementos | 8-12px |
-
+| Purpose | Value |
+|---------|-------|
+| Minimum spacing | 4px |
+| Small spacing | 8px |
+| Medium spacing | 12–16px |
+| Large spacing | 20–24px |
+| Extra large spacing | 30–40px |
+| Card padding | 20–24px |
+| Horizontal margin | 16–20px |
+| Element gap | 8–12px |
 
 ### Web (Angular)
 
-**Base:** Sistema de 4px (Tailwind)
+**Base:** 4px grid system (Tailwind)
 
-| Propósito | Valor | Tailwind |
-|-----------|-------|---------|
-| Espacio mínimo | 4px | space-1 |
-| Espacio pequeño | 8px | space-2 |
-| Espacio medio | 16px | space-4 |
-| Espacio grande | 24px | space-6 |
-| Espacio extra grande | 32px | space-8 |
-| Padding cards | 24px | p-6 |
-| Margin cards | 16px | m-4 |
-| Gap form rows | 14px | gap-3.5 |
-| Margin top forms | 28px | mt-7 |
+| Purpose | Value | Tailwind |
+|---------|-------|---------|
+| Minimum spacing | 4px | space-1 |
+| Small spacing | 8px | space-2 |
+| Medium spacing | 16px | space-4 |
+| Large spacing | 24px | space-6 |
+| Extra large spacing | 32px | space-8 |
+| Card padding | 24px | p-6 |
+| Card margin | 16px | m-4 |
+| Form row gap | 14px | gap-3.5 |
+| Form top margin | 28px | mt-7 |
 
 **Breakpoints:**
 - Mobile: < 760px
-- Tablet: 760px - 1024px
+- Tablet: 760px – 1024px
 - Desktop: > 1024px
 
 ## 🔲 Border Radius
 
-### Móvil
-| Elemento | Radio |
-|----------|-------|
-| Botones primarios | 12-16px |
-| Botones grandes | 25-30px |
-| Cards estándar | 20-24px |
-| Cards grandes | 28px |
+### Mobile
+| Element | Radius |
+|---------|--------|
+| Primary buttons | 12–16px |
+| Large buttons | 25–30px |
+| Standard cards | 20–24px |
+| Large cards | 28px |
 | Inputs | 20px |
-| Modales | 30px |
-| Avatar | 35-40px |
-| Iconos circulares | 10-15px |
-| Badges | 12-20px |
-| Botón SOS | 50px (circular) |
+| Modals | 30px |
+| Avatars | 35–40px |
+| Circular icons | 10–15px |
+| Badges | 12–20px |
+| SOS button | 50px (circular) |
 
 ### Web
-| Elemento | Variable CSS | Valor |
-|----------|--------------|-------|
+| Element | CSS Variable | Value |
+|---------|--------------|-------|
 | Auth cards | --radius-card | 28px |
 | Inputs | --radius-input | 14px |
 | Buttons | --radius-btn | 50px (pill) |
@@ -353,18 +352,18 @@ headercolor2: #860386
 | Dashboard cards | --dash-radius-card | 12px |
 | Small elements | --dash-radius-sm | 6px |
 
-## 🌑 Sombras
+## 🌑 Shadows
 
-### Móvil
+### Mobile
 ```typescript
 // Cards
-shadowColor: COLORS.purpleDark o "#000"
+shadowColor: COLORS.purpleDark or "#000"
 shadowOffset: { width: 0, height: 8 }
 shadowOpacity: 0.15
 shadowRadius: 24
 elevation: 10
 
-// Botones
+// Buttons
 shadowColor: COLORS.purpleDark
 shadowOffset: { width: 0, height: 4 }
 shadowOpacity: 0.3
@@ -398,24 +397,24 @@ elevation: 8
 --dash-shadow-card : 0 0 0 1.5px var(--border), 0 4px 16px rgba(124, 58, 237, 0.10);
 ```
 
-## 🧩 Componentes Base
+## 🧩 Base Components
 
-### Botones
+### Buttons
 
-#### Móvil - Botón Primario (Aceptar)
-**Archivo:** `src/components/ui/button/aceptar.tsx`
+#### Mobile — Primary Button (Confirm)
+**File:** `src/components/ui/button/aceptar.tsx`
 
 **Props:**
-- `title: string` - Texto del botón
-- `onPress: () => void` - Función al presionar
-- `color?: string` - Color personalizado (default: "#331753")
+- `title: string` — Button text
+- `onPress: () => void` — Handler function
+- `color?: string` — Custom color (default: "#331753")
 
-**Estados:**
-- Normal: opacidad 1
-- Pressed: opacidad 0.85, scale 0.92
-- Disabled: opacidad 0.5
+**States:**
+- Normal: opacity 1
+- Pressed: opacity 0.85, scale 0.92
+- Disabled: opacity 0.5
 
-**Estilos:**
+**Styles:**
 ```typescript
 width: "90%"
 padding: 15
@@ -426,16 +425,16 @@ fontWeight: "bold"
 fontSize: 16
 ```
 
-#### Móvil - Botón Secundario (Cancelar)
-**Archivo:** `src/components/ui/button/cancelar.tsx`
+#### Mobile — Secondary Button (Cancel)
+**File:** `src/components/ui/button/cancelar.tsx`
 
 **Props:**
-- `title: string` - Texto del botón
-- `onPress: () => void` - Función al presionar
-- `bgColor?: string` - Color de fondo (default: "#ffffff")
-- `textColor?: string` - Color de texto (default: "#000000")
+- `title: string` — Button text
+- `onPress: () => void` — Handler function
+- `bgColor?: string` — Background color (default: "#ffffff")
+- `textColor?: string` — Text color (default: "#000000")
 
-**Estilos:**
+**Styles:**
 ```typescript
 width: "90%"
 padding: 16
@@ -444,33 +443,33 @@ borderWidth: 1
 borderColor: "#ffffff"
 ```
 
-#### Web - Button Component
-**Archivo:** `app/shared/components/button/button.scss`
+#### Web — Button Component
+**File:** `app/shared/components/button/button.scss`
 
-**Variantes:**
-- `primary`: Gradiente púrpura/rosa con sombra
-- `secondary`: Transparente con borde púrpura
-- `danger`: Transparente con borde rojo
+**Variants:**
+- `primary`: Purple/pink gradient with shadow
+- `secondary`: Transparent with purple border
+- `danger`: Transparent with red border
 
-**Tamaños:**
+**Sizes:**
 - `sm`: 8px 18px padding, 13px font
 - `md`: 12px 28px padding, 15px font
 - `lg`: 15px 36px padding, 17px font
 
-**Estados:**
+**States:**
 - `disabled`: opacity 0.6, cursor not-allowed
-- `loading`: muestra spinner componente
-- `hover`: transform translateY(-1px), sombra aumentada
+- `loading`: shows spinner component
+- `hover`: transform translateY(-1px), increased shadow
 - `active`: transform translateY(0)
 
 ### Inputs
 
-#### Móvil - TextInput
+#### Mobile — TextInput
 
-**Estados:**
+**States:**
 ```typescript
 // Normal
-backgroundColor: theme.contactBuscadorBg
+backgroundColor: theme.contactSearchBg
 borderColor: theme.contactCardBorder
 
 // Focus
@@ -482,14 +481,14 @@ borderColor: #e74c3c
 backgroundColor: "#FFF5F5"
 ```
 
-**Validaciones:**
-- Error inline debajo del input
-- Icono de error visible
-- Mensaje descriptivo
+**Validations:**
+- Inline error below the input
+- Visible error icon
+- Descriptive error message
 
-#### Web - Input Fields
+#### Web — Input Fields
 
-**Estados:**
+**States:**
 ```css
 /* Normal */
 background: rgba(245, 233, 233, 0.9)
@@ -507,17 +506,17 @@ error-message visible
 
 ### Cards
 
-#### Móvil - Card Base
-**Archivo:** `src/components/ui/card/card.tsx`
+#### Mobile — Base Card
+**File:** `src/components/ui/card/card.tsx`
 
 **Props:**
-- `title?: string` - Título de la card
-- `titleHighlight?: string` - Texto destacado
-- `children?: React.ReactNode` - Contenido
-- `style?: any` - Estilos adicionales
-- `gradientColors?: readonly [string, string, ...string[]]` - Colores del gradiente
+- `title?: string` — Card title
+- `titleHighlight?: string` — Highlighted text
+- `children?: React.ReactNode` — Content
+- `style?: any` — Additional styles
+- `gradientColors?: readonly [string, string, ...string[]]` — Gradient colors
 
-**Estilos:**
+**Styles:**
 ```typescript
 marginHorizontal: 14
 marginTop: 24
@@ -533,10 +532,10 @@ borderColor: COLORS.purpleLight
 padding: 24
 ```
 
-#### Web - Card Component
-**Archivo:** `app/shared/components/card/card.scss`
+#### Web — Card Component
+**File:** `app/shared/components/card/card.scss`
 
-**Estilos:**
+**Styles:**
 ```css
 background: var(--bg-card)
 border: 1.5px solid var(--border)
@@ -545,56 +544,56 @@ shadow: var(--dash-shadow-card)
 hover: background var(--bg-card-hover)
 ```
 
-### Modales
+### Modals
 
-#### Móvil - Modal de Confirmación
-**Archivo:** `src/components/ui/modalConfirmacion/confirmacion.tsx`
+#### Mobile — Confirmation Modal
+**File:** `src/components/ui/modalConfirmacion/confirmacion.tsx`
 
 **Props:**
-- `visible: boolean` - Visibilidad
-- `departamento: string` - Departamento a confirmar
-- `municipio: string` - Municipio a confirmar
-- `onConfirmar: () => void` - Callback confirmar
-- `onRegresar: () => void` - Callback regresar
-- `soloConfirmar: boolean` - Mostrar solo botón confirmar
+- `visible: boolean` — Visibility
+- `department: string` — Department to confirm
+- `municipality: string` — Municipality to confirm
+- `onConfirm: () => void` — Confirm callback
+- `onGoBack: () => void` — Go back callback
+- `confirmOnly: boolean` — Show only confirm button
 
-**Estilos:**
+**Styles:**
 ```typescript
 overlay: backgroundColor 'rgba(0,0,0,0.6)'
-modalCard: 
+modalCard:
   width: '85%'
   backgroundColor: '#FFF'
   borderRadius: 30
   padding: 25
   elevation: 10
 iconCircle: 70x70px, borderRadius 35, backgroundColor '#F3E5F5'
-btnConfirmar: height 55, backgroundColor '#471e63', borderRadius 15
-btnRegresar: height 55, backgroundColor transparent, borderWidth 2
+btnConfirm: height 55, backgroundColor '#471e63', borderRadius 15
+btnGoBack: height 55, backgroundColor transparent, borderWidth 2
 ```
 
-#### Web - Modal Component
-**Archivo:** `app/shared/components/modal/modal.scss`
+#### Web — Modal Component
+**File:** `app/shared/components/modal/modal.scss`
 
-**Tamaños:**
-- `sm`: Modal pequeño
-- `md`: Modal mediano (default)
-- `lg`: Modal grande
-- `zona`: Modal especial para zonas
+**Sizes:**
+- `sm`: Small modal
+- `md`: Medium modal (default)
+- `lg`: Large modal
+- `zone`: Special modal for zones
 
-**Variantes:**
-- `default`: Estilo normal
-- `danger`: Estilo para acciones destructivas
+**Variants:**
+- `default`: Standard style
+- `danger`: Style for destructive actions
 
-**Comportamiento:**
-- `cerrarAlClickFuera`: Cierra al hacer click fuera
-- Evento `cerrar`: Emite cuando se cierra
+**Behavior:**
+- `closeOnOutsideClick`: Closes when clicking outside
+- `close` event: Emitted when closed
 
-### Badges y Chips
+### Badges and Chips
 
-#### Móvil - Chips de Sugerencia
-**Uso:** Sugerencias de nombre de ubicación
+#### Mobile — Suggestion Chips
+**Use:** Location name suggestions
 
-**Estilos:**
+**Styles:**
 ```typescript
 backgroundColor: COLORS.white
 borderWidth: 1.5
@@ -604,25 +603,25 @@ paddingVertical: 8
 paddingHorizontal: 14
 ```
 
-#### Web - Chip Component
-**Archivo:** `app/shared/components/chip/chip.scss`
+#### Web — Chip Component
+**File:** `app/shared/components/chip/chip.scss`
 
 **Props:**
 ```typescript
 label: string
 active: boolean
-dotColor?: string   // Color del punto opcional
-count?: number     // Contador opcional
+dotColor?: string   // Optional dot color
+count?: number      // Optional counter
 ```
 
-**Uso:** Filtros y etiquetas interactivas con estado activo/inactivo
+**Use:** Interactive filters and tags with active/inactive state
 
 ### Navigation Bars
 
-#### Móvil - Tabs de Navegación
-**Archivo:** `src/components/ui/Tabs/TabsNavegationStyle.ts`
+#### Mobile — Navigation Tabs
+**File:** `src/components/ui/Tabs/TabsNavegationStyle.ts`
 
-**Estilos:**
+**Styles:**
 ```typescript
 tabBarLabelStyle: {
   fontSize: 11,
@@ -643,207 +642,207 @@ tabBarStyle: {
 }
 ```
 
-#### Web - Dashboard Navbar
-**Archivo:** `app/shared/components/dashboard-navbar/dashboard-navbar.scss`
+#### Web — Dashboard Navbar
+**File:** `app/shared/components/dashboard-navbar/dashboard-navbar.scss`
 
-**Componentes:**
-- Logo y branding
-- Perfil de usuario
-- Switch de tema
-- Notificaciones
-- Menú de logout
+**Components:**
+- Logo and branding
+- User profile
+- Theme switch
+- Notifications
+- Logout menu
 
-## ♿ Accesibilidad y Reglas UX
+## ♿ Accessibility and UX Rules
 
-### Contraste de Color (WCAG AA)
+### Color Contrast (WCAG AA)
 
-**Estándares implementados:**
-- Contraste automático de texto (getContrastText en móvil)
-- Texto normal: mínimo 4.5:1
-- Texto grande: mínimo 3:1
-- Componentes UI: mínimo 3:1
+**Implemented standards:**
+- Automatic text contrast (getContrastText on mobile)
+- Normal text: minimum 4.5:1
+- Large text: minimum 3:1
+- UI components: minimum 3:1
 
-**Verificación:**
-- Todos los textos primarios cumplen WCAG AA
-- Colores semánticos con contraste suficiente
-- Modo oscuro con contraste ajustado
+**Verification:**
+- All primary texts meet WCAG AA
+- Semantic colors with sufficient contrast
+- Dark mode with adjusted contrast
 
-### Targets Táctiles Mínimos
+### Minimum Touch Targets
 
-**Móvil:**
-- Botones: mínimo 44x44dp
-- Botón SOS: 68% del ancho de pantalla
-- Tabs: altura 70px
-- Iconos circulares: mínimo 48x48dp
+**Mobile:**
+- Buttons: minimum 44×44dp
+- SOS button: 68% of screen width
+- Tabs: 70px height
+- Circular icons: minimum 48×48dp
 
 **Web:**
-- Botones: mínimo 44px de altura
-- Links en navegación: padding 12px
-- Inputs: altura mínima 48px
-- Touch targets en mobile: 48x48px
+- Buttons: minimum 44px height
+- Navigation links: 12px padding
+- Inputs: minimum 48px height
+- Touch targets on mobile: 48×48px
 
-### Feedback Háptico
+### Haptic Feedback
 
-**Móvil:**
-- Long press en botón SOS: vibración intensa
-- Activación de alerta: patrón de vibración
-- Confirmación de acción: vibración corta
-- Error: vibración larga
+**Mobile:**
+- Long press on SOS button: intense vibration
+- Alert activation: vibration pattern
+- Action confirmation: short vibration
+- Error: long vibration
 
-**Implementación:**
+**Implementation:**
 ```typescript
 import { Vibration } from 'expo-haptics';
 
-// Alerta activada
+// Alert activated
 Vibration.vibrate([100, 50, 100]);
 
 // Error
 Vibration.vibrate(500);
 
-// Confirmación
+// Confirmation
 Vibration.vibrate(50);
 ```
 
-### Mecanismos de Alerta Discreta
+### Discreet Alert Mechanisms
 
-**Móvil:**
-1. **Triple tap**: Tocar pantalla 3 veces rápido
-2. **Botón físico**: Mantener presionado botón volumen 3 seg
-3. **Activación por Shake**: Sacudir dispositivo vigorosamente
+**Mobile:**
+1. **Triple tap**: Tap the screen 3 times quickly
+2. **Physical button**: Hold volume button for 3 seconds
+3. **Shake activation**: Shake the device vigorously
 
-**Confirmación:**
-- Cuenta regresiva de 3-5 segundos
-- Vibración intensa
-- Sonido de alarma
-- Opción de cancelar
+**Confirmation:**
+- 3–5 second countdown
+- Intense vibration
+- Alarm sound
+- Option to cancel
 
-### Patrones de Recuperación de Error
+### Error Recovery Patterns
 
 **Inputs:**
-- Validación en tiempo real (onChange)
-- Error inline debajo del campo
-- Icono de error visible
-- Mensaje descriptivo del error
-- Sugerencia de corrección
+- Real-time validation (onChange)
+- Inline error below the field
+- Visible error icon
+- Descriptive error message
+- Correction suggestion
 
-**Acciones destructivas:**
-- Modal de confirmación antes de eliminar
-- Botón de cancelar con icono rojo (#E53935)
-- Texto claro de advertencia
-- Acción reversible cuando es posible
-- Historial de acciones
+**Destructive actions:**
+- Confirmation modal before deleting
+- Cancel button with red icon (#E53935)
+- Clear warning text
+- Reversible action when possible
+- Action history
 
-**Conexión de red:**
-- Indicador de estado de conexión
-- Reintento automático (exponential backoff)
-- Mensaje de error específico
-- Acción manual de reintentar
-- Caché de datos offline
+**Network connectivity:**
+- Connection status indicator
+- Automatic retry (exponential backoff)
+- Specific error message
+- Manual retry action
+- Offline data cache
 
-## ⏱️ Timings de Feedback
+## ⏱️ Feedback Timings
 
-### Móvil
-| Acción | Duración | Easing |
-|--------|---------|--------|
-| Botón press | 100ms | ease-out |
-| Glow animation | 1600-2500ms | quad out |
-| Tab button | 100ms cada dirección | ease-in-out |
-| Navegación slide | 300ms | ease-in-out |
+### Mobile
+| Action | Duration | Easing |
+|--------|----------|--------|
+| Button press | 100ms | ease-out |
+| Glow animation | 1600–2500ms | quad out |
+| Tab button | 100ms each direction | ease-in-out |
+| Slide navigation | 300ms | ease-in-out |
 | Modal fade | 250ms | ease-out |
-| Carga | Indefinido (ActivityIndicator) | - |
+| Loading | Indefinite (ActivityIndicator) | — |
 
 ### Web
-| Acción | Duración | Easing |
-|--------|---------|--------|
+| Action | Duration | Easing |
+|--------|----------|--------|
 | Hover states | 0.2s | ease |
-| Transiciones generales | 0.3s | ease |
-| Modales | 0.5s | ease |
-| Transformaciones GPU | 0.2s | ease |
-| Scroll suave | 0.5s | ease-in-out |
+| General transitions | 0.3s | ease |
+| Modals | 0.5s | ease |
+| GPU transforms | 0.2s | ease |
+| Smooth scroll | 0.5s | ease-in-out |
 
-## 🌓 Modo Oscuro
+## 🌓 Dark Mode
 
-### Móvil
-**Implementación:**
-- 6 modos de tema: light, dark, rosa, vino, azul, magenta
-- Transición suave entre modos
-- Todos los componentes adaptados
-- Contraste automático de texto
+### Mobile
+**Implementation:**
+- 6 theme modes: light, dark, pink, wine, blue, magenta
+- Smooth transition between modes
+- All components adapted
+- Automatic text contrast
 
-**Cambios principales:**
-- Fondos más oscuros (#3d3d42, #1e1e22)
-- Textos más claros (#f0e6ff, #e8d5ff)
-- Bordes más visibles (#3d3d50)
-- Sombras aumentadas para contraste
+**Main changes:**
+- Darker backgrounds (#3d3d42, #1e1e22)
+- Lighter text (#f0e6ff, #e8d5ff)
+- More visible borders (#3d3d50)
+- Increased shadows for contrast
 
 ### Web
-**Implementación:**
-- Activado mediante atributo `data-theme="dark"` en html
-- Transición suave entre modos
-- Todos los componentes adaptados
+**Implementation:**
+- Activated via `data-theme="dark"` attribute on html element
+- Smooth transition between modes
+- All components adapted
 
-**Cambios principales:**
-- Fondos más oscuros (#14101f, #1e1833)
-- Textos más claros (#ede9fe, #a8a0c4)
-- Bordes más visibles (#4c3a80)
-- Sombras aumentadas para contraste
-- Mapas con filtro invertido para modo oscuro
+**Main changes:**
+- Darker backgrounds (#14101f, #1e1833)
+- Lighter text (#ede9fe, #a8a0c4)
+- More visible borders (#4c3a80)
+- Increased shadows for contrast
+- Maps with inverted filter for dark mode
 
 ## 📱 Responsive Design
 
-### Móvil
-**Valores relativos:**
-- Botón SOS: 68% del ancho de pantalla
-- Títulos: width * 0.038
-- Padding: basado en insets de safe area
+### Mobile
+**Relative values:**
+- SOS button: 68% of screen width
+- Titles: width × 0.038
+- Padding: based on safe area insets
 
-**Orientación:**
-- Portrait: Layout principal
-- Landscape: Adaptación de grid
-- Safe area: Insets dinámicos
+**Orientation:**
+- Portrait: Main layout
+- Landscape: Grid adaptation
+- Safe area: Dynamic insets
 
 ### Web
 **Breakpoints:**
 - Mobile: < 760px
-- Tablet: 760px - 1024px
+- Tablet: 760px – 1024px
 - Desktop: > 1024px
 
-**Adaptaciones:**
-- Desktop: Layout de 3 columnas
-- Tablet: Layout de 2 columnas
-- Mobile: Layout de 1 columna
+**Adaptations:**
+- Desktop: 3-column layout
+- Tablet: 2-column layout
+- Mobile: 1-column layout
 
-## 🔐 Seguridad y Privacidad
+## 🔐 Security and Privacy
 
-### Manejo de Datos Sensibles
-- Contraseñas: toggle visibilidad
-- Datos personales: encriptación en tránsito
-- Ubicación: permisos explícitos
-- Contactos: permisos de lectura
-- Cámara/Micrófono: permisos por uso
+### Sensitive Data Handling
+- Passwords: visibility toggle
+- Personal data: encryption in transit
+- Location: explicit permissions
+- Contacts: read permissions
+- Camera/Microphone: per-use permissions
 
-### Permisos Runtime
-**Móvil:**
-- GPS: Obligatorio para funcionalidad principal
-- SMS: Requerido para alertas
-- Cámara: Opcional para evidencia
-- Micrófono: Opcional para evidencia
-- Contactos: Requerido para notificaciones
-- Notificaciones: Requerido para alertas
+### Runtime Permissions
+**Mobile:**
+- GPS: Required for core functionality
+- SMS: Required for alerts
+- Camera: Optional for evidence
+- Microphone: Optional for evidence
+- Contacts: Required for notifications
+- Notifications: Required for alerts
 
 **Web:**
-- Geolocation API: Para ubicación
-- Notifications API: Para alertas
-- MediaDevices API: Para cámara/micrófono
+- Geolocation API: For location
+- Notifications API: For alerts
+- MediaDevices API: For camera/microphone
 
-## 🎯 Estados de Carga
+## 🎯 Loading States
 
-### Móvil
+### Mobile
 ```typescript
 // ActivityIndicator
-<ActivityIndicator 
-  size="large" 
-  color={COLORS.accent} 
+<ActivityIndicator
+  size="large"
+  color={COLORS.accent}
 />
 
 // Skeleton loading
@@ -863,20 +862,20 @@ Vibration.vibrate(50);
 <div class="skeleton-text"></div>
 ```
 
-## 📊 Métricas de Performance
+## 📊 Performance Metrics
 
-### Móvil
-- Frame rate: 60fps objetivo
+### Mobile
+- Frame rate: 60fps target
 - Time to interactive: < 3s
-- Bundle size: Optimizado con code splitting
-- Imágenes: Lazy loading y compresión
+- Bundle size: Optimized with code splitting
+- Images: Lazy loading and compression
 
 ### Web
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3s
-- Bundle size: Code splitting por ruta
-- Imágenes: WebP y lazy loading
+- Bundle size: Code splitting by route
+- Images: WebP and lazy loading
 
 ---
 
-Este sistema de diseño combina las mejores prácticas de React Native y Angular para mantener consistencia visual y funcional entre la aplicación móvil y el panel web administrativo.
+This design system combines React Native and Angular best practices to maintain visual and functional consistency between the mobile application and the web administrative panel.

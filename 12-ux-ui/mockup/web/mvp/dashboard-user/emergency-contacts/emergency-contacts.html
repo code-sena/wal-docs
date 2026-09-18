@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlertaMujer - Contactos de Emergencia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              magenta: '#DB079C',
+              darkPurple: '#430261',
+              deepPurple: '#7C3AED',
+              palePurple: '#EDE9FE',
+              hoverPurple: '#E0D8FC',
+              baseBg: '#F5F4FF',
+              cardBorder: '#C4B5FD',
+              textPrimary: '#1E1A3C',
+              textMuted: '#6B7280',
+              textDim: '#9CA3AF',
+              green: '#16A34A',
+              greenPale: '#DCFCE7',
+              amber: '#D97706',
+              amberPale: '#FEF3C7',
+              red: '#DC2626',
+              redPale: '#FEE2E2',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg-base: #F5F4FF;
+      --bg-card: #FFFFFF;
+      --border: #C4B5FD;
+      --purple-deep: #7C3AED;
+      --purple-pale: #EDE9FE;
+      --text-primary: #1E1A3C;
+      --text-muted: #6B7280;
+    }
+    body {
+      background-color: var(--bg-base);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: var(--text-primary);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #C4B5FD;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+<body class="h-full antialiased custom-scrollbar">
+
+<div class="flex h-screen overflow-hidden bg-[#F5F4FF]">
+
+  <!-- ========================================================= -->
+  <!-- SIDEBAR IZQUIERDO (DashboardLayout - 250px) -->
+  <!-- ========================================================= -->
+  <aside class="w-64 bg-white border-r border-[#C4B5FD]/70 flex flex-col justify-between shrink-0 z-20">
+    <div>
+      <!-- Brand Header con Logo Oficial SVG -->
+      <div class="p-5 pb-4 border-b border-[#EDE9FE] flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full shadow-md shrink-0 flex items-center justify-center overflow-hidden border border-[#D99B26]/40 bg-[#4B0F6B]">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgwZ2882MU24b30pTfUCYS2pIK5nTVOqE6eNFnCNbj0ojzyGsUo7VVOu3YmnAx2pKE9wrBSdAfewyWm5rhAqxegEUWESBxyW8NsVvknia4imfvSt_THrq9noaKkrzhNp3ShyLi-ykRlCgWbANXdzl7hlfPOrroAwebRX9FzDAaPD_YH4uMPtPG3h6F6h5dx_7Hz0ygZ3yE6hIPGdkRoZYD2D3fyifM9ybPDVwYMUmhDiCaLkGydkoHhnNYIj5EmuZPRQ" alt="AlertaMujer Logo" class="w-full h-full object-cover">
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-black text-lg tracking-tight text-[#1E1A3C]">Alerta<span class="text-[#DB079C]">Mujer</span></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-[#16A34A] animate-pulse"></span>
+          </div>
+          <span class="text-[9px] font-extrabold tracking-[0.14em] text-[#7C3AED] uppercase -mt-0.5">Seguridad para todas</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-4 space-y-1.5" aria-label="Navegación principal">
+        <a href="#home" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#6B7280] hover:bg-[#EDE9FE]/50 hover:text-[#7C3AED] transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Home (Monitoreo)
+        </a>
+
+        <a href="#alertas" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#6B7280] hover:bg-[#EDE9FE]/50 hover:text-[#7C3AED] transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          Historial de Alertas
+        </a>
+
+        <!-- CONTACTOS ACTIVO -->
+        <a href="#contactos" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[#7C3AED] bg-[#EDE9FE] border border-[#C4B5FD] transition-all shadow-sm">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[#7C3AED]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>Contactos SOS</span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-[#7C3AED] text-white">3/5</span>
+        </a>
+
+        <a href="#dispositivos" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#6B7280] hover:bg-[#EDE9FE]/50 hover:text-[#7C3AED] transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          Estado del Dispositivo
+        </a>
+
+        <a href="#asistencia" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#6B7280] hover:bg-[#EDE9FE]/50 hover:text-[#7C3AED] transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Asistencia & Recursos
+        </a>
+
+        <a href="#perfil" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#6B7280] hover:bg-[#EDE9FE]/50 hover:text-[#7C3AED] transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Perfil de Cuenta
+        </a>
+      </nav>
+    </div>
+
+    <!-- Bottom Sidebar (Protocolo & Modo Sigilo) -->
+    <div class="p-4 border-t border-[#EDE9FE] space-y-3 bg-[#FCF8FF]">
+      <div class="p-3 bg-white rounded-xl border border-[#C4B5FD]/70 shadow-xs flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-[#16A34A] animate-ping"></div>
+          <span class="text-xs font-bold text-[#1E1A3C]">Custodia Nivel 1</span>
+        </div>
+        <span class="text-[10px] uppercase font-bold text-[#7C3AED] bg-[#EDE9FE] px-2 py-0.5 rounded-full">Activa</span>
+      </div>
+
+      <button class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs font-bold bg-[#EDE9FE] hover:bg-[#E0D8FC] text-[#7C3AED] border border-[#C4B5FD] transition-all shadow-xs" title="Oculta la ventana y limpia rastros inmediatos">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+        <span>Modo Sigilo (Escape)</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========================================================= -->
+  <!-- ÁREA DE CONTENIDO PRINCIPAL CON TOPBAR PERSISTENTE -->
+  <!-- ========================================================= -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+    <!-- TOPBAR (64px) -->
+    <header class="h-16 bg-white border-b border-[#C4B5FD]/70 px-8 flex items-center justify-between shrink-0 z-10">
+      <div class="flex items-center gap-3">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-xs font-semibold text-[#6B7280]">
+          <span>DASHBOARD</span>
+          <span>/</span>
+          <span class="text-[#7C3AED] font-bold">CONTACTOS DE EMERGENCIA</span>
+        </div>
+      </div>
+
+      <!-- Topbar Controls -->
+      <div class="flex items-center gap-4">
+        <!-- Badge Red Segura -->
+        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-xs font-extrabold border border-[#16A34A]/30 shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-[#16A34A]"></span>
+          <span>Red Segura Activa</span>
+        </div>
+
+        <!-- Toggle Theme -->
+        <button class="p-2 text-[#6B7280] hover:text-[#7C3AED] hover:bg-[#EDE9FE] rounded-lg transition-colors" title="Cambiar tema">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </button>
+
+        <!-- Notification Bell -->
+        <button class="relative p-2 text-[#6B7280] hover:text-[#7C3AED] hover:bg-[#EDE9FE] rounded-lg transition-colors" title="Notificaciones">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center">2</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center gap-3 pl-3 border-l border-[#EDE9FE]">
+          <div class="text-right hidden md:block">
+            <p class="text-xs font-bold text-[#1E1A3C]">Ana García</p>
+            <p class="text-[10px] text-[#6B7280] font-mono">ID: ALM-94827</p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7C3AED] to-[#DB079C] p-0.5 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+            AG
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================= -->
+    <!-- CONTENIDO CON SCROLL INTERNO -->
+    <!-- ========================================================= -->
+    <main class="flex-1 overflow-y-auto p-8 space-y-6">
+
+      <!-- Page Title & Header Actions -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-[2rem] font-bold text-[#1E1A3C] tracking-tight leading-none">
+              👥 Contactos de Emergencia
+            </h1>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#EDE9FE] text-[#7C3AED] border border-[#C4B5FD]">
+              Canal SOS Prioritario
+            </span>
+          </div>
+          <p class="text-sm text-[#6B7280] mt-1.5 max-w-2xl">
+            Gestiona tu red de confianza inmediata. En caso de activar una alarma preventiva o SOS crítico, se emitirá una ráfaga secuencial de auxilio vía SMS cifrado y llamada automática.
+          </p>
+        </div>
+
+        <!-- Botón Probar Cadena SOS -->
+        <div class="flex items-center gap-3 shrink-0">
+          <button class="px-4 py-2.5 rounded-full text-xs font-bold bg-white text-[#7C3AED] border border-[#C4B5FD] hover:bg-[#EDE9FE] transition-all flex items-center gap-2 shadow-xs">
+            <svg class="w-4 h-4 text-[#7C3AED]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Simular Envío de Prueba</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BANNER INFORMATIVO (Design tokens: #ede9fe con borde 3px solid #7c3aed) -->
+      <div class="bg-[#EDE9FE] border-l-[3px] border-[#7C3AED] rounded-r-xl p-4 shadow-xs flex items-start gap-3.5">
+        <div class="w-7 h-7 rounded-full bg-[#7C3AED]/15 text-[#7C3AED] flex items-center justify-center shrink-0 mt-0.5 font-bold text-sm">
+          ℹ️
+        </div>
+        <div class="flex-1 text-sm text-[#1E1A3C] leading-relaxed">
+          <span class="font-bold text-[#7C3AED]">Protocolo de Notificación Secuencial:</span> 
+          Los contactos se notifican automáticamente al activar una alerta SOS, <strong>en estricto orden de prioridad</strong>. El contacto principal (<span class="text-[#D99B26] font-bold">⭐ Prioridad 1</span>) recibe un enlace de telemetría en vivo GPS y acceso al canal de audio en directo inmediatamente.
+        </div>
+        <div class="hidden lg:flex items-center gap-2 text-xs font-semibold text-[#7C3AED] bg-white px-3 py-1.5 rounded-lg border border-[#C4B5FD] shrink-0">
+          <svg class="w-3.5 h-3.5 text-[#16A34A]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span>SMS Cifrados SHA-256</span>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- CARD PRINCIPAL: MIS CONTACTOS (3 / máx. 5) -->
+      <!-- ========================================================= -->
+      <div class="bg-white border-[1.5px] border-[#C4B5FD] rounded-xl shadow-sm overflow-hidden">
+        
+        <!-- Header de la Card -->
+        <div class="px-6 py-4 border-b border-[#EDE9FE] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FCF8FF]/60">
+          <div class="flex items-center gap-3">
+            <h2 class="text-lg font-bold text-[#1E1A3C]">
+              Mis Contactos
+            </h2>
+            <div class="flex items-center gap-2" aria-live="polite">
+              <span class="text-xs font-bold text-[#7C3AED] bg-[#EDE9FE] px-2.5 py-0.5 rounded-full border border-[#C4B5FD]/70">
+                3 / máx. 5 asignados
+              </span>
+              <span class="text-xs text-[#6B7280]">· 2 ranuras de seguridad disponibles</span>
+            </div>
+          </div>
+
+          <!-- Botón Agregar Contacto -->
+          <button onclick="document.getElementById('modal-agregar-editar').classList.remove('hidden')" class="px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-[#DB079C] to-[#7C3AED] hover:opacity-95 text-white transition-all shadow-sm flex items-center gap-1.5 self-start sm:self-auto cursor-pointer" aria-label="Agregar nuevo contacto de emergencia">
+            <span class="text-sm font-black leading-none">+</span>
+            <span>AGREGAR CONTACTO</span>
+          </button>
+        </div>
+
+        <!-- Tabla Desktop & Tablet (WCAG AA con caption semántico) -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse" aria-label="Lista de contactos de emergencia ordenados por prioridad">
+            <caption class="sr-only">Contactos de emergencia registrados para notificaciones SOS de AlertaMujer</caption>
+            <thead>
+              <tr class="border-b border-[#EDE9FE] bg-[#F5F4FF]/70 text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">
+                <th scope="col" class="py-3.5 px-5 w-16 text-center">Ord.</th>
+                <th scope="col" class="py-3.5 px-6">Nombre / Relación</th>
+                <th scope="col" class="py-3.5 px-6">Teléfono</th>
+                <th scope="col" class="py-3.5 px-6">Email (Opcional)</th>
+                <th scope="col" class="py-3.5 px-5 text-center">Estado</th>
+                <th scope="col" class="py-3.5 px-6 text-right w-44">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#EDE9FE]">
+              
+              <!-- CONTACTO 1: PRINCIPAL ⭐ -->
+              <tr class="hover:bg-[#F0EEFF]/60 transition-colors group bg-[#FFFDF5]/50">
+                <!-- Ord / Prioridad con ⭐ -->
+                <td class="py-4 px-5 text-center">
+                  <div class="inline-flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-[#FEF3C7] border border-[#D97706]/30">
+                    <span class="text-[#D97706] text-sm leading-none" title="Contacto Principal SOS">⭐</span>
+                    <span class="font-extrabold text-xs text-[#D97706]">1</span>
+                  </div>
+                </td>
+                
+                <!-- Nombre y Relación -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-[#EDE9FE] text-[#7C3AED] font-extrabold text-xs flex items-center justify-center border border-[#C4B5FD]">
+                      CG
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[0.9rem] font-bold text-[#1E1A3C]">Carmen García</span>
+                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#D97706] border border-[#D97706]/30">Principal</span>
+                      </div>
+                      <span class="text-[0.8rem] text-[#6B7280] flex items-center gap-1.5 mt-0.5">
+                        <span>Mamá</span>
+                        <span class="text-xs text-[#C4B5FD]">•</span>
+                        <span class="text-[11px] text-[#16A34A] font-medium">Batería celular 88%</span>
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Teléfono (Monospace) -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-2 font-mono text-[0.875rem] font-semibold text-[#1E1A3C]">
+                    <span class="text-[#7C3AED] text-xs">🇨🇴</span>
+                    <span>+57 312 458 9012</span>
+                  </div>
+                </td>
+
+                <!-- Email -->
+                <td class="py-4 px-6">
+                  <span class="text-xs text-[#6B7280] font-sans">carmen.garcia@gmail.com</span>
+                </td>
+
+                <!-- Estado (Badge Verificado) -->
+                <td class="py-4 px-5 text-center">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#DCFCE7] text-[#16A34A] border border-[#16A34A]/20">
+                    <svg class="w-3.5 h-3.5 text-[#16A34A]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    <span>Verificado</span>
+                  </span>
+                </td>
+
+                <!-- Acciones (↑↓, Editar, Eliminar) -->
+                <td class="py-4 px-6 text-right">
+                  <div class="inline-flex items-center gap-1.5">
+                    <!-- Reordenar ↑ / ↓ -->
+                    <div class="flex items-center bg-[#F5F4FF] border border-[#C4B5FD] rounded-lg p-0.5 mr-1">
+                      <button class="p-1 text-[#9CA3AF] cursor-not-allowed" disabled aria-label="Ya es el contacto de mayor prioridad">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                      </button>
+                      <button class="p-1 text-[#6B7280] hover:text-[#7C3AED] hover:bg-white rounded transition-colors" aria-label="Bajar prioridad de Carmen García a orden 2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                      </button>
+                    </div>
+
+                    <!-- Botón Editar -->
+                    <button onclick="document.getElementById('modal-agregar-editar').classList.remove('hidden')" class="p-2 text-[#7C3AED] hover:bg-[#EDE9FE] rounded-lg transition-colors border border-transparent hover:border-[#C4B5FD]" aria-label="Editar datos de Carmen García" title="Editar contacto">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+
+                    <!-- Botón Eliminar -->
+                    <button onclick="abrirModalEliminar('Carmen García', 'Mamá')" class="p-2 text-[#DC2626] hover:bg-[#FEE2E2] rounded-lg transition-colors border border-transparent hover:border-[#DC2626]/30" aria-label="Eliminar contacto Carmen García" title="Eliminar contacto">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- CONTACTO 2 -->
+              <tr class="hover:bg-[#F0EEFF]/60 transition-colors group">
+                <!-- Ord. -->
+                <td class="py-4 px-5 text-center">
+                  <div class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#F5F4FF] border border-[#C4B5FD] font-extrabold text-xs text-[#1E1A3C]">
+                    2
+                  </div>
+                </td>
+
+                <!-- Nombre y Relación -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-[#EDE9FE] text-[#7C3AED] font-extrabold text-xs flex items-center justify-center border border-[#C4B5FD]">
+                      VR
+                    </div>
+                    <div>
+                      <span class="text-[0.9rem] font-bold text-[#1E1A3C] block">Valeria Ramos</span>
+                      <span class="text-[0.8rem] text-[#6B7280] flex items-center gap-1.5 mt-0.5">
+                        <span>Hermana</span>
+                        <span class="text-xs text-[#C4B5FD]">•</span>
+                        <span class="text-[11px] text-[#16A34A] font-medium">Batería celular 64%</span>
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Teléfono (Monospace) -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-2 font-mono text-[0.875rem] font-semibold text-[#1E1A3C]">
+                    <span class="text-[#7C3AED] text-xs">🇨🇴</span>
+                    <span>+57 301 987 6543</span>
+                  </div>
+                </td>
+
+                <!-- Email -->
+                <td class="py-4 px-6">
+                  <span class="text-xs text-[#6B7280] font-sans">valeria.ramos@outlook.com</span>
+                </td>
+
+                <!-- Estado (Badge Verificado) -->
+                <td class="py-4 px-5 text-center">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#DCFCE7] text-[#16A34A] border border-[#16A34A]/20">
+                    <svg class="w-3.5 h-3.5 text-[#16A34A]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    <span>Verificado</span>
+                  </span>
+                </td>
+
+                <!-- Acciones -->
+                <td class="py-4 px-6 text-right">
+                  <div class="inline-flex items-center gap-1.5">
+                    <!-- Reordenar ↑ / ↓ -->
+                    <div class="flex items-center bg-[#F5F4FF] border border-[#C4B5FD] rounded-lg p-0.5 mr-1">
+                      <button class="p-1 text-[#6B7280] hover:text-[#7C3AED] hover:bg-white rounded transition-colors" aria-label="Subir prioridad de Valeria Ramos a orden 1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                      </button>
+                      <button class="p-1 text-[#6B7280] hover:text-[#7C3AED] hover:bg-white rounded transition-colors" aria-label="Bajar prioridad de Valeria Ramos a orden 3">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                      </button>
+                    </div>
+
+                    <!-- Editar -->
+                    <button onclick="document.getElementById('modal-agregar-editar').classList.remove('hidden')" class="p-2 text-[#7C3AED] hover:bg-[#EDE9FE] rounded-lg transition-colors border border-transparent hover:border-[#C4B5FD]" aria-label="Editar contacto Valeria Ramos" title="Editar contacto">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+
+                    <!-- Eliminar -->
+                    <button onclick="abrirModalEliminar('Valeria Ramos', 'Hermana')" class="p-2 text-[#DC2626] hover:bg-[#FEE2E2] rounded-lg transition-colors border border-transparent hover:border-[#DC2626]/30" aria-label="Eliminar contacto Valeria Ramos" title="Eliminar contacto">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- CONTACTO 3: PENDIENTE ⏳ -->
+              <tr class="hover:bg-[#F0EEFF]/60 transition-colors group">
+                <!-- Ord. -->
+                <td class="py-4 px-5 text-center">
+                  <div class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#F5F4FF] border border-[#C4B5FD] font-extrabold text-xs text-[#1E1A3C]">
+                    3
+                  </div>
+                </td>
+
+                <!-- Nombre y Relación -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-[#FEF3C7] text-[#D97706] font-extrabold text-xs flex items-center justify-center border border-[#D97706]/30">
+                      DL
+                    </div>
+                    <div>
+                      <span class="text-[0.9rem] font-bold text-[#1E1A3C] block">Dr. Luis Asesor Jurídico</span>
+                      <span class="text-[0.8rem] text-[#6B7280] flex items-center gap-1.5 mt-0.5">
+                        <span>Abogado / Institucional</span>
+                        <span class="text-xs text-[#C4B5FD]">•</span>
+                        <span class="text-[11px] text-[#D97706] font-medium">SMS de confirmación enviado</span>
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Teléfono (Monospace) -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-2 font-mono text-[0.875rem] font-semibold text-[#1E1A3C]">
+                    <span class="text-[#7C3AED] text-xs">🇨🇴</span>
+                    <span>+57 320 112 3456</span>
+                  </div>
+                </td>
+
+                <!-- Email -->
+                <td class="py-4 px-6">
+                  <span class="text-xs text-[#6B7280] font-sans">luis.defensoria@legal.gov.co</span>
+                </td>
+
+                <!-- Estado (Badge Pendiente ⏳) -->
+                <td class="py-4 px-5 text-center">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FEF3C7] text-[#D97706] border border-[#D97706]/30">
+                    <span class="text-xs leading-none">⏳</span>
+                    <span>Pendiente</span>
+                  </span>
+                </td>
+
+                <!-- Acciones -->
+                <td class="py-4 px-6 text-right">
+                  <div class="inline-flex items-center gap-1.5">
+                    <!-- Reordenar ↑ / ↓ -->
+                    <div class="flex items-center bg-[#F5F4FF] border border-[#C4B5FD] rounded-lg p-0.5 mr-1">
+                      <button class="p-1 text-[#6B7280] hover:text-[#7C3AED] hover:bg-white rounded transition-colors" aria-label="Subir prioridad de Dr. Luis a orden 2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                      </button>
+                      <button class="p-1 text-[#9CA3AF] cursor-not-allowed" disabled aria-label="Último contacto en lista">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                      </button>
+                    </div>
+
+                    <!-- Editar -->
+                    <button onclick="document.getElementById('modal-agregar-editar').classList.remove('hidden')" class="p-2 text-[#7C3AED] hover:bg-[#EDE9FE] rounded-lg transition-colors border border-transparent hover:border-[#C4B5FD]" aria-label="Editar contacto Dr. Luis" title="Editar contacto">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+
+                    <!-- Eliminar -->
+                    <button onclick="abrirModalEliminar('Dr. Luis Asesor Jurídico', 'Abogado / Institucional')" class="p-2 text-[#DC2626] hover:bg-[#FEE2E2] rounded-lg transition-colors border border-transparent hover:border-[#DC2626]/30" aria-label="Eliminar contacto Dr. Luis" title="Eliminar contacto">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Ranura vacía interactiva para completar los 5 contactos permitidos -->
+        <div class="p-4 bg-[#F5F4FF]/50 border-t border-[#EDE9FE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full border border-dashed border-[#7C3AED] text-[#7C3AED] flex items-center justify-center font-bold text-sm bg-white">
+              +
+            </div>
+            <div>
+              <p class="text-xs font-bold text-[#1E1A3C]">¿Deseas agregar un 4to contacto de respaldo?</p>
+              <p class="text-[11px] text-[#6B7280]">Recomendamos añadir una persona cercana en tu entorno de trabajo o vecindario.</p>
+            </div>
+          </div>
+          <button onclick="document.getElementById('modal-agregar-editar').classList.remove('hidden')" class="px-3.5 py-1.5 rounded-full text-xs font-bold text-[#7C3AED] bg-white border border-[#C4B5FD] hover:bg-[#EDE9FE] transition-colors self-start sm:self-auto shadow-2xs">
+            + Añadir contacto 4
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- CARD INFORMATIVA: RECOMENDACIONES DE SEGURIDAD SOS -->
+      <!-- ========================================================= -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <div class="bg-white p-5 rounded-xl border border-[#C4B5FD] shadow-xs flex items-start gap-3.5">
+          <div class="w-9 h-9 rounded-lg bg-[#EDE9FE] text-[#7C3AED] flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-[#1E1A3C]">Verificación SMS Obligatoria</h3>
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              Cada contacto debe responder un código PIN seguro para asegurar que su línea está activa y acepta recibir alertas críticas.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-[#C4B5FD] shadow-xs flex items-start gap-3.5">
+          <div class="w-9 h-9 rounded-lg bg-[#DCFCE7] text-[#16A34A] flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-[#1E1A3C]">Disparo Silencioso</h3>
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              Si activas el modo sigilo o el botón de coacción, tus contactos son alertados sin encender la pantalla ni emitir sonidos en tu teléfono.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-[#C4B5FD] shadow-xs flex items-start gap-3.5">
+          <div class="w-9 h-9 rounded-lg bg-[#FEF3C7] text-[#D97706] flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-[#1E1A3C]">Enlace GPS Dinámico</h3>
+            <p class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+              El SMS incluye un enlace único web temporal que traza tu ruta en tiempo real mientras el evento de alerta permanezca abierto.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+
+<!-- ================================================================= -->
+<!-- MODAL 1: AGREGAR / EDITAR CONTACTO (app-modal size="md")           -->
+<!-- ================================================================= -->
+<div id="modal-agregar-editar" class="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1A3C]/60 backdrop-blur-xs p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+  <div class="bg-white rounded-2xl max-w-lg w-full border-[1.5px] border-[#C4B5FD] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-[#EDE9FE] bg-[#FCF8FF] flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-[#EDE9FE] text-[#7C3AED] flex items-center justify-center font-bold">
+          👥
+        </div>
+        <h3 id="modal-titulo" class="text-lg font-bold text-[#1E1A3C]">
+          Agregar Contacto de Emergencia
+        </h3>
+      </div>
+      <button onclick="document.getElementById('modal-agregar-editar').classList.add('hidden')" class="text-[#6B7280] hover:text-[#1E1A3C] p-1.5 rounded-lg hover:bg-[#EDE9FE] transition-colors" aria-label="Cerrar modal">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Modal Form Body -->
+    <form class="p-6 space-y-4" onsubmit="event.preventDefault(); document.getElementById('modal-agregar-editar').classList.add('hidden');">
+      
+      <!-- Nombre Completo -->
+      <div>
+        <label for="contact-name" class="block text-xs font-bold text-[#1E1A3C] mb-1">
+          Nombre completo <span class="text-[#DC2626]">*</span>
+        </label>
+        <input type="text" id="contact-name" required placeholder="Ej: Patricia Morales Gómez" class="w-full px-3.5 py-2.5 rounded-xl border border-[#C4B5FD] text-sm text-[#1E1A3C] focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] transition-all placeholder-[#9CA3AF]">
+      </div>
+
+      <!-- Relación / Parentesco (Select) -->
+      <div>
+        <label for="contact-relation" class="block text-xs font-bold text-[#1E1A3C] mb-1">
+          Relación o Parentesco <span class="text-[#DC2626]">*</span>
+        </label>
+        <div class="relative">
+          <select id="contact-relation" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#C4B5FD] text-sm text-[#1E1A3C] bg-white focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] transition-all appearance-none cursor-pointer">
+            <option value="" disabled selected>Seleccionar vínculo...</option>
+            <option value="mama">Mamá</option>
+            <option value="papa">Papá</option>
+            <option value="hermano">Hermano / Hermana</option>
+            <option value="pareja">Pareja / Cónyuge</option>
+            <option value="hijo">Hijo / Hija</option>
+            <option value="amigo">Amigo / Amiga cercana</option>
+            <option value="abogado">Abogado / Asesoría Jurídica</option>
+            <option value="otro">Otro contacto de confianza</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#6B7280]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teléfono Móvil con Formato Internacional -->
+      <div>
+        <label for="contact-phone" class="block text-xs font-bold text-[#1E1A3C] mb-1">
+          Número de Teléfono Móvil <span class="text-[#DC2626]">*</span>
+        </label>
+        <div class="flex rounded-xl border border-[#C4B5FD] overflow-hidden focus-within:ring-2 focus-within:ring-[#7C3AED] focus-within:border-[#7C3AED]">
+          <span class="inline-flex items-center px-3.5 bg-[#F5F4FF] border-r border-[#C4B5FD] text-xs font-mono font-bold text-[#7C3AED]">
+            🇨🇴 +57
+          </span>
+          <input type="tel" id="contact-phone" required placeholder="300 123 4567" class="w-full px-3.5 py-2.5 text-sm font-mono text-[#1E1A3C] focus:outline-none placeholder-[#9CA3AF]">
+        </div>
+        <p class="text-[11px] text-[#6B7280] mt-1">Se enviará un código SMS para comprobar la recepción inmediata de alertas.</p>
+      </div>
+
+      <!-- Email Opcional -->
+      <div>
+        <label for="contact-email" class="block text-xs font-bold text-[#1E1A3C] mb-1">
+          Correo Electrónico <span class="text-[#6B7280] font-normal">(Opcional para reportes periciales)</span>
+        </label>
+        <input type="email" id="contact-email" placeholder="nombre@correo.com" class="w-full px-3.5 py-2.5 rounded-xl border border-[#C4B5FD] text-sm text-[#1E1A3C] focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] transition-all placeholder-[#9CA3AF]">
+      </div>
+
+      <!-- Checkboxes de Configuración -->
+      <div class="pt-2 space-y-3 border-t border-[#EDE9FE]">
+        <!-- Checkbox: Marcar como principal -->
+        <label class="flex items-start gap-3 cursor-pointer group">
+          <input type="checkbox" id="check-principal" class="mt-0.5 w-4 h-4 rounded text-[#7C3AED] border-[#C4B5FD] focus:ring-[#7C3AED] focus:ring-offset-0 cursor-pointer">
+          <div>
+            <span class="text-xs font-bold text-[#1E1A3C] group-hover:text-[#7C3AED] transition-colors flex items-center gap-1.5">
+              <span>Marcar como Contacto Principal</span>
+              <span class="text-xs text-[#D97706]">⭐</span>
+            </span>
+            <p class="text-[11px] text-[#6B7280]">Recibirá la primera llamada telefónica y el stream de geolocalización en primer lugar.</p>
+          </div>
+        </label>
+
+        <!-- Checkbox: Enviar SMS de verificación -->
+        <label class="flex items-start gap-3 cursor-pointer group">
+          <input type="checkbox" id="check-sms" checked class="mt-0.5 w-4 h-4 rounded text-[#7C3AED] border-[#C4B5FD] focus:ring-[#7C3AED] focus:ring-offset-0 cursor-pointer">
+          <div>
+            <span class="text-xs font-bold text-[#1E1A3C] group-hover:text-[#7C3AED] transition-colors">
+              Enviar SMS de verificación al guardar
+            </span>
+            <p class="text-[11px] text-[#6B7280]">Envía mensaje de bienvenida y validación de seguridad de la red AlertaMujer.</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="pt-4 border-t border-[#EDE9FE] flex items-center justify-end gap-3">
+        <button type="button" onclick="document.getElementById('modal-agregar-editar').classList.add('hidden')" class="px-4 py-2.5 rounded-full text-xs font-bold text-[#6B7280] hover:text-[#1E1A3C] hover:bg-[#EDE9FE] transition-colors">
+          Cancelar
+        </button>
+        <button type="submit" class="px-5 py-2.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#DB079C] to-[#7C3AED] hover:opacity-95 text-white transition-all shadow-sm flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span>Guardar Contacto</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+
+<!-- ================================================================= -->
+<!-- MODAL 2: CONFIRMAR ELIMINAR (app-modal size="sm" variant="danger")  -->
+<!-- ================================================================= -->
+<div id="modal-eliminar" class="fixed inset-0 z-50 flex items-center justify-center bg-[#1E1A3C]/60 backdrop-blur-xs p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-danger-titulo">
+  <div class="bg-white rounded-2xl max-w-sm w-full border border-[#DC2626]/30 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    
+    <!-- Modal Danger Header -->
+    <div class="p-5 pb-3 flex items-start gap-3.5">
+      <div class="w-10 h-10 rounded-full bg-[#FEE2E2] text-[#DC2626] flex items-center justify-center shrink-0 font-bold text-lg">
+        🗑️
+      </div>
+      <div>
+        <h3 id="modal-danger-titulo" class="text-base font-bold text-[#1E1A3C]">
+          ¿Eliminar contacto de auxilio?
+        </h3>
+        <p id="modal-danger-descripcion" class="text-xs text-[#6B7280] mt-1 leading-relaxed">
+          ¿Estás segura de eliminar a <strong class="text-[#1E1A3C]" id="target-nombre">Carmen García</strong> (<span id="target-relacion">Mamá</span>)?
+        </p>
+      </div>
+    </div>
+
+    <!-- Advertencia -->
+    <div class="px-5 py-2">
+      <div class="p-3 bg-[#FEE2E2]/60 rounded-xl border border-[#DC2626]/20 text-[11px] text-[#DC2626] leading-relaxed">
+        ⚠️ <strong>Atención:</strong> Este contacto dejará de recibir notificaciones de emergencia y se desvinculará de la cadena automática SOS.
+      </div>
+    </div>
+
+    <!-- Acciones Cancelar / Eliminar -->
+    <div class="p-4 px-5 bg-[#FCF8FF] border-t border-[#EDE9FE] flex items-center justify-end gap-2.5">
+      <button onclick="document.getElementById('modal-eliminar').classList.add('hidden')" class="px-4 py-2 rounded-full text-xs font-bold text-[#6B7280] hover:text-[#1E1A3C] hover:bg-[#EDE9FE] transition-colors">
+        Cancelar
+      </button>
+      <button onclick="document.getElementById('modal-eliminar').classList.add('hidden')" class="px-4 py-2 rounded-full text-xs font-bold bg-[#DC2626] hover:bg-[#B91C1C] text-white transition-all shadow-xs flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        <span>Sí, Eliminar</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function abrirModalEliminar(nombre, relacion) {
+    document.getElementById('target-nombre').innerText = nombre;
+    document.getElementById('target-relacion').innerText = relacion;
+    document.getElementById('modal-eliminar').classList.remove('hidden');
+  }
+</script>
+
+</body>
+</html>

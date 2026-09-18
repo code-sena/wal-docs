@@ -4,7 +4,7 @@
 
 ## What is Woman Alert?
 
-Alerta Mujer is a system in development that includes a mobile application (Android) and a web platform, designed to provide quick, safe and discreet care to women at risk or gender violence. Allows the user to activate a panic button that sends alerts with real-time location to trusted contacts configured by the user, through multiple channels (SMS, email, push notifications).
+Woman Alert is a system in development that includes a mobile application (Android) and a web platform, designed to provide quick, safe and discreet care to women at risk or gender violence. Allows the user to activate a panic button that sends alerts with real-time location to trusted contacts configured by the user, through multiple channels (SMS, email, push notifications).
 
 ## Problem it solves
 

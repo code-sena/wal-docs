@@ -48,11 +48,10 @@
 
 | Role | Description | Permissions |
 |------|-------------|------------|
-| `SUPER_ADMIN` | System technical administrator | All |
-| `ADMIN` | Business administrator | [define] |
-| `OPERATOR` | Operator with write permissions | [define] |
-| `VIEWER` | Read-only | [define] |
-| `[CUSTOM_ROLE]` | [description] | [define] |
+| `SUPER_ADMIN` | System technical administrator (menticio) | All system permissions, user management, configuration |
+| `ADMIN` | Administrative panel user (organization staff) | View alerts, manage zones, moderate reports, view statistics |
+| `USER` | Regular app user (women using the service) | Manage own profile, contacts, alerts, evidence, frequent locations |
+| `VIEWER` | Read-only auditor (external review) | View-only access to non-sensitive data for compliance |
 
 **Permission model:**
 

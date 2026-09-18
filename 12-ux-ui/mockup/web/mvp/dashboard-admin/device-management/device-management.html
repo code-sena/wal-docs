@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AlertaMujer - Gestión de Dispositivos (/admin/devices-management)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --bg-base: #f5f4ff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f0eeff;
+      --border: #c4b5fd;
+      --text-primary: #1e1a3c;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+      --purple-deep: #7c3aed;
+      --purple-mid: #a78bfa;
+      --purple-light: #c4b5fd;
+      --purple-pale: #ede9fe;
+      --purple-pale-hover: #e0d8fc;
+      --pink: #ec4899;
+      --green: #16a34a;
+      --green-pale: #dcfce7;
+      --red: #dc2626;
+      --red-pale: #fee2e2;
+      --amber: #d97706;
+      --amber-pale: #fef3c7;
+      --dash-radius-card: 12px;
+      --dash-shadow-card: 0 0 0 1.5px var(--border), 0 4px 16px rgba(124,58,237,0.10);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .custom-card {
+      background-color: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--dash-radius-card);
+      box-shadow: var(--dash-shadow-card);
+    }
+
+    @keyframes pulseUrgent {
+      0%, 100% {
+        background-color: #fee2e2;
+        box-shadow: inset 4px 0 0 0 #dc2626, 0 0 0 0 rgba(220, 38, 38, 0.4);
+      }
+      50% {
+        background-color: #fecaca;
+        box-shadow: inset 4px 0 0 0 #dc2626, 0 0 14px 2px rgba(220, 38, 38, 0.25);
+      }
+    }
+
+    .urgent-row {
+      animation: pulseUrgent 2s infinite ease-in-out;
+    }
+
+    /* Modal Backdrop Transitions */
+    .modal-backdrop {
+      background-color: rgba(30, 26, 60, 0.65);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col">
+<!-- Topbar Admin -->
+<header class="h-16 bg-white border-b border-[#c4b5fd] sticky top-0 z-30 px-4 lg:px-6 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3 lg:gap-6">
+<button class="lg:hidden p-2 rounded-lg hover:bg-[#ede9fe] text-[#7c3aed]">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Logo Institucional AlertaMujer -->
+<a class="flex items-center gap-3 group" href="#">
+<img alt="AlertaMujer Logo" class="w-10 h-10 rounded-full object-cover shadow-sm border border-[#7c3aed]/20 transition-transform group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPjjuif6OlSNm0a0T19-KVqT0SE4JIiDMjw22nzERCagnyfv9HfaJSLFYZM48SN7MX2Y4fZG0NbvI6LZW3h-LCaf0HDPmQWUUQJqucfbFDx6isIirkrVv7Ism4XsA7Ap1Q7g7keRdHdDuspQeSzWj30y_0YPbkFugiTrYYofNlVgPJbHFbS7jKqHKSYoK5pyH1pFP_KMJnxMwBU4XmUf0-2u_MPff9TDeAKCtIAL6I30WSwKzh21B75wTj0mCdA9R_7A"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-extrabold text-xl tracking-tight text-[#1e1a3c]">Alerta<span class="text-[#c900ae]">Mujer</span></span>
+<span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#ede9fe] text-[#7c3aed] border border-[#c4b5fd]/60">Admin</span>
+</div>
+<span class="text-[9px] font-bold tracking-widest text-[#7c3aed] uppercase">Seguridad Para Todas</span>
+</div>
+</a>
+<!-- Breadcrumbs -->
+<nav class="hidden md:flex items-center gap-2 text-xs font-semibold text-[#6b7280] ml-4 pl-4 border-l border-gray-200"><span class="hover:text-[#7c3aed] cursor-pointer">ADMIN</span><span>/</span><span class="hover:text-[#7c3aed] cursor-pointer">GESTIÓN DE SISTEMA</span><span>/</span><span class="text-[#c900ae] font-bold">GESTIÓN DE DISPOSITIVOS</span></nav>
+</div>
+<!-- Indicadores y Perfil Administrador -->
+<div class="flex items-center gap-3 sm:gap-4">
+<!-- Badge Polling Activo -->
+<div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+<span>Polling Activo (30s)</span>
+</div>
+<!-- Notificaciones Campana -->
+<button aria-label="Notificaciones" class="relative p-2 rounded-xl text-gray-600 hover:bg-[#ede9fe] hover:text-[#7c3aed] transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-1.5 right-1.5 w-4 h-4 bg-[#dc2626] text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+</button>
+<!-- Toggle Tema -->
+<button class="p-2 rounded-xl text-gray-600 hover:bg-[#ede9fe] hover:text-[#7c3aed] transition" id="themeToggle" title="Cambiar tema">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="h-6 w-px bg-gray-200"></div>
+<!-- Avatar Admin -->
+<div class="flex items-center gap-2.5 pl-1">
+<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#db079c] p-0.5 shadow-sm">
+<div class="w-full h-full bg-white rounded-full flex items-center justify-center font-bold text-xs text-[#7c3aed]">
+            CM
+          </div>
+</div>
+<div class="hidden md:flex flex-col text-left">
+<span class="text-xs font-bold text-[#1e1a3c]">Carlos Mendoza</span>
+<span class="text-[10px] font-semibold text-[#7c3aed]">Admin Master</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Contenedor Principal (Sidebar Admin + Body) -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Sidebar Admin Persistente -->
+<aside class="w-64 bg-white border-r border-[#c4b5fd] flex-shrink-0 hidden lg:flex flex-col justify-between py-5 px-3 z-20 shadow-sm">
+<div class="space-y-6">
+<div>
+<span class="px-3 text-[11px] font-bold uppercase tracking-wider text-[#9ca3af]">Menú Principal</span>
+<nav class="mt-2 space-y-1"><a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-[#f0eeff] hover:text-[#7c3aed] transition" href="#"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Dashboard</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-[#f0eeff] hover:text-[#7c3aed] transition" href="#"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Usuarios</span></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-[#f0eeff] hover:text-[#7c3aed] transition" href="#"><div class="flex items-center gap-3"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Alertas</span></div><span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#fee2e2] text-[#dc2626]">12</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-[#f0eeff] hover:text-[#7c3aed] transition" href="#"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Zonas de Riesgo</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-[#f0eeff] hover:text-[#7c3aed] transition" href="#"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Emergencias</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-[#f0eeff] hover:text-[#7c3aed] transition" href="#"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Moderadores</span></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold bg-[#ede9fe] text-[#7c3aed] border-l-4 border-[#7c3aed] shadow-xs" href="#"><div class="flex items-center gap-3"><svg class="w-5 h-5 text-[#7c3aed]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Dispositivos</span></div><span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#dcfce7] text-[#16a34a]">342</span></a></nav>
+</div>
+</div>
+<!-- Footer Sidebar Admin -->
+<div class="space-y-3 pt-4 border-t border-gray-200">
+<div class="p-3 bg-[#f5f4ff] rounded-xl border border-[#c4b5fd]/60 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center font-bold">
+            🛡️
+          </div>
+<div>
+<span class="block text-[11px] font-bold text-[#1e1a3c]">Consola de Despacho</span>
+<span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> Nodo Operativo 911
+            </span>
+</div>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-gray-600 hover:text-[#dc2626] hover:bg-red-50 rounded-lg transition">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Cerrar Sesión Segura</span>
+</button>
+</div>
+</aside>
+<!-- Área de Contenido Principal -->
+<main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+<!-- Header Título & Acciones Rápidas -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><div class="flex items-center gap-2.5"><span class="text-2xl">📱</span><h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#1e1a3c]">Gestión de Dispositivos</h1><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#dcfce7] text-[#16a34a] border border-emerald-200">342 Registrados</span></div><p class="text-sm text-[#6b7280] mt-1">Auditoría de terminales conectados, telemetría de hardware, niveles de batería y estado de sincronización GPS.</p></div><div class="flex items-center gap-3"><button class="px-4 py-2 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-xs" id="btnExport"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>Exportar Bitácora</span></button><button class="px-5 py-2.5 bg-gradient-to-r from-[#7c3aed] to-[#db079c] hover:opacity-95 text-white text-xs font-bold rounded-full flex items-center gap-2 transition shadow-md shadow-[#7c3aed]/20" id="btnRegisterDevice"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>+ Registrar Dispositivo</span></button></div></div>
+<!-- Grid 3 Stat Cards (Wireframe Exacto) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6"><div class="custom-card p-5 lg:p-6 flex flex-col justify-between relative overflow-hidden bg-white"><div class="flex items-center justify-between"><span class="text-xs font-bold uppercase tracking-wider text-[#6b7280]">Total Dispositivos</span><div class="w-8 h-8 rounded-lg bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center text-sm font-bold">📱</div></div><div class="mt-4"><div class="text-3xl sm:text-4xl font-bold text-[#1e1a3c]" id="statTotal">342</div><div class="flex items-center gap-2 mt-1"><span class="text-xs text-[#6b7280]">342 dispositivos registrados en plataforma</span></div></div></div><div class="custom-card p-5 lg:p-6 flex flex-col justify-between relative overflow-hidden bg-white border-emerald-300"><div class="flex items-center justify-between"><span class="text-xs font-bold uppercase tracking-wider text-[#16a34a]">Conectados</span><div class="w-8 h-8 rounded-lg bg-[#dcfce7] text-[#16a34a] flex items-center justify-center text-sm font-bold">🟢</div></div><div class="mt-4"><div class="text-3xl sm:text-4xl font-bold text-[#16a34a]" id="statOnline">298</div><div class="flex items-center gap-2 mt-1"><span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">87.1% en línea</span><span class="text-xs text-[#6b7280]">Transmitiendo telemetría activa</span></div></div></div><div class="custom-card p-5 lg:p-6 flex flex-col justify-between relative overflow-hidden bg-white border-amber-300"><div class="flex items-center justify-between"><span class="text-xs font-bold uppercase tracking-wider text-[#d97706]">Desconectados / Sin Señal</span><div class="w-8 h-8 rounded-lg bg-[#fef3c7] text-[#d97706] flex items-center justify-center text-sm font-bold">⚠️</div></div><div class="mt-4"><div class="text-3xl sm:text-4xl font-bold text-[#d97706]" id="statOffline">44</div><div class="flex items-center gap-2 mt-1"><span class="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">12 &gt; 24h offline</span><span class="text-xs text-[#6b7280]">Sin señal o suspendidos</span></div></div></div></div>
+<!-- Card Filtros (Buscador, Chips Estado, Chips Tipo, Period Badge) -->
+<div class="custom-card p-5 bg-white space-y-4"><div class="flex items-center justify-between border-b border-gray-100 pb-3"><div class="flex items-center gap-2"><span class="text-sm font-bold text-[#1e1a3c]">Filtros de Dispositivos</span><span class="text-xs font-semibold px-2 py-0.5 bg-[#f5f4ff] text-[#7c3aed] rounded-full" id="filterCountBadge">Todos los terminales (342)</span></div><button class="text-xs font-semibold text-[#7c3aed] hover:underline flex items-center gap-1" id="btnResetFilters"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Restablecer</button></div><div class="relative"><div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div><input class="w-full pl-10 pr-4 py-2.5 bg-[#f5f4ff] border border-[#c4b5fd] rounded-xl text-sm text-[#1e1a3c] placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:bg-white transition" id="searchInput" placeholder="Buscar por UUID, modelo, usuaria o teléfono..." type="text"/></div><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1"><div class="flex flex-wrap items-center gap-2"><span class="text-xs font-bold text-[#6b7280] mr-1">Estado:</span><button class="chip-filter-status active px-3 py-1.5 rounded-full text-xs font-bold bg-[#ede9fe] text-[#7c3aed] border border-[#7c3aed] transition" data-status="all">● Todos (342)</button><button class="chip-filter-status px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-[#dcfce7] hover:text-[#16a34a] border border-transparent transition" data-status="Conectado">🟢 Conectados (298)</button><button class="chip-filter-status px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-[#fee2e2] hover:text-[#dc2626] border border-transparent transition" data-status="Desconectado">🔴 Desconectados (44)</button><button class="chip-filter-status px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 border border-transparent transition" data-status="Inactivo">⚪ Inactivos (15)</button></div><div class="text-xs text-[#6b7280] font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>Sincronización de hardware en vivo</div></div></div>
+<!-- Card Alertas: Tabla Paginada Oficial -->
+<div class="custom-card bg-white overflow-hidden"><div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2"><div><h2 class="text-base font-bold text-[#1e1a3c]">Inventario de Terminales y Telemetría</h2><p class="text-xs text-[#6b7280]">Supervisión en tiempo real de batería, precisión de geolocalización satelital y versión de la app AlertaMujer.</p></div><div class="text-xs font-semibold text-[#6b7280]">Mostrando <span class="font-bold text-[#7c3aed]">1 - 5</span> de <span class="font-bold text-[#1e1a3c]">342</span> terminales</div></div><div class="overflow-x-auto"><table class="w-full text-left border-collapse" id="devicesTable"><caption class="sr-only">Lista de terminales móviles registrados</caption><thead><tr class="bg-[#f5f4ff] text-[11px] font-bold uppercase tracking-wider text-[#6b7280] border-b border-[#c4b5fd]/60"><th class="py-3 px-4 w-12 text-center" scope="col">#</th><th class="py-3 px-4" scope="col">UUID / Modelo</th><th class="py-3 px-4" scope="col">Usuaria Asignada</th><th class="py-3 px-4" scope="col">🔋 Batería &amp; Señal GPS</th><th class="py-3 px-4" scope="col">Estado</th><th class="py-3 px-4 text-right" scope="col">Acciones</th></tr></thead><tbody class="divide-y divide-gray-100 text-sm" id="devicesTableBody"><tr class="cursor-pointer transition hover:bg-[#f0eeff]" onclick="openDeviceModal(1)"><td class="py-3.5 px-4 font-bold text-gray-500 text-center font-mono">#1</td><td class="py-3.5 px-4"><div class="font-mono font-bold text-xs text-[#7c3aed]">a1b2c3d4-e5f6-7890</div><div class="text-xs text-[#1e1a3c] font-medium">Samsung Galaxy S21 · Android 13</div><div class="text-[10px] text-[#6b7280]">App v2.1.0 · Build 1042</div></td><td class="py-3.5 px-4"><div class="font-bold text-[#1e1a3c]">Ana García</div><div class="text-xs text-[#6b7280] font-mono">+57 300 123 4567</div></td><td class="py-3.5 px-4"><div class="flex items-center gap-2"><span class="text-xs font-bold text-emerald-600 font-mono">85%</span><div class="w-20 bg-gray-200 rounded-full h-2 overflow-hidden"><div class="bg-[#16a34a] h-2 rounded-full" style="width: 85%"></div></div></div><div class="text-[11px] text-[#16a34a] font-semibold mt-1 flex items-center gap-1"><span>📡</span> GPS Fuerte (±3m) · 4 satélites</div></td><td class="py-3.5 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#dcfce7] text-[#16a34a] border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span> Conectado</span></td><td class="py-3.5 px-4 text-right"><div class="flex items-center justify-end gap-2"><button class="px-3 py-1 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(1)">Ver Detalle</button><button class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(1)">Editar</button></div></td></tr><tr class="cursor-pointer transition hover:bg-[#f0eeff]" onclick="openDeviceModal(2)"><td class="py-3.5 px-4 font-bold text-gray-500 text-center font-mono">#2</td><td class="py-3.5 px-4"><div class="font-mono font-bold text-xs text-[#7c3aed]">c3d4e5f6-1234-5678</div><div class="text-xs text-[#1e1a3c] font-medium">Samsung Galaxy A52 · Android 12</div><div class="text-[10px] text-[#6b7280]">App v2.0.8 · Build 988</div></td><td class="py-3.5 px-4"><div class="font-bold text-[#1e1a3c]">María López</div><div class="text-xs text-[#6b7280] font-mono">+57 312 987 6543</div></td><td class="py-3.5 px-4"><div class="flex items-center gap-2"><span class="text-xs font-bold text-emerald-600 font-mono">72%</span><div class="w-20 bg-gray-200 rounded-full h-2 overflow-hidden"><div class="bg-[#16a34a] h-2 rounded-full" style="width: 72%"></div></div></div><div class="text-[11px] text-[#16a34a] font-semibold mt-1 flex items-center gap-1"><span>📡</span> GPS Fuerte (±4m) · 3 satélites</div></td><td class="py-3.5 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#dcfce7] text-[#16a34a] border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span> Conectado</span></td><td class="py-3.5 px-4 text-right"><div class="flex items-center justify-end gap-2"><button class="px-3 py-1 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(2)">Ver Detalle</button><button class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(2)">Editar</button></div></td></tr><tr class="cursor-pointer transition hover:bg-red-50 bg-red-50/50" onclick="openDeviceModal(3)"><td class="py-3.5 px-4 font-bold text-[#dc2626] text-center font-mono">#3</td><td class="py-3.5 px-4"><div class="font-mono font-bold text-xs text-[#7c3aed]">e5f6a1b2-9876-5432</div><div class="text-xs text-[#1e1a3c] font-medium">Samsung Galaxy S20 · Android 12</div><div class="text-[10px] text-[#6b7280]">App v2.1.0 · Build 1042</div></td><td class="py-3.5 px-4"><div class="font-bold text-[#1e1a3c]">Laura Torres</div><div class="text-xs text-[#6b7280] font-mono">+57 320 445 6677</div></td><td class="py-3.5 px-4"><div class="flex items-center gap-2"><span class="text-xs font-bold text-[#dc2626] font-mono flex items-center gap-1">⚠️ 15%</span><div class="w-20 bg-gray-200 rounded-full h-2 overflow-hidden"><div class="bg-[#dc2626] h-2 rounded-full" style="width: 15%"></div></div><span class="text-[10px] font-bold text-[#dc2626] bg-[#fee2e2] px-1.5 py-0.5 rounded">Batería Crítica</span></div><div class="text-[11px] text-[#d97706] font-semibold mt-1 flex items-center gap-1"><span>📡</span> GPS Moderada (±7m) · 2 satélites</div></td><td class="py-3.5 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#dcfce7] text-[#16a34a] border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span> Conectado</span></td><td class="py-3.5 px-4 text-right"><div class="flex items-center justify-end gap-2"><button class="px-3 py-1 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(3)">Ver Detalle</button><button class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(3)">Editar</button></div></td></tr><tr class="cursor-pointer transition hover:bg-[#f0eeff]" onclick="openDeviceModal(4)"><td class="py-3.5 px-4 font-bold text-gray-500 text-center font-mono">#4</td><td class="py-3.5 px-4"><div class="font-mono font-bold text-xs text-[#7c3aed]">78901234-abcd-ef01</div><div class="text-xs text-[#1e1a3c] font-medium">Huawei P30 Pro · EMUI 11</div><div class="text-[10px] text-[#6b7280]">App v1.9.4 · Build 875</div></td><td class="py-3.5 px-4"><div class="font-bold text-[#1e1a3c]">Paula Morales</div><div class="text-xs text-[#6b7280] font-mono">+57 315 789 0123</div></td><td class="py-3.5 px-4"><div class="text-xs font-medium text-[#6b7280]">— (Sin telemetría)</div><div class="text-[11px] text-[#dc2626] font-semibold mt-1 flex items-center gap-1"><span>⚠️</span> GPS Desconectado (&gt; 24h)</div></td><td class="py-3.5 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#fee2e2] text-[#dc2626] border border-red-300"><span class="w-1.5 h-1.5 rounded-full bg-[#dc2626]"></span> Desconectado</span></td><td class="py-3.5 px-4 text-right"><div class="flex items-center justify-end gap-2"><button class="px-3 py-1 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(4)">Ver Detalle</button><button class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-[#d97706] border border-amber-200 text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); showToast('Comando Enviado', 'Solicitud de ping y reconexión remitida al terminal.')">Reconectar</button></div></td></tr><tr class="cursor-pointer transition hover:bg-[#f0eeff] opacity-80" onclick="openDeviceModal(5)"><td class="py-3.5 px-4 font-bold text-gray-400 text-center font-mono">#5</td><td class="py-3.5 px-4"><div class="font-mono font-bold text-xs text-gray-500">abcd5678-4321-8765</div><div class="text-xs text-gray-600 font-medium">Samsung Galaxy A12 · Android 11</div><div class="text-[10px] text-gray-400">App v1.8.0 (Obsoleta)</div></td><td class="py-3.5 px-4"><div class="font-bold text-gray-600">Sofía Rojas</div><div class="text-xs text-gray-400 font-mono">+57 310 222 3344</div></td><td class="py-3.5 px-4"><div class="text-xs text-gray-400">— (Dispositivo dado de baja)</div><div class="text-[11px] text-gray-400 mt-1">Sin señal</div></td><td class="py-3.5 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Inactivo</span></td><td class="py-3.5 px-4 text-right"><div class="flex items-center justify-end gap-2"><button class="px-3 py-1 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); openDeviceModal(5)">Ver Detalle</button><button class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-[#16a34a] border border-emerald-300 text-xs font-bold rounded-lg transition" onclick="event.stopPropagation(); showToast('Terminal Activado', 'El terminal ha sido reincorporado a la red.')">Activar</button></div></td></tr></tbody></table></div><div class="px-5 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#faf9ff]"><div class="text-xs text-[#6b7280]">Mostrando <span class="font-bold text-[#7c3aed]">1 - 5</span> de <span class="font-bold text-[#1e1a3c]">342</span> terminales (Pág. 1 / 69)</div><div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-white border border-[#c4b5fd] rounded-lg text-xs font-bold text-gray-400 cursor-not-allowed flex items-center gap-1 shadow-xs" disabled=""><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><span>&lt; Anterior</span></button><div class="flex items-center gap-1"><button class="w-8 h-8 rounded-lg bg-[#7c3aed] text-white text-xs font-bold shadow-xs">1</button><button class="w-8 h-8 rounded-lg hover:bg-[#ede9fe] text-gray-700 text-xs font-semibold">2</button><button class="w-8 h-8 rounded-lg hover:bg-[#ede9fe] text-gray-700 text-xs font-semibold">3</button><span class="text-xs text-gray-400 px-1">...</span><button class="w-8 h-8 rounded-lg hover:bg-[#ede9fe] text-gray-700 text-xs font-semibold">69</button></div><button class="px-3 py-1.5 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-[#7c3aed] rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition"><span>Siguiente &gt;</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></div></div></div>
+</main>
+</div>
+<!-- MODAL OFICIAL DETALLE DE ALERTA (Wireframe ASCII app-modal) -->
+<div aria-labelledby="modalTitle" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden" id="detailModal" role="dialog"><div class="bg-white rounded-2xl border-2 border-[#c4b5fd] shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"><div class="px-6 py-4 bg-[#f5f4ff] border-b border-[#c4b5fd] flex items-center justify-between"><div class="flex items-center gap-2.5"><span class="text-xl">📱</span><div><h3 class="text-lg font-bold text-[#1e1a3c]" id="modalTitle">Dispositivo a1b2c3d4 · Samsung Galaxy S21</h3><span class="text-xs text-emerald-600 font-semibold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>Terminal En Línea · Telemetría Activa</span></div></div><button class="w-8 h-8 rounded-full bg-white hover:bg-gray-100 border border-gray-200 text-gray-500 hover:text-gray-800 flex items-center justify-center font-bold text-base transition" onclick="closeDetailModal()">✕</button></div><div class="p-6 overflow-y-auto space-y-5 text-sm"><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-[#faf9ff] border border-[#c4b5fd]/60"><div class="sm:col-span-2"><span class="block text-xs font-semibold text-[#6b7280]">UUID Global del Dispositivo:</span><span class="text-sm font-bold text-[#7c3aed] font-mono" id="modalUUID">a1b2c3d4-e5f6-7890-abcd-1234567890ab</span></div><div><span class="block text-xs font-semibold text-[#6b7280]">Modelo &amp; Sistema Operativo:</span><span class="text-sm font-bold text-[#1e1a3c]" id="modalDeviceModel">Samsung Galaxy S21 (Android 13)</span><span class="text-xs text-[#6b7280] block">Versión App AlertaMujer: <span class="font-semibold text-[#7c3aed]" id="modalAppVersion">2.1.0</span></span></div><div><span class="block text-xs font-semibold text-[#6b7280]">Usuaria Asignada:</span><span class="text-sm font-bold text-[#1e1a3c]" id="modalUserName">Ana García</span><span class="text-xs text-[#6b7280] block font-mono" id="modalUserContact">ana@gmail.com · CC 1.020.345.678</span></div><div><span class="block text-xs font-semibold text-[#6b7280]">Nivel de Batería:</span><div class="flex items-center gap-2 mt-1"><span class="text-sm font-bold text-emerald-600 font-mono" id="modalBatteryText">85%</span><div class="flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden"><div class="bg-[#16a34a] h-2.5 rounded-full" id="modalBatteryBar" style="width: 85%"></div></div></div></div><div><span class="block text-xs font-semibold text-[#6b7280]">Calidad GPS:</span><span class="text-sm font-semibold text-emerald-700 flex items-center gap-1 mt-1" id="modalGPS"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Fuerte (±3.5m) · 4 satélites activos</span></div><div class="sm:col-span-2"><span class="block text-xs font-semibold text-[#6b7280]">Última sincronización de red:</span><span class="text-xs font-semibold text-[#1e1a3c]" id="modalSyncTime">Hoy, 10:32 am (hace 3 min)</span></div></div><div class="space-y-2 pt-2 border-t border-gray-100"><span class="block text-xs font-bold uppercase tracking-wider text-[#6b7280]">Actualizar Estado del Dispositivo:</span><div class="grid grid-cols-3 gap-3"><label class="flex items-center gap-2 p-3 rounded-xl border-2 border-[#16a34a] bg-emerald-50 cursor-pointer hover:bg-emerald-100 transition"><input checked="" class="text-emerald-600 focus:ring-emerald-500 w-4 h-4" name="modalStatusRadio" type="radio" value="Conectado"/><div class="flex flex-col"><span class="text-xs font-bold text-emerald-900">🟢 Conectado</span><span class="text-[10px] text-emerald-700">Telemetría OK</span></div></label><label class="flex items-center gap-2 p-3 rounded-xl border border-red-300 bg-red-50 cursor-pointer hover:bg-red-100 transition"><input class="text-red-600 focus:ring-red-500 w-4 h-4" name="modalStatusRadio" type="radio" value="Desconectado"/><div class="flex flex-col"><span class="text-xs font-bold text-red-900">🔴 Desconectado</span><span class="text-[10px] text-red-700">Sin señal</span></div></label><label class="flex items-center gap-2 p-3 rounded-xl border border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100 transition"><input class="text-gray-600 focus:ring-gray-500 w-4 h-4" name="modalStatusRadio" type="radio" value="Inactivo"/><div class="flex flex-col"><span class="text-xs font-bold text-gray-800">⚪ Inactivo</span><span class="text-[10px] text-gray-500">Baja temporal</span></div></label></div></div></div><div class="px-6 py-4 bg-[#faf9ff] border-t border-[#c4b5fd]/60 flex items-center justify-between"><button class="px-3.5 py-2 bg-white border border-red-300 hover:bg-red-50 text-[#dc2626] text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5" onclick="decommissionDevice()"><span>🗑️</span> Dar de Baja</button><div class="flex items-center gap-2.5"><button class="px-4 py-2 bg-white border border-[#c4b5fd] hover:bg-[#ede9fe] text-gray-700 text-xs font-bold rounded-xl transition shadow-xs" onclick="closeDetailModal()">Cancelar</button><button class="px-5 py-2 bg-gradient-to-r from-[#7c3aed] to-[#db079c] hover:opacity-95 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md shadow-[#7c3aed]/20 transition" id="btnSaveModal" onclick="saveDeviceChanges()"><span class="hidden w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" id="btnSaveSpinner"></span><span>💾 Actualizar Estado</span></button></div></div></div></div>
+<!-- Toast de Notificación Exitoso -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 bg-[#1e1a3c] text-white rounded-xl shadow-2xl border border-[#7c3aed]" id="toastSuccess">
+<span class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+<div>
+<span class="block text-xs font-bold" id="toastTitle">Incidente Actualizado</span>
+<span class="text-[11px] text-gray-300" id="toastMessage">El estado de la alerta ha sido sincronizado en la central.</span>
+</div>
+</div>
+<!-- Scripts Funcionales para Interacción Completa -->
+<script>
+    // Datos simulados de las alertas
+    const alertsData = {
+      1: { id: 1, user: "Ana García", phone: "+57 300 123 4567", type: "SOS", typeLabel: "🔴 SOS Pánico", status: "Pendiente", time: "Hoy, 10:32 am", address: "Cra 7 #34-12, Teusaquillo, Bogotá D.C.", coords: "Lat: 4.6221 · Lng: -74.0671", notes: "Alerta disparada por sensor SOS. Despachada patrulla del CAI Lourdes (Cuadrante 14). Operadora de turno contactó al primer número de confianza." },
+      2: { id: 2, user: "María López", phone: "+57 312 987 6543", type: "Robo", typeLabel: "🟡 Robo en Proceso", status: "Pendiente", time: "Hoy, 10:28 am", address: "Calle 12 #4-55, Candelaria, Bogotá D.C.", coords: "Lat: 4.5981 · Lng: -74.0758", notes: "Reporte de asalto con coacción. Localización GPS transmitiendo cada 5 segundos." },
+      3: { id: 3, user: "Laura Torres", phone: "+57 320 445 6677", type: "Acoso", typeLabel: "🟣 Acoso Callejero", status: "Atendida", time: "Hoy, 10:25 am", address: "Parque Central Bavaria, Cra 13, Bogotá D.C.", coords: "Lat: 4.6190 · Lng: -74.0682", notes: "Patrulla motorizada acompañó a la usuaria hasta estación TransMilenio Calle 26. Caso atendido sin novedades graves." },
+      4: { id: 4, user: "Paula Morales", phone: "+57 315 789 0123", type: "Medical", typeLabel: "🩷 Emergencia Médica", status: "Atendida", time: "Hoy, 10:20 am", address: "Av. 68 con Calle 53, Salitre, Bogotá D.C.", coords: "Lat: 4.6590 · Lng: -74.0950", notes: "Ambulancia despachada para atención por contusión física. Traslado a clínica Méderi." },
+      5: { id: 5, user: "Sofía Rojas", phone: "+57 310 222 3344", type: "SOS", typeLabel: "🔴 SOS Pánico", status: "Pendiente", time: "Hoy, 10:15 am", address: "Cra 15 #85-20, Chapinero, Bogotá D.C.", coords: "Lat: 4.6710 · Lng: -74.0550", notes: "Botón de pánico presionado repetidamente. Enlace directo establecido con CAI Virrey." }
+    };
+
+    let activeAlertId = 1;
+
+    function openDetailModal(id) {
+      activeAlertId = id;
+      const data = alertsData[id] || alertsData[1];
+      
+      document.getElementById('modalTitle').textContent = `Alerta #${data.id} — ${data.typeLabel}`;
+      document.getElementById('modalUserName').textContent = data.user;
+      document.getElementById('modalUserPhone').textContent = data.phone;
+      document.getElementById('modalTypeBadge').textContent = data.typeLabel;
+      document.getElementById('modalTimestamp').textContent = data.time;
+      document.getElementById('modalAddress').textContent = data.address;
+      document.getElementById('modalCoords').textContent = data.coords;
+      document.getElementById('adminNotes').value = data.notes || '';
+      
+      // Actualizar contador
+      updateCharCount();
+
+      // Seleccionar radio button correspondiente
+      const radios = document.getElementsByName('modalStatusRadio');
+      radios.forEach(r => {
+        r.checked = (r.value === data.status);
+      });
+
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function updateCharCount() {
+      const val = document.getElementById('adminNotes').value;
+      document.getElementById('charCounter').textContent = `${val.length} / 500 car.`;
+    }
+
+    document.getElementById('adminNotes').addEventListener('input', updateCharCount);
+
+    function saveAlertChanges() {
+      const spinner = document.getElementById('btnSaveSpinner');
+      const saveBtn = document.getElementById('btnSaveModal');
+      
+      spinner.classList.remove('hidden');
+      saveBtn.disabled = true;
+
+      // Obtener nuevo estado seleccionado
+      const selectedStatus = document.querySelector('input[name="modalStatusRadio"]:checked').value;
+      const newNotes = document.getElementById('adminNotes').value;
+
+      setTimeout(() => {
+        // Actualizar datos locales
+        if (alertsData[activeAlertId]) {
+          alertsData[activeAlertId].status = selectedStatus;
+          alertsData[activeAlertId].notes = newNotes;
+        }
+
+        spinner.classList.add('hidden');
+        saveBtn.disabled = false;
+        closeDetailModal();
+
+        // Si se actualizó a Atendida la alerta #1, quitar animación urgente
+        if (activeAlertId === 1 && selectedStatus === 'Atendida') {
+          const row1 = document.querySelector('.urgent-row');
+          if (row1) {
+            row1.classList.remove('urgent-row');
+            row1.classList.remove('hover:bg-red-100/70');
+            row1.classList.add('hover:bg-[#f0eeff]');
+          }
+          document.getElementById('statPending').textContent = "11";
+          document.getElementById('statResolved').textContent = "219";
+        }
+
+        showToast("Cambios Guardados", `La alerta #${activeAlertId} ahora tiene estado "${selectedStatus}".`);
+      }, 700);
+    }
+
+    function showToast(title, msg) {
+      const toast = document.getElementById('toastSuccess');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = msg;
+      
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+
+    // Filtros de Estado
+    const statusChips = document.querySelectorAll('.chip-filter-status');
+    statusChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        statusChips.forEach(c => {
+          c.classList.remove('active', 'bg-[#ede9fe]', 'text-[#7c3aed]', 'border-[#7c3aed]', 'font-bold');
+          c.classList.add('bg-gray-100', 'text-gray-600', 'border-transparent', 'font-semibold');
+        });
+        chip.classList.add('active', 'bg-[#ede9fe]', 'text-[#7c3aed]', 'border-[#7c3aed]', 'font-bold');
+        chip.classList.remove('bg-gray-100', 'text-gray-600', 'border-transparent');
+        
+        applyFilters();
+      });
+    });
+
+    // Filtros de Tipo
+    const typeChips = document.querySelectorAll('.chip-filter-type');
+    typeChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        typeChips.forEach(c => c.classList.remove('active', 'ring-2', 'ring-[#7c3aed]'));
+        chip.classList.add('active', 'ring-2', 'ring-[#7c3aed]');
+        applyFilters();
+      });
+    });
+
+    // Buscador
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', applyFilters);
+
+    function applyFilters() {
+      const query = searchInput.value.toLowerCase();
+      const activeStatus = document.querySelector('.chip-filter-status.active').getAttribute('data-status');
+      const activeType = document.querySelector('.chip-filter-type.active').getAttribute('data-type');
+      
+      const rows = document.querySelectorAll('#alertsTableBody tr');
+      let visibleCount = 0;
+
+      rows.forEach((row, index) => {
+        const id = index + 1;
+        const item = alertsData[id];
+        if (!item) return;
+
+        const matchesQuery = item.user.toLowerCase().includes(query) || 
+                             item.address.toLowerCase().includes(query) || 
+                             item.phone.includes(query) ||
+                             item.typeLabel.toLowerCase().includes(query);
+
+        const matchesStatus = (activeStatus === 'all') || (item.status === activeStatus);
+        const matchesType = (activeType === 'all') || (item.type === activeType);
+
+        if (matchesQuery && matchesStatus && matchesType) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('filterCountBadge').textContent = `${visibleCount} incidentes filtrados`;
+    }
+
+    // Botón restablecer
+    document.getElementById('btnResetFilters').addEventListener('click', () => {
+      searchInput.value = '';
+      statusChips[0].click();
+      typeChips[0].click();
+    });
+
+    // Botón refrescar / sincronizar
+    document.getElementById('btnRefresh').addEventListener('click', () => {
+      showToast("Sincronización Completada", "Telemetría e incidentes sincronizados con el servidor central.");
+    });
+
+    // Botón exportar
+    document.getElementById('btnExport').addEventListener('click', () => {
+      showToast("Generando Reporte", "Descargando bitácora forense de alertas en formato CSV...");
+    });
+  </script>
+</body>
+</html>

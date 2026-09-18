@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Iniciar Sesión | AlertaMujer</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-surface":"#302c4f","surface-variant":"#e4dfff","on-surface":"#1b1739","surface-container":"#f0ebff","background":"#fcf8ff","surface-container-high":"#eae5ff","on-error-container":"#93000a","tertiary-container":"#00855b","inverse-on-surface":"#f3eeff","surface":"#fcf8ff","tertiary":"#006947","primary-fixed":"#ffd8e8","on-primary-fixed":"#3c0028","inverse-primary":"#ffafd6","surface-container-highest":"#e4dfff","primary-container":"#db079c","on-primary-container":"#fffbff","on-tertiary-fixed":"#002113","on-background":"#1b1739","on-error":"#ffffff","outline":"#8b6f7c","outline-variant":"#dfbecc","surface-container-low":"#f6f1ff","on-secondary":"#ffffff","secondary-container":"#e1a0ff","error-container":"#ffdad6","surface-tint":"#b4007f","primary-fixed-dim":"#ffafd6","on-secondary-fixed":"#310049","on-tertiary-container":"#f4fff6","on-tertiary-fixed-variant":"#005236","primary":"#b0007c","surface-bright":"#fcf8ff","on-secondary-fixed-variant":"#652c83","on-tertiary":"#ffffff","secondary-fixed":"#f6d9ff","secondary-fixed-dim":"#e8b3ff","secondary":"#7f459d","tertiary-fixed-dim":"#4edea3","on-primary":"#ffffff","on-surface-variant":"#58404b","tertiary-fixed":"#6ffbbe","on-primary-fixed-variant":"#8a0061","error":"#ba1a1a","on-secondary-container":"#682f85","surface-container-lowest":"#ffffff","surface-dim":"#dcd5ff"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-sm":"0.5rem","space-xs":"0.25rem","space-lg":"1.5rem",gutter:"1.5rem","margin-mobile":"1rem",margin:"2rem","space-md":"1rem","gutter-sm":"1rem","space-xl":"2.5rem"},fontFamily:{"headline-lg":["Plus Jakarta Sans","sans-serif"],"body-md":["Plus Jakarta Sans","sans-serif"],"title-md":["Plus Jakarta Sans","sans-serif"],"label-sm":["Plus Jakarta Sans","sans-serif"],"body-lg":["Plus Jakarta Sans","sans-serif"],"display-hero-mobile":["Plus Jakarta Sans","sans-serif"],"label-md":["Plus Jakarta Sans","sans-serif"],"body-sm":["Plus Jakarta Sans","sans-serif"],"display-hero":["Plus Jakarta Sans","sans-serif"],"headline-lg-mobile":["Plus Jakarta Sans","sans-serif"],"headline-sm":["Plus Jakarta Sans","sans-serif"],"headline-md":["Plus Jakarta Sans","sans-serif"]}}}}</script><style>
+  @layer base {
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  }
+  .focus-ring:focus-within, .focus-ring:focus {
+    box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.25) !important;
+    border-color: #db079c !important;
+  }
+  .state-pill-active {
+    background-color: #db079c !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+</style></head><body class="min-h-screen relative flex flex-col justify-between overflow-x-hidden text-on-surface select-none antialiased" style="background: linear-gradient(135deg, #db079c 0%, #af0763 35%, #9a07a7 70%, #430261 100%);">
+<!-- Background Ambient Orbs (Hidden on small mobile screens) -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden -z-10 aria-hidden='true'">
+<div class="hidden sm:block absolute -top-24 -left-24 w-96 h-96 bg-[#7f459d]" style="filter: blur(60px); opacity: 0.5; border-radius: 50%;"></div>
+<div class="hidden sm:block absolute -bottom-24 -right-24 w-96 h-96 bg-[#db079c]" style="filter: blur(60px); opacity: 0.5; border-radius: 50%;"></div>
+</div>
+<!-- Header discreto de seguridad con Salida Rápida (Sin navbar estándar) -->
+<div class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex items-center justify-between z-20">
+<div class="flex items-center gap-2 text-white/90 text-xs font-semibold tracking-wide uppercase bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
+<span class="inline-block w-2 h-2 rounded-full bg-[#4edea3] animate-pulse"></span>
+<span>Canal Seguro Cifrado</span>
+</div>
+<button aria-label="Salida Rápida discreta de emergencia" class="px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-lg transition-transform active:scale-95 border border-red-400/40 focus:outline-none focus:ring-2 focus:ring-white" onclick="quickStealthExit()" title="Cerrar y abrir sitio alternativo seguro" type="button">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>Salida Rápida</span>
+</button>
+</div>
+<!-- Main Centered Auth Container -->
+<main class="flex-1 w-full flex flex-col items-center justify-center px-4 py-6 z-10">
+<!-- Floating Auth Card -->
+<div class="w-full max-w-[440px] mx-auto rounded-[28px] transition-all duration-300" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 24px 60px rgba(78, 16, 177, 0.18), 0 4px 16px rgba(91, 33, 182, 0.10); padding: 40px 36px;">
+<!-- Brand Header -->
+<div class="flex flex-col items-center text-center">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-11 h-11 rounded-full overflow-hidden shadow-md flex items-center justify-center shrink-0 bg-[#310049] border border-secondary/20">
+<img alt="Isotipo oficial AlertaMujer Pantera" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOD1Ejz1qmeH_4kjEgNYMmT5nuUX-mGzFYVtebDi5ARV_fnYcuO-U1J0Lxxtvx-182Ei1lG1hZDluUSsCZ143JOudtelvOPOvzlQ_p3Fmujf6rv_-uhC0OjCijK_-44m0yPRLuCLhgImm9JizlT_bprd3XmbsZCXVoUQtIQlryf32hiABteOxpqK5mmDT8OLcXHWsGDFIVugFPDDqRhC85_DxqFEH5dLwjeg7FHojgEcm36MNmYbuXXqhZhw4Oj5KEEg"/>
+</div>
+<span class="font-extrabold text-[1.25rem] tracking-wider text-[#2d1457] uppercase font-['Plus_Jakarta_Sans']">
+          ALERTA <span style="color: #db079c;">MUJER</span>
+</span>
+</div>
+<!-- Tagline -->
+<div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[#7f459d]" style="background-color: #f0ebff;">
+<span class="w-1.5 h-1.5 rounded-full bg-[#db079c] animate-ping"></span>
+        Seguridad para todas
+      </div>
+<!-- Title & Subtitle -->
+<h1 class="mt-4 tracking-tight" style="font-size: 2rem; line-height: 2.25rem; font-weight: 700; color: #2d1457;">
+        Iniciar sesión
+      </h1>
+<p class="mt-1" style="font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; color: #6b7280;">
+        Bienvenida de vuelta.
+      </p>
+</div>
+<!-- Interactive State Demo Selector (Mockup Switcher) -->
+<div class="mt-4 p-1.5 rounded-xl bg-[#f6f1ff] border border-[#dfbecc]/40">
+<div class="text-[10px] uppercase font-bold text-[#58404b] px-1 mb-1 tracking-wider flex items-center justify-between">
+<span>Simular estado UI:</span>
+<span class="font-normal lowercase text-[#7f459d]" id="current-state-badge">inicial</span>
+</div>
+<div class="grid grid-cols-5 gap-1">
+<button class="state-pill-active py-1 px-0.5 rounded text-[10px] text-center transition font-medium text-[#58404b] hover:bg-white truncate" id="pill-init" onclick="setDemoState('init')" title="Formulario Inicial" type="button">Inicial</button>
+<button class="py-1 px-0.5 rounded text-[10px] text-center transition font-medium text-[#58404b] hover:bg-white truncate" id="pill-valid" onclick="setDemoState('valid')" title="Formulario Válido" type="button">Válido</button>
+<button class="py-1 px-0.5 rounded text-[10px] text-center transition font-medium text-[#58404b] hover:bg-white truncate" id="pill-loading" onclick="setDemoState('loading')" title="Enviando con Spinner" type="button">Enviando</button>
+<button class="py-1 px-0.5 rounded text-[10px] text-center transition font-medium text-[#58404b] hover:bg-white truncate" id="pill-error" onclick="setDemoState('error')" title="Error de Credenciales" type="button">Error</button>
+<button class="py-1 px-0.5 rounded text-[10px] text-center transition font-medium text-[#58404b] hover:bg-white truncate" id="pill-success" onclick="setDemoState('success')" title="Éxito y Redirección" type="button">Éxito</button>
+</div>
+</div>
+<!-- Alert / Banner de Error con role="alert" -->
+<div aria-live="assertive" class="hidden mt-3.5 p-3 rounded-xl bg-[#ffdad6] text-[#93000a] text-xs font-semibold flex items-start gap-2 border border-[#ba1a1a]/20" id="error-banner" role="alert">
+<span class="material-symbols-outlined text-[18px] text-[#ba1a1a] shrink-0">error</span>
+<div class="flex-1">
+<strong class="block font-bold">Error de credenciales</strong>
+<span class="font-normal" id="error-message">Correo electrónico o contraseña incorrectos. Por favor, verifica tus datos.</span>
+</div>
+</div>
+<!-- Alert / Banner de Éxito -->
+<div aria-live="polite" class="hidden mt-3.5 p-3 rounded-xl bg-[#e6f7ef] text-[#006947] text-xs font-semibold flex items-center gap-2 border border-[#4edea3]/40" id="success-banner" role="status">
+<span class="material-symbols-outlined text-[18px] text-[#00855b]">check_circle</span>
+<div class="flex-1">
+<strong class="block font-bold">¡Acceso verificado!</strong>
+<span class="font-normal text-[11px]" id="success-text">Redirigiendo al panel seguro de Operadora...</span>
+</div>
+</div>
+<!-- Reactive Form (gap: 14px, margin-top: 28px) -->
+<form aria-label="Formulario de inicio de sesión" class="flex flex-col text-left" id="login-form" novalidate="" onsubmit="handleFormSubmit(event)" style="gap: 14px; margin-top: 28px;">
+<!-- Input Correo Electrónico -->
+<div class="space-y-1">
+<label class="block font-semibold" for="login-email" style="font-size: 0.9rem; color: #2d1457;">
+          Correo electrónico
+        </label>
+<div class="relative flex items-center rounded-[14px] transition-all focus-ring" style="background-color: rgba(245, 233, 233, 0.9); border: 2px solid rgba(236, 72, 153, 0.15);">
+<span aria-hidden="true" class="absolute left-3.5 flex items-center justify-center text-[#58404b] pointer-events-none">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</span>
+<input autocomplete="email" class="w-full h-12 pl-11 pr-4 bg-transparent border-0 rounded-[14px] text-[#1b1739] text-sm placeholder:text-[#8b6f7c]/70 focus:ring-0 focus:outline-none" id="login-email" name="email" oninput="clearFieldFeedback('login-email')" placeholder="ejemplo@correo.com" required="" type="email"/>
+</div>
+<p class="hidden text-xs text-[#ba1a1a] mt-1 font-medium" id="login-email-error">Ingresa un correo electrónico institucional o registrado válido.</p>
+</div>
+<!-- Input Contraseña -->
+<div class="space-y-1">
+<label class="block font-semibold" for="login-password" style="font-size: 0.9rem; color: #2d1457;">
+          Contraseña
+        </label>
+<div class="relative flex items-center rounded-[14px] transition-all focus-ring" style="background-color: rgba(245, 233, 233, 0.9); border: 2px solid rgba(236, 72, 153, 0.15);">
+<span aria-hidden="true" class="absolute left-3.5 flex items-center justify-center text-[#58404b] pointer-events-none">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</span>
+<input autocomplete="current-password" class="w-full h-12 pl-11 pr-11 bg-transparent border-0 rounded-[14px] text-[#1b1739] text-sm placeholder:text-[#8b6f7c]/70 focus:ring-0 focus:outline-none font-sans" id="login-password" name="password" oninput="clearFieldFeedback('login-password')" placeholder="••••••••" required="" type="password"/>
+<button aria-label="Mostrar u ocultar contraseña" class="absolute right-2.5 w-8 h-8 rounded-lg flex items-center justify-center text-[#58404b] hover:text-[#2d1457] hover:bg-black/5 transition-colors focus:outline-none" id="toggle-password-btn" onclick="togglePasswordVisibility()" type="button">
+<span class="material-symbols-outlined text-[20px]" id="toggle-password-icon">visibility</span>
+</button>
+</div>
+<p class="hidden text-xs text-[#ba1a1a] mt-1 font-medium" id="login-password-error">La contraseña debe tener mínimo 6 caracteres.</p>
+</div>
+<!-- Utility Row: Remember & Forgot Password -->
+<div class="flex items-center justify-between pt-0.5">
+<label class="inline-flex items-center gap-2 cursor-pointer select-none">
+<input class="w-4 h-4 rounded text-[#db079c] focus:ring-0 cursor-pointer accent-[#db079c]" id="remember-me" name="remember" type="checkbox"/>
+<span class="text-xs text-[#58404b]">Recordar equipo</span>
+</label>
+<a class="font-semibold transition-all hover:underline focus:outline-none" href="/auth/forgot-password" style="font-size: 0.875rem; color: #c900ae;">
+          ¿Olvidaste tu contraseña?
+        </a>
+</div>
+<!-- Primary Submit Button -->
+<div class="pt-2">
+<button aria-live="polite" class="w-full h-[50px] flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] focus:outline-none focus-ring" id="submit-button" style="background: linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%); border-radius: 50px; box-shadow: 0 8px 24px rgba(233, 30, 140, 0.38); font-size: 0.9rem; font-weight: 600; letter-spacing: 0.5px; color: #ffffff;" type="submit">
+<span class="material-symbols-outlined text-[19px]" id="btn-shield-icon">shield</span>
+<span id="btn-text">INICIAR SESIÓN</span>
+<span class="hidden animate-spin material-symbols-outlined text-[19px]" id="btn-spinner">progress_activity</span>
+</button>
+</div>
+</form>
+<!-- Register Link -->
+<div class="mt-5 pt-3 border-t border-[#dfbecc]/30 text-center">
+<p class="text-sm text-[#58404b]">
+        ¿No tienes cuenta?
+        <a class="font-bold hover:underline ml-1 inline-flex items-center gap-0.5 focus:outline-none" href="/auth/register" style="color: #c900ae;">
+<span>Regístrate</span>
+<span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+</a>
+</p>
+</div>
+<!-- Direct Quick Emergency Bar -->
+<div class="mt-4 p-2.5 rounded-xl bg-[#f6f1ff] flex items-center justify-between gap-2 border border-[#dfbecc]/40">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="w-2 h-2 rounded-full bg-[#ba1a1a] animate-ping shrink-0"></span>
+<span class="text-xs text-[#58404b] truncate">¿En peligro inminente? Llama gratis:</span>
+</div>
+<a aria-label="Llamar inmediatamente a la línea de emergencia 911" class="shrink-0 px-2.5 py-1 rounded-full bg-[#00855b] hover:bg-[#006947] text-white text-xs font-bold flex items-center gap-1 shadow-sm transition active:scale-95 text-decoration-none" href="tel:911">
+<span class="material-symbols-outlined text-[14px]">call</span>
+<span>911 / 123</span>
+</a>
+</div>
+</div>
+<!-- Bottom Security Certificate & Telemetry Badges -->
+<div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-white/80 text-xs font-medium tracking-wide">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-[#6ffbbe]">verified_user</span>
+<span>Cifrado TLS 1.3 / 256-bit</span>
+</div>
+<span class="inline-block w-1 h-1 rounded-full bg-white/40"></span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-[#ffd8e8]">lock</span>
+<span>Protección de Datos Sensibles</span>
+</div>
+</div>
+</main>
+<!-- Minimal Footer Disclaimer -->
+<footer class="w-full py-3 px-4 text-center z-10 text-white/70 text-[11px]">
+<div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
+<span>© 2025 AlertaMujer Web. Protocolo Nacional de Respuesta de Emergencia.</span>
+</div>
+</footer>
+<script>
+  // Password Visibility Toggle
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('login-password');
+    const toggleIcon = document.getElementById('toggle-password-icon');
+    const toggleBtn = document.getElementById('toggle-password-btn');
+    if (!passwordInput || !toggleIcon) return;
+
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.textContent = 'visibility_off';
+      toggleBtn.setAttribute('aria-label', 'Ocultar contraseña');
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.textContent = 'visibility';
+      toggleBtn.setAttribute('aria-label', 'Mostrar contraseña');
+    }
+  }
+
+  // Clear validation visual styles on user type
+  function clearFieldFeedback(fieldId) {
+    const err = document.getElementById(fieldId + '-error');
+    if (err) err.classList.add('hidden');
+    const banner = document.getElementById('error-banner');
+    if (banner) banner.classList.add('hidden');
+    const succ = document.getElementById('success-banner');
+    if (succ) succ.classList.add('hidden');
+  }
+
+  // Quick Stealth Exit (Escape to neutral site)
+  function quickStealthExit() {
+    window.location.replace('https://www.google.com/search?q=recetas+saludables+faciles');
+  }
+
+  // Form Submission Logic
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-email');
+    const password = document.getElementById('login-password');
+    const emailError = document.getElementById('login-email-error');
+    const passwordError = document.getElementById('login-password-error');
+    const errorBanner = document.getElementById('error-banner');
+    const successBanner = document.getElementById('success-banner');
+    const submitBtn = document.getElementById('submit-button');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const shieldIcon = document.getElementById('btn-shield-icon');
+
+    if (errorBanner) errorBanner.classList.add('hidden');
+    if (successBanner) successBanner.classList.add('hidden');
+
+    let valid = true;
+    const emailVal = email ? email.value.trim() : '';
+    const passVal = password ? password.value : '';
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailVal)) {
+      if (emailError) emailError.classList.remove('hidden');
+      valid = false;
+    } else {
+      if (emailError) emailError.classList.add('hidden');
+    }
+
+    if (passVal.length < 6) {
+      if (passwordError) passwordError.classList.remove('hidden');
+      valid = false;
+    } else {
+      if (passwordError) passwordError.classList.add('hidden');
+    }
+
+    if (!valid) return;
+
+    // Trigger loading state
+    btnText.textContent = 'AUTENTICANDO...';
+    btnSpinner.classList.remove('hidden');
+    if (shieldIcon) shieldIcon.classList.add('hidden');
+    submitBtn.setAttribute('disabled', 'true');
+    submitBtn.classList.add('opacity-80', 'cursor-wait');
+
+    setTimeout(() => {
+      btnSpinner.classList.add('hidden');
+      if (shieldIcon) shieldIcon.classList.remove('hidden');
+      submitBtn.removeAttribute('disabled');
+      submitBtn.classList.remove('opacity-80', 'cursor-wait');
+
+      if (emailVal.includes('error') || passVal.includes('error')) {
+        btnText.textContent = 'INICIAR SESIÓN';
+        if (errorBanner) {
+          errorBanner.classList.remove('hidden');
+          document.getElementById('error-message').textContent = 'Credenciales no reconocidas. Contacta al administrador si persiste.';
+        }
+      } else {
+        btnText.textContent = 'SESIÓN INICIADA';
+        if (successBanner) {
+          successBanner.classList.remove('hidden');
+          const isOperadora = emailVal.includes('operador');
+          const roleName = isOperadora ? 'Operadora de Emergencias' : 'Administradora';
+          document.getElementById('success-text').textContent = `Acceso autorizado (${roleName}). Redirigiendo...`;
+          setTimeout(() => {
+            window.location.href = isOperadora ? '/dashboard/home' : '/admin/dashboard';
+          }, 1200);
+        }
+      }
+    }, 1000);
+  }
+
+  // Interactive Mockup State Switcher
+  function setDemoState(state) {
+    const email = document.getElementById('login-email');
+    const password = document.getElementById('login-password');
+    const emailError = document.getElementById('login-email-error');
+    const passwordError = document.getElementById('login-password-error');
+    const errorBanner = document.getElementById('error-banner');
+    const successBanner = document.getElementById('success-banner');
+    const submitBtn = document.getElementById('submit-button');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const shieldIcon = document.getElementById('btn-shield-icon');
+    const badge = document.getElementById('current-state-badge');
+
+    // Update pill styles
+    ['init', 'valid', 'loading', 'error', 'success'].forEach(s => {
+      const pill = document.getElementById('pill-' + s);
+      if (pill) {
+        if (s === state) {
+          pill.classList.add('state-pill-active');
+        } else {
+          pill.classList.remove('state-pill-active');
+        }
+      }
+    });
+
+    if (badge) badge.textContent = state;
+
+    // Reset components
+    if (emailError) emailError.classList.add('hidden');
+    if (passwordError) passwordError.classList.add('hidden');
+    if (errorBanner) errorBanner.classList.add('hidden');
+    if (successBanner) successBanner.classList.add('hidden');
+    if (btnSpinner) btnSpinner.classList.add('hidden');
+    if (shieldIcon) shieldIcon.classList.remove('hidden');
+    submitBtn.removeAttribute('disabled');
+    submitBtn.classList.remove('opacity-80', 'cursor-wait');
+    btnText.textContent = 'INICIAR SESIÓN';
+
+    switch (state) {
+      case 'init':
+        email.value = '';
+        password.value = '';
+        break;
+      case 'valid':
+        email.value = 'operadora@alertamujer.org';
+        password.value = 'Segura#2025!';
+        break;
+      case 'loading':
+        email.value = 'admin@alertamujer.org';
+        password.value = 'AdminAlerta911';
+        btnText.textContent = 'AUTENTICANDO...';
+        btnSpinner.classList.remove('hidden');
+        shieldIcon.classList.add('hidden');
+        submitBtn.setAttribute('disabled', 'true');
+        submitBtn.classList.add('opacity-80', 'cursor-wait');
+        break;
+      case 'error':
+        email.value = 'desconocido@correo.com';
+        password.value = 'clave123';
+        errorBanner.classList.remove('hidden');
+        document.getElementById('error-message').textContent = 'El usuario o contraseña no existen en el registro nacional.';
+        break;
+      case 'success':
+        email.value = 'operadora.central@alertamujer.org';
+        password.value = 'OperadorValido2025';
+        successBanner.classList.remove('hidden');
+        document.getElementById('success-text').textContent = 'Credenciales validadas. Entrando a consola de despacho...';
+        btnText.textContent = 'ACCESO CONCEDIDO';
+        break;
+    }
+  }
+</script>
+</body></html>

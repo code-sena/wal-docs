@@ -487,6 +487,6 @@ FR4.4, FR4.5, and FR5.4 did not generate a separate user story: they were added 
 
 ## Correlations
 
-* Complete template with DoD checklist → `04-requisitos/_template-hu.md`
-* Non-functional requirements → `04-requisitos/non-functional.md`
-* Traceability matrix → `04-requisitos/traceability-matrix.md`
+* Complete template with DoD checklist → `04-requirements/_template-hu.md`
+* Non-functional requirements → `04-requirements/non-functional.md`
+* Traceability matrix → `04-requirements/traceability-matrix.md`

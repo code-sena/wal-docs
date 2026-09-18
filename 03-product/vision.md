@@ -60,3 +60,5 @@ Derived from the non-functional requirements already defined in the SRS. These a
 * Problem Framing (the why) → `03-product/problem-framing.md`
 * Backlog implementing the vision → `04-requirements/user-stories.md`
 * KPIs in operations → `13-operations/README.md`
+* Architecture supporting the vision → `05-architecture/overview.md`
+* Data model enabling the vision → `06-data/models.md`
