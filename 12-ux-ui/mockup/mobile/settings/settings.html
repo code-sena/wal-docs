@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-lowest": "#ffffff", "secondary-fixed-dim": "#e8b3ff", "error": "#ba1a1a", "on-tertiary-fixed": "#002113", "on-secondary": "#ffffff", "tertiary-fixed": "#6ffbbe", "on-primary": "#ffffff", "outline": "#8b6f7c", "on-secondary-fixed-variant": "#652c83", "background": "#fcf8ff", "on-tertiary-container": "#f4fff6", "on-primary-fixed": "#3c0028", "primary-fixed": "#ffd8e8", "surface-dim": "#dcd5ff", "inverse-on-surface": "#f3eeff", "on-error-container": "#93000a", "on-surface": "#1b1739", "on-secondary-fixed": "#310049", "surface-container": "#f0ebff", "on-background": "#1b1739", "on-tertiary-fixed-variant": "#005236", "surface-container-highest": "#e4dfff", "tertiary-container": "#00855b", "primary-container": "#db079c", "tertiary": "#006947", "inverse-primary": "#ffafd6", "tertiary-fixed-dim": "#4edea3", "primary": "#b0007c", "on-surface-variant": "#58404b", "error-container": "#ffdad6", "inverse-surface": "#302c4f", "on-tertiary": "#ffffff", "on-error": "#ffffff", "on-primary-fixed-variant": "#8a0061", "secondary-fixed": "#f6d9ff", "secondary-container": "#e1a0ff", "surface-container-low": "#f6f1ff", "outline-variant": "dfbecc", "on-secondary-container": "#682f85", "primary-fixed-dim": "#ffafd6", "surface-variant": "#e4dfff", "surface-container-high": "#eae5ff", "surface-tint": "#b4007f", "secondary": "#7f459d", "surface": "#fcf8ff", "surface-bright": "#fcf8ff", "on-primary-container": "#fffbff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-sm": "1rem", "space-xl": "2.5rem", "space-md": "1rem", "space-xs": "0.25rem", "gutter": "1.5rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "space-lg": "1.5rem", "margin": "2rem" }, "fontFamily": { "label-sm": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "title-md": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"] }, "fontSize": { "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "headline-sm": ["22px", { "lineHeight": "30px", "fontWeight": "600" }], "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "title-md": ["18px", { "lineHeight": "26px", "fontWeight": "600" }], "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(67,2,97,0.04)] pt-safe"><div class="h-16 px-space-md flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><button aria-label="Volver" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container active:scale-95 transition-all" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><img alt="LOGO.png" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WvcqHOK_moyGB6f9j6JqDUT2njM5mq35TdVbBDbLYkiP4HlI7r-fUKJFOpRCHs13uzR6M83iweYP-JLwK7ZdH8vpcPATvQPZA2Tmljc84UoP1MYIeWCn6XjBfTbZnwuwVno_kndlovJR8GznI3bnyBmwQGUG-KHYb1o-CdzAWV5ZGZ2argKUvNVuQb_VENYmXjwkv5yeAj45nSF72KItZivYRkcKVFc39-qN8ACyIaI7dkn6xh4n8IHILn5uU_lkscgnwWt7k"/><span class="font-label-md text-label-md text-secondary tracking-wide uppercase hidden xs:inline-block">AlertaMujer</span></div><h1 class="font-title-md text-title-md text-on-surface font-bold tracking-tight truncate text-center flex-1">Configuración</h1><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(219,7,156,0.25)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full bg-[#f6f1fb]">
+<!-- Hero Banner: Settings Header with Android Status Bar -->
+<header class="relative w-full rounded-b-[24px] bg-gradient-to-r from-[#7c3aed] to-[#db079c] text-white shadow-lg overflow-hidden pb-6">
+<!-- Subtle Ambient Shimmer Vector -->
+<svg class="absolute -right-12 -top-12 w-48 h-48 opacity-15 pointer-events-none text-white fill-current" viewbox="0 0 200 200">
+<circle cx="100" cy="100" r="80"></circle>
+</svg>
+<!-- Android Status Bar Emulation (System Clarity) -->
+<div class="w-full px-5 pt-3 pb-2 flex items-center justify-between text-white/90 text-xs font-semibold tracking-wider select-none">
+<span>09:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- Navigation & Title Content -->
+<div class="px-4 pt-2 flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<button aria-label="Volver atrás" class="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white shrink-0" onclick="history.back()" type="button">
+<span class="material-symbols-outlined text-[26px]">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h1 class="text-[1.5rem] font-bold text-white tracking-tight leading-tight">Configuración</h1>
+<p class="text-white/90 text-[13px] font-normal leading-snug">Preferencias del sistema y seguridad personal</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Settings Body -->
+<div class="flex flex-col gap-5 px-4 py-5 max-w-xl mx-auto w-full">
+<!-- SECCIÓN 1: PERMISOS -->
+<section aria-labelledby="sec-permisos" class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-1">
+<span class="text-[0.68rem] font-bold text-[#7c3aed] uppercase tracking-[0.08em]" id="sec-permisos">Permisos</span>
+<span class="text-[11px] font-medium text-purple-700/70">Hardware &amp; SO</span>
+</div>
+<div class="bg-white rounded-[18px] shadow-[0_4px_20px_-2px_rgba(67,2,97,0.06),0_2px_6px_-1px_rgba(67,2,97,0.04)] p-4 flex flex-col gap-3.5">
+<!-- Ubicación -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">location_on</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Ubicación en tiempo real</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">GPS continuo para alertas SOS</span>
+</div>
+</div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#dcfce7] text-[#16a34a] shrink-0">
+            Concedido
+          </span>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Cámara -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">photo_camera</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Cámara</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">Evidencias automáticas</span>
+</div>
+</div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#dcfce7] text-[#16a34a] shrink-0">
+            Concedido
+          </span>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Micrófono -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">mic</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Micrófono</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">Grabación de audio ambiental</span>
+</div>
+</div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#dcfce7] text-[#16a34a] shrink-0">
+            Concedido
+          </span>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Contactos (Denegado) -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#fee2e2] text-[#dc2626] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">contacts</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Acceso a Contactos</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">Selección de red de apoyo</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fee2e2] text-[#dc2626]">
+              Denegado
+            </span>
+<button aria-label="Permitir acceso a Contactos" class="px-3 py-1 text-xs font-bold text-white bg-[#7c3aed] hover:bg-[#6d28d9] rounded-full shadow-sm active:scale-95 transition-all" type="button">
+              Permitir
+            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- SECCIÓN 2: ALERTA SOS -->
+<section aria-labelledby="sec-alerta" class="flex flex-col gap-2">
+<div class="px-1">
+<span class="text-[0.68rem] font-bold text-[#7c3aed] uppercase tracking-[0.08em]" id="sec-alerta">Alerta SOS</span>
+</div>
+<div class="bg-white rounded-[18px] shadow-[0_4px_20px_-2px_rgba(67,2,97,0.06),0_2px_6px_-1px_rgba(67,2,97,0.04)] p-4 flex flex-col gap-3.5">
+<!-- Cuenta regresiva Selector -->
+<button aria-haspopup="dialog" class="w-full flex items-center justify-between gap-2 text-left min-h-[48px] rounded-xl hover:bg-[#fcf8ff] transition-colors -mx-1 px-1" id="btn-countdown" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">timer</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Tiempo de cuenta regresiva</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">Demora antes de despachar SOS</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#f0ebff] text-[#7c3aed]" id="countdown-val">
+              3 segundos
+            </span>
+<span class="material-symbols-outlined text-purple-400 text-[20px]">chevron_right</span>
+</div>
+</button>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Grabar video automático -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">videocam</span>
+</div>
+<div class="flex flex-col min-w-0">
+<label class="font-bold text-sm text-[#1b1739] leading-tight cursor-pointer" for="toggle-video">Grabar video automáticamente</label>
+<span class="text-xs text-[#58404b] leading-tight truncate">Activa cámara frontal y trasera en alerta</span>
+</div>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-[#7c3aed] transition-colors duration-200 ease-in-out focus:outline-none" id="toggle-video" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform translate-x-5.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5"></span>
+</button>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Llamada SOS automática -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">phone_in_talk</span>
+</div>
+<div class="flex flex-col min-w-0">
+<label class="font-bold text-sm text-[#1b1739] leading-tight cursor-pointer" for="toggle-call">Llamada SOS automática</label>
+<span class="text-xs text-[#58404b] leading-tight truncate">Discado automático a línea 123 y contactos</span>
+</div>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-[#7c3aed] transition-colors duration-200 ease-in-out focus:outline-none" id="toggle-call" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform translate-x-5.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5"></span>
+</button>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Modo silencioso -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">volume_off</span>
+</div>
+<div class="flex flex-col min-w-0">
+<label class="font-bold text-sm text-[#1b1739] leading-tight cursor-pointer" for="toggle-silent">Modo silencioso</label>
+<span class="text-xs text-[#58404b] leading-tight truncate">No emitir sirena local para protección encubierta</span>
+</div>
+</div>
+<button aria-checked="false" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-[#dcd5ff] transition-colors duration-200 ease-in-out focus:outline-none" id="toggle-silent" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform translate-x-0.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- SECCIÓN 3: NOTIFICACIONES -->
+<section aria-labelledby="sec-notificaciones" class="flex flex-col gap-2">
+<div class="px-1">
+<span class="text-[0.68rem] font-bold text-[#7c3aed] uppercase tracking-[0.08em]" id="sec-notificaciones">Notificaciones</span>
+</div>
+<div class="bg-white rounded-[18px] shadow-[0_4px_20px_-2px_rgba(67,2,97,0.06),0_2px_6px_-1px_rgba(67,2,97,0.04)] p-4 flex flex-col gap-3.5">
+<!-- Alertas push -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+</div>
+<div class="flex flex-col min-w-0">
+<label class="font-bold text-sm text-[#1b1739] leading-tight cursor-pointer" for="toggle-push">Alertas push</label>
+<span class="text-xs text-[#58404b] leading-tight truncate">Avisos de zonas de riesgo y red comunitaria</span>
+</div>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-[#7c3aed] transition-colors duration-200 ease-in-out" id="toggle-push" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform translate-x-5.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5"></span>
+</button>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Sonido de alarma -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">volume_up</span>
+</div>
+<div class="flex flex-col min-w-0">
+<label class="font-bold text-sm text-[#1b1739] leading-tight cursor-pointer" for="toggle-alarm">Sonido de alarma</label>
+<span class="text-xs text-[#58404b] leading-tight truncate">Tono penetrante al activar botón de pánico</span>
+</div>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-[#7c3aed] transition-colors duration-200 ease-in-out" id="toggle-alarm" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform translate-x-5.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5"></span>
+</button>
+</div>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Vibración háptica -->
+<div class="flex items-center justify-between gap-3 min-h-[48px]">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">vibration</span>
+</div>
+<div class="flex flex-col min-w-0">
+<label class="font-bold text-sm text-[#1b1739] leading-tight cursor-pointer" for="toggle-vibrate">Vibración háptica</label>
+<span class="text-xs text-[#58404b] leading-tight truncate">Patrón táctil de confirmación en SOS</span>
+</div>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-[#7c3aed] transition-colors duration-200 ease-in-out" id="toggle-vibrate" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform translate-x-5.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- SECCIÓN 4: CUENTA -->
+<section aria-labelledby="sec-cuenta" class="flex flex-col gap-2">
+<div class="px-1">
+<span class="text-[0.68rem] font-bold text-[#7c3aed] uppercase tracking-[0.08em]" id="sec-cuenta">Cuenta</span>
+</div>
+<div class="bg-white rounded-[18px] shadow-[0_4px_20px_-2px_rgba(67,2,97,0.06),0_2px_6px_-1px_rgba(67,2,97,0.04)] p-4 flex flex-col gap-3.5">
+<!-- Editar perfil -->
+<button class="w-full flex items-center justify-between gap-3 text-left min-h-[48px] rounded-xl hover:bg-[#fcf8ff] transition -mx-1 px-1" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">person</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Editar perfil</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">dannybahamon613@gmail.com</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-purple-400 text-[20px] shrink-0">chevron_right</span>
+</button>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Cambiar contraseña -->
+<button class="w-full flex items-center justify-between gap-3 text-left min-h-[48px] rounded-xl hover:bg-[#fcf8ff] transition -mx-1 px-1" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">lock_reset</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Cambiar contraseña</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">Última actualización hace 3 meses</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-purple-400 text-[20px] shrink-0">chevron_right</span>
+</button>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Ubicación guardada -->
+<button class="w-full flex items-center justify-between gap-3 text-left min-h-[48px] rounded-xl hover:bg-[#fcf8ff] transition -mx-1 px-1" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">explore</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Municipio y Departamento</span>
+<span class="text-xs text-[#7c3aed] font-semibold leading-tight truncate">Huila · La Plata</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-purple-400 text-[20px] shrink-0">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- SECCIÓN 5: PRIVACIDAD Y SEGURIDAD -->
+<section aria-labelledby="sec-privacidad" class="flex flex-col gap-2">
+<div class="px-1">
+<span class="text-[0.68rem] font-bold text-[#7c3aed] uppercase tracking-[0.08em]" id="sec-privacidad">Privacidad y Seguridad</span>
+</div>
+<div class="bg-white rounded-[18px] shadow-[0_4px_20px_-2px_rgba(67,2,97,0.06),0_2px_6px_-1px_rgba(67,2,97,0.04)] p-4 flex flex-col gap-3.5">
+<!-- Términos y condiciones -->
+<button class="w-full flex items-center justify-between gap-3 text-left min-h-[48px] rounded-xl hover:bg-[#fcf8ff] transition -mx-1 px-1" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Términos y condiciones</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-purple-400 text-[20px] shrink-0">chevron_right</span>
+</button>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Política de privacidad -->
+<button class="w-full flex items-center justify-between gap-3 text-left min-h-[48px] rounded-xl hover:bg-[#fcf8ff] transition -mx-1 px-1" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#f3e8ff] text-[#7c3aed] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">verified_user</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#1b1739] leading-tight">Política de privacidad</span>
+<span class="text-xs text-[#58404b] leading-tight truncate">Cifrado conforme a Ley 1581</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-purple-400 text-[20px] shrink-0">chevron_right</span>
+</button>
+<div class="h-[1px] bg-[#f0ebff] w-full"></div>
+<!-- Eliminar mis datos y cuenta (Destructive) -->
+<button class="w-full flex items-center justify-between gap-3 text-left min-h-[48px] rounded-xl hover:bg-[#fee2e2]/40 transition -mx-1 px-1" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full bg-[#fee2e2] text-[#dc2626] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">delete_forever</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-bold text-sm text-[#dc2626] leading-tight">Eliminar mis datos y cuenta</span>
+<span class="text-xs text-[#9f1239] leading-tight truncate">Acción irreversible con confirmación de clave</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[#dc2626] text-[20px] shrink-0">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- 6. ACCIÓN DE CIERRE (DANGER ACTION) -->
+<div class="pt-2">
+<button class="w-full py-3.5 px-4 rounded-full border-2 border-red-500 text-red-600 font-bold text-sm flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 active:scale-[0.99] transition shadow-sm" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span>Cerrar sesión</span>
+</button>
+</div>
+<!-- App Version & Legal Protection Sub-Footer -->
+<footer class="text-center py-4 flex flex-col items-center gap-1">
+<div class="flex items-center gap-1.5 text-xs text-purple-900/60 font-medium">
+<span class="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
+<span>AlertaMujer v2.4.0 (Build 2026)</span>
+</div>
+<p class="text-[11px] text-purple-900/50">Cifrado de extremo a extremo activo</p>
+</footer>
+<!-- Android Home Navigation Gesture Bar Indicator -->
+<div class="w-full flex justify-center pt-2 pb-3 select-none pointer-events-none">
+<div class="w-32 h-1 bg-[#1b1739]/30 rounded-full"></div>
+</div>
+</div>
+<!-- Modal Selector for Cuenta Regresiva -->
+<div aria-labelledby="modal-title" aria-modal="true" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4" id="modal-countdown" role="dialog">
+<div class="bg-white rounded-[24px] w-full max-w-sm p-5 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-150">
+<div class="flex items-center justify-between">
+<h2 class="text-base font-bold text-[#1b1739]" id="modal-title">Tiempo de cuenta regresiva</h2>
+<button aria-label="Cerrar ventana" class="w-8 h-8 rounded-full flex items-center justify-center text-purple-900/60 hover:bg-purple-50" id="btn-modal-close" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<p class="text-xs text-[#58404b]">Elige cuántos segundos esperar antes de despachar la señal SOS automática a la red de emergencia:</p>
+<div class="flex flex-col gap-2">
+<button class="opt-btn flex items-center justify-between px-4 py-3 rounded-xl bg-[#f3e8ff] text-[#7c3aed] font-semibold text-sm" data-seconds="3" type="button">
+<span>3 segundos (Recomendado)</span>
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button class="opt-btn flex items-center justify-between px-4 py-3 rounded-xl hover:bg-[#f6f1fb] text-[#1b1739] font-medium text-sm" data-seconds="5" type="button">
+<span>5 segundos</span>
+<span class="material-symbols-outlined text-[18px] hidden">check</span>
+</button>
+<button class="opt-btn flex items-center justify-between px-4 py-3 rounded-xl hover:bg-[#f6f1fb] text-[#1b1739] font-medium text-sm" data-seconds="10" type="button">
+<span>10 segundos</span>
+<span class="material-symbols-outlined text-[18px] hidden">check</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    // Interactive switches
+    const switches = document.querySelectorAll('button[role="switch"]');
+    switches.forEach(sw => {
+      sw.addEventListener('click', () => {
+        const isChecked = sw.getAttribute('aria-checked') === 'true';
+        const newChecked = !isChecked;
+        sw.setAttribute('aria-checked', newChecked.toString());
+        
+        const knob = sw.querySelector('span');
+        if (newChecked) {
+          sw.classList.remove('bg-[#dcd5ff]');
+          sw.classList.add('bg-[#7c3aed]');
+          knob.classList.remove('translate-x-0.5');
+          knob.classList.add('translate-x-5.5');
+        } else {
+          sw.classList.remove('bg-[#7c3aed]');
+          sw.classList.add('bg-[#dcd5ff]');
+          knob.classList.remove('translate-x-5.5');
+          knob.classList.add('translate-x-0.5');
+        }
+      });
+    });
+
+    // Countdown Dialog interaction
+    const btnCountdown = document.getElementById('btn-countdown');
+    const modal = document.getElementById('modal-countdown');
+    const btnClose = document.getElementById('btn-modal-close');
+    const valDisplay = document.getElementById('countdown-val');
+    const optButtons = document.querySelectorAll('.opt-btn');
+
+    if (btnCountdown && modal && btnClose && valDisplay) {
+      btnCountdown.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+      });
+
+      const closeModal = () => modal.classList.add('hidden');
+      btnClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      optButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const sec = btn.getAttribute('data-seconds');
+          valDisplay.textContent = sec + ' segundos';
+          
+          optButtons.forEach(b => {
+            b.classList.remove('bg-[#f3e8ff]', 'text-[#7c3aed]', 'font-semibold');
+            b.classList.add('hover:bg-[#f6f1fb]', 'text-[#1b1739]', 'font-medium');
+            const icon = b.querySelector('.material-symbols-outlined');
+            if (icon) icon.classList.add('hidden');
+          });
+
+          btn.classList.remove('hover:bg-[#f6f1fb]', 'text-[#1b1739]', 'font-medium');
+          btn.classList.add('bg-[#f3e8ff]', 'text-[#7c3aed]', 'font-semibold');
+          const icon = btn.querySelector('.material-symbols-outlined');
+          if (icon) icon.classList.remove('hidden');
+
+          setTimeout(closeModal, 180);
+        });
+      });
+    }
+  })();
+</script></main></body></html>

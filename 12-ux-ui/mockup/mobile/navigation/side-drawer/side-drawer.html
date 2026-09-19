@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "background": "#fcf8ff", "on-surface": "#1b1739", "on-tertiary-container": "#f4fff6", "inverse-primary": "#ffafd6", "tertiary-fixed-dim": "#4edea3", "on-primary-fixed-variant": "#8a0061", "secondary-container": "#e1a0ff", "secondary-fixed-dim": "#e8b3ff", "tertiary-fixed": "#6ffbbe", "secondary-fixed": "#f6d9ff", "surface-container-highest": "#e4dfff", "tertiary": "#006947", "tertiary-container": "#00855b", "on-primary": "#ffffff", "on-tertiary-fixed": "#002113", "on-tertiary-fixed-variant": "#005236", "primary-container": "#db079c", "on-primary-fixed": "#3c0028", "secondary": "#7f459d", "on-error": "#ffffff", "surface-tint": "#b4007f", "error": "#ba1a1a", "on-surface-variant": "#58404b", "surface-container-high": "#eae5ff", "surface-container-lowest": "#ffffff", "surface-bright": "#fcf8ff", "on-secondary-fixed": "#310049", "surface-container-low": "#f6f1ff", "surface-container": "#f0ebff", "on-secondary-fixed-variant": "#652c83", "on-primary-container": "#fffbff", "error-container": "#ffdad6", "on-secondary": "#ffffff", "on-secondary-container": "#682f85", "surface-dim": "#dcd5ff", "surface": "#fcf8ff", "surface-variant": "#e4dfff", "on-tertiary": "#ffffff", "inverse-surface": "#302c4f", "on-background": "#1b1739", "primary-fixed-dim": "#ffafd6", "inverse-on-surface": "#f3eeff", "on-error-container": "#93000a", "primary-fixed": "#ffd8e8", "outline": "#8b6f7c", "outline-variant": "#dfbecc", "primary": "#b0007c" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xl": "2.5rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "space-md": "1rem", "gutter-sm": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "margin": "2rem", "gutter": "1.5rem" }, fontFamily: { "title-md": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"] }, fontSize: { "title-md": ["18px", { "lineHeight": "26px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "headline-sm": ["22px", { "lineHeight": "30px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }], "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100vh;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}</style></head><body class="bg-surface font-body-md text-on-surface flex flex-col relative min-h-screen pt-safe pb-safe"><main class="flex-1 flex flex-col relative w-full bg-surface"><div class="flex flex-col w-full relative select-none">
+<!-- Parent Mockup Container representing the mobile viewport with active Drawer overlay -->
+<div class="relative w-full overflow-hidden flex min-h-[820px] bg-surface">
+<!-- BEHIND THE DRAWER: Blurred, Dimmed App Interface (18% visible on right) -->
+<div class="absolute inset-0 flex flex-col pointer-events-none filter blur-[2px] opacity-75">
+<!-- Simulated App Top Header -->
+<div class="h-16 bg-surface-container flex items-center justify-between px-4">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-container animate-ping"></span>
+<span class="font-headline-sm text-headline-sm text-primary">AlertaMujer</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+</div>
+<!-- Simulated Map Canvas with safe route -->
+<div class="h-72 w-full bg-surface-container-high relative bg-cover bg-center" data-location="Bogota, Colombia" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAOk9pMexqZTdq48XERkXUF_bpDRiSK8flsogPHHdNuzMjefkQ_U8JZhsT5bWjWfynjHtHv_xTaO8pPL5qDxmjgJGVjC63EkEcGxU46YzVac7LnVk6xvNOvyDHpQKoL6pdctXORBXL9l4WH_QE88VgiR2h9_0zUbZpT4sJfuRhel4L4wxGyh4strQ0thUXkX-eCDJJBk66I1LTiLUUeSPG16ji44tF3URPoKXZSccqsVtRsuCp0IL2w')">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent to-surface"></div>
+</div>
+<!-- Simulated SOS Trigger Preview on base screen -->
+<div class="flex-1 flex flex-col items-center justify-center p-6 gap-4">
+<div class="w-44 h-44 rounded-full bg-primary-container/20 flex items-center justify-center p-4">
+<div class="w-36 h-36 rounded-full bg-primary flex flex-col items-center justify-center text-on-primary shadow-lg shadow-primary/40">
+<span class="material-symbols-outlined text-4xl">sos</span>
+<span class="font-label-md text-label-md tracking-wider mt-1">EMERGENCIA</span>
+</div>
+</div>
+<div class="w-full h-14 bg-surface-container-lowest rounded-xl shadow-sm"></div>
+</div>
+</div>
+<!-- TRANSLUCENT SCRIM / BACKDROP (Dismiss area on tap) -->
+<div aria-label="Cerrar navegación lateral" class="absolute inset-0 bg-inverse-surface/65 backdrop-blur-[3px] z-30 transition-opacity duration-300" id="drawer-scrim" onclick="toggleDrawerDismiss()">
+<!-- Subtle indicator that clicking closes drawer -->
+<div class="absolute right-2 top-6 text-on-primary/75 flex items-center justify-center w-8 h-8 rounded-full bg-inverse-surface/50">
+<span class="material-symbols-outlined text-sm">close</span>
+</div>
+</div>
+<!-- MAIN SIDE NAVIGATION DRAWER (Covers 82% width, slides from left) -->
+<aside aria-label="Menú principal de usuaria" aria-modal="true" class="relative z-40 w-[84%] max-w-[340px] flex flex-col shadow-2xl bg-secondary transition-transform duration-300 overflow-y-auto max-h-[100vh]" id="alerta-drawer" role="dialog">
+<!-- Top Section: Purple Radiant Header & User Identity Card -->
+<div class="relative bg-gradient-to-b from-secondary via-secondary to-surface-container-low pt-6 pb-5 px-5 flex flex-col items-center text-center">
+<!-- Floating Subtle Micro-particles (Pure SVG) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
+<circle cx="20%" cy="25%" fill="#ffffff" r="3"></circle>
+<circle cx="85%" cy="35%" fill="#ffffff" r="4"></circle>
+<circle cx="70%" cy="75%" fill="#ffffff" r="2"></circle>
+<circle cx="15%" cy="80%" fill="#ffffff" r="3.5"></circle>
+</svg>
+<!-- Profile Avatar with Verified Shield Ring -->
+<div class="relative mb-3">
+<div class="w-20 h-20 rounded-full p-[3px] bg-surface-container-lowest shadow-md flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Close up warm confident headshot portrait of Danny, a 28 year old Latin American woman with warm ambient magenta and violet backlighting, soft natural smile and calm radiant gaze for safety app identity badge" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrMwfzo_dIJK3fJL3B7EDZfZYVuT4zrmXpXNQibUp8Z1IbxOtY7e97KsNTgh9HkXt2QpeVslO_Fqnw1ZsBcEF9uOZW_c-eE9NHeY1M-zOZ9ze1iKKKdtu19xKYK7Dyl-RfncrMKj9lhVo9ZhsjFZp3WxWEprnfoWkBh16SvvGmmO0Y7no-94ulpPY-nKeU5CgaMKiE4OBXjbbOEPrv3O7J4eAdMojbR3UN4aX6urERW91NDkNIBVHH"/>
+</div>
+<div class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container shadow-sm ring-2 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+</div>
+</div>
+<!-- Identity Labels -->
+<h2 class="font-title-md text-title-md font-bold text-on-primary tracking-tight">dannybahamon613</h2>
+<p class="font-body-sm text-body-sm text-on-primary/80 mt-0.5 select-all">dannybahamon613@gmail.com</p>
+<!-- Refined underline bar -->
+<div class="w-9 h-[3px] rounded-full bg-on-primary/90 mt-2 mb-3"></div>
+<!-- Verified Safety Status Pill -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container shadow-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></span>
+<span class="font-label-sm text-label-sm font-semibold tracking-normal">Usuaria Verificada • SOS Activo</span>
+</div>
+</div>
+<!-- Drawer Body: Action Menu Stack & Personalization Box -->
+<div class="flex-1 bg-surface-container-low px-4 py-4 space-y-4">
+<!-- Navigation Menu Cards Stack -->
+<nav aria-label="Secciones principales" class="flex flex-col space-y-2">
+<!-- 1. Inicio (Active Item) -->
+<button aria-current="page" class="group w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-high shadow-sm text-left transition-all active:scale-[0.98]" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-primary">Inicio</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/80">Pantalla de protección</span>
+</div>
+</div>
+<div class="flex items-center text-primary pr-1">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</div>
+</button>
+<!-- 2. Red de Contactos -->
+<button class="group w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm hover:bg-surface-container text-left transition-all active:scale-[0.98]" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">group</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Contactos</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">3 círculos de confianza</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[18px] pr-1">chevron_right</span>
+</button>
+<!-- 3. Historial de Alertas -->
+<button class="group w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm hover:bg-surface-container text-left transition-all active:scale-[0.98]" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">history_toggle_off</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Historial</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rutas y alertas pasadas</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[18px] pr-1">chevron_right</span>
+</button>
+<!-- 4. Dispositivos Vinculados (Smartband, Botón Bluetooth) -->
+<button class="group w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm hover:bg-surface-container text-left transition-all active:scale-[0.98]" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">sensors</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Dispositivos Vinculados</span>
+<span class="font-label-sm text-label-sm text-tertiary font-medium">1 botón activo • 94%</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[18px] pr-1">chevron_right</span>
+</button>
+<!-- 5. Configuración de Seguridad -->
+<button class="group w-full flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm hover:bg-surface-container text-left transition-all active:scale-[0.98]" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Configuración</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sensores y volumen de alerta</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[18px] pr-1">chevron_right</span>
+</button>
+</nav>
+<!-- THEME CUSTOMIZATION CARD (Personalización de Tema) -->
+<section aria-label="Personalización de Tema" class="p-3.5 bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-3">
+<!-- Header row with custom toggle -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">palette</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-on-surface">Tema Personalizado</span>
+</div>
+<!-- Modern Interactive Switch -->
+<button aria-checked="true" class="w-11 h-6 bg-primary rounded-full p-0.5 transition-colors relative flex items-center" id="custom-theme-switch" onclick="toggleCustomTheme(this)" role="switch" type="button">
+<span class="w-5 h-5 bg-on-primary rounded-full shadow-md transform translate-x-5 transition-transform flex items-center justify-center" id="theme-switch-thumb">
+<span class="material-symbols-outlined text-[12px] text-primary">check</span>
+</span>
+</button>
+</div>
+<!-- Subtle Separator -->
+<div class="w-full h-px bg-surface-container-highest"></div>
+<!-- Swatches Header -->
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm tracking-wider font-bold text-on-surface-variant uppercase text-[10px]">
+              TEMAS PREDETERMINADOS
+            </span>
+<span class="font-label-sm text-label-sm font-semibold text-secondary" id="active-theme-label">
+              Púrpura Imperial
+            </span>
+</div>
+<!-- Interactive Color Swatches Grid (6 themes with radio semantics) -->
+<div aria-label="Seleccionar paleta cromática" class="grid grid-cols-6 gap-1.5 pt-0.5" role="radiogroup">
+<!-- Swatch 1: Magenta Original -->
+<button aria-checked="false" aria-label="Magenta AlertaMujer" class="swatch-item group relative h-10 w-full rounded-full bg-primary-container flex items-center justify-center transition-all hover:scale-105 active:scale-95" onclick="selectSwatch(this, 'Magenta Alerta', '#db079c')" role="radio" type="button">
+<span class="check-icon hidden material-symbols-outlined text-on-primary text-[15px]">check</span>
+</button>
+<!-- Swatch 2: Vino Tinto -->
+<button aria-checked="false" aria-label="Vino Tinto Guardián" class="swatch-item group relative h-10 w-full rounded-full bg-on-primary-fixed-variant flex items-center justify-center transition-all hover:scale-105 active:scale-95" onclick="selectSwatch(this, 'Vino Tinto', '#8a0061')" role="radio" type="button">
+<span class="check-icon hidden material-symbols-outlined text-on-primary text-[15px]">check</span>
+</button>
+<!-- Swatch 3: Deep Night -->
+<button aria-checked="false" aria-label="Noche Sigilosa" class="swatch-item group relative h-10 w-full rounded-full bg-inverse-surface flex items-center justify-center transition-all hover:scale-105 active:scale-95" onclick="selectSwatch(this, 'Noche Sigilosa', '#1b1739')" role="radio" type="button">
+<span class="check-icon hidden material-symbols-outlined text-on-primary text-[15px]">check</span>
+</button>
+<!-- Swatch 4: Dark Purple (Active by default) -->
+<button aria-checked="true" aria-label="Púrpura Imperial" class="swatch-item selected-swatch group relative h-10 w-full rounded-full bg-secondary flex items-center justify-center shadow-md shadow-secondary/40 transition-all scale-105" onclick="selectSwatch(this, 'Púrpura Imperial', '#7f459d')" role="radio" type="button">
+<span class="check-icon material-symbols-outlined text-on-primary text-[15px] font-bold">check</span>
+</button>
+<!-- Swatch 5: Sapphire Blue -->
+<button aria-checked="false" aria-label="Azul Confianza" class="swatch-item group relative h-10 w-full rounded-full bg-on-background flex items-center justify-center transition-all hover:scale-105 active:scale-95" onclick="selectSwatch(this, 'Azul Confianza', '#302c4f')" role="radio" type="button">
+<span class="check-icon hidden material-symbols-outlined text-on-primary text-[15px]">check</span>
+</button>
+<!-- Swatch 6: Emerald -->
+<button aria-checked="false" aria-label="Verde Esperanza" class="swatch-item group relative h-10 w-full rounded-full bg-tertiary flex items-center justify-center transition-all hover:scale-105 active:scale-95" onclick="selectSwatch(this, 'Verde Esperanza', '#006947')" role="radio" type="button">
+<span class="check-icon hidden material-symbols-outlined text-on-primary text-[15px]">check</span>
+</button>
+</div>
+<!-- Status badge indicator -->
+<div class="flex items-center justify-center py-1 rounded-lg bg-surface-container">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Modo visual activo en toda la app
+            </span>
+</div>
+</section>
+</div>
+<!-- Drawer Footer: Logout and Versioning -->
+<div class="p-4 bg-surface-container-low flex flex-col gap-3">
+<!-- Cerrar Sesión Action -->
+<button class="w-full h-12 flex items-center justify-center gap-2.5 px-4 rounded-full bg-error-container text-on-error-container font-label-md text-label-md font-bold hover:bg-error hover:text-on-error transition-colors active:scale-98" onclick="handleLogout()" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span>Cerrar sesión</span>
+</button>
+<!-- App Metadata -->
+<div class="flex flex-col items-center justify-center text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant/75 tracking-tight font-medium">
+            AlertaMujer Mobile v2.4.1 (Build 2026)
+          </p>
+<span class="font-label-sm text-[10px] text-tertiary font-semibold flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+            Red de Asistencia 24/7 Conectada
+          </span>
+</div>
+</div>
+</aside>
+</div>
+<!-- Interactive script for swatch selections, switches, and dismissal delight -->
+<script>
+    function selectSwatch(selectedButton, themeName, colorValue) {
+      const allSwatches = document.querySelectorAll('.swatch-item');
+      allSwatches.forEach(btn => {
+        btn.setAttribute('aria-checked', 'false');
+        btn.classList.remove('scale-105', 'shadow-md');
+        const icon = btn.querySelector('.check-icon');
+        if (icon) {
+          icon.classList.add('hidden');
+        }
+      });
+
+      selectedButton.setAttribute('aria-checked', 'true');
+      selectedButton.classList.add('scale-105', 'shadow-md');
+      const icon = selectedButton.querySelector('.check-icon');
+      if (icon) {
+        icon.classList.remove('hidden');
+      }
+
+      const themeLabel = document.getElementById('active-theme-label');
+      if (themeLabel) {
+        themeLabel.textContent = themeName;
+      }
+    }
+
+    function toggleCustomTheme(button) {
+      const isChecked = button.getAttribute('aria-checked') === 'true';
+      const newState = !isChecked;
+      button.setAttribute('aria-checked', newState.toString());
+
+      const thumb = document.getElementById('theme-switch-thumb');
+      if (newState) {
+        button.classList.remove('bg-surface-variant');
+        button.classList.add('bg-primary');
+        thumb.classList.remove('translate-x-0');
+        thumb.classList.add('translate-x-5');
+      } else {
+        button.classList.remove('bg-primary');
+        button.classList.add('bg-surface-variant');
+        thumb.classList.remove('translate-x-5');
+        thumb.classList.add('translate-x-0');
+      }
+    }
+
+    function toggleDrawerDismiss() {
+      const drawer = document.getElementById('alerta-drawer');
+      const scrim = document.getElementById('drawer-scrim');
+      if (drawer && scrim) {
+        drawer.classList.add('-translate-x-full');
+        scrim.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          drawer.classList.remove('-translate-x-full');
+          scrim.classList.remove('opacity-0', 'pointer-events-none');
+        }, 1200);
+      }
+    }
+
+    function handleLogout() {
+      const btn = event.currentTarget;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Cerrando...';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span> Sesión finalizada';
+      }, 700);
+    }
+  </script>
+</div></main></body></html>
