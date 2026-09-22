@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlertaMujer - Registro (/auth/register)</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Nunito', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              magenta: '#db079c',
+              berry: '#af0763',
+              purple: '#9a07a7',
+              darkPurple: '#430261',
+              violet: '#650dc9',
+              deepViolet: '#54048a',
+              pink: '#ae10df',
+              textDark: '#2d1457',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --gradient-bg: linear-gradient(135deg, #db079c 0%, #af0763 35%, #9a07a7 70%, #430261 100%);
+      --gradient-btn: linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%);
+      --radius-card: 28px;
+      --radius-input: 14px;
+      --radius-btn: 50px;
+      --shadow-card: 0 24px 60px rgba(78, 16, 177, 0.22), 0 4px 16px rgba(91, 33, 182, 0.12);
+      --shadow-btn: 0 8px 24px rgba(233, 30, 140, 0.38);
+      --shadow-btn-hover: 0 12px 32px rgba(233, 30, 140, 0.48);
+      --color-purple: #c900ae;
+      --color-text-dark: #2d1457;
+      --text-muted: #6b7280;
+    }
+
+    [data-theme="dark"] {
+      --color-text-dark: #f3e8ff;
+      --text-muted: #a79fc4;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Nunito', sans-serif;
+      min-height: 100vh;
+      background: var(--gradient-bg);
+      background-attachment: fixed;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient blur orbs */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .orb-1 {
+      top: -10%;
+      left: -5%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #db079c 0%, #650dc9 80%);
+    }
+    .orb-2 {
+      bottom: -10%;
+      right: -5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #ff2a9d 0%, #54048a 75%);
+    }
+
+    /* Input style matching design tokens */
+    .auth-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .auth-input {
+      width: 100%;
+      background: rgba(245, 233, 233, 0.9);
+      border: 2px solid rgba(236, 72, 153, 0.2);
+      border-radius: var(--radius-input);
+      font-size: 0.9rem;
+      color: #1e1a3c;
+      padding: 10px 14px 10px 38px;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .auth-input:hover {
+      border-color: rgba(236, 72, 153, 0.38);
+      background: rgba(255, 245, 245, 0.95);
+    }
+    .auth-input:focus {
+      background: #ffffff;
+      border-color: #db1879;
+      box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+    }
+    .auth-input.has-right-btn {
+      padding-right: 42px;
+    }
+    .auth-input-no-icon {
+      padding-left: 14px;
+    }
+
+    /* Input error state */
+    .auth-input.error {
+      border-color: #dc2626 !important;
+      background: #fff5f5;
+    }
+    .auth-input.valid {
+      border-color: #16a34a !important;
+    }
+
+    /* Interactive state simulation buttons */
+    .state-pill {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .state-pill.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+      font-weight: 600;
+    }
+
+    /* Custom Checkbox */
+    .custom-checkbox {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(236, 72, 153, 0.4);
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+      display: inline-grid;
+      place-content: center;
+      transition: all 0.15s ease;
+      background-color: white;
+      flex-shrink: 0;
+    }
+    .custom-checkbox:checked {
+      background-color: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .custom-checkbox:checked::before {
+      content: "";
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid white;
+      border-bottom: 2px solid white;
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+
+    /* Strength meter segment */
+    .meter-seg {
+      height: 4px;
+      border-radius: 2px;
+      background: #e2e8f0;
+      flex: 1;
+      transition: background-color 0.3s ease;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen py-6 px-4 relative z-10 text-slate-800">
+
+  <!-- Ambient background glow elements -->
+  <div class="bg-orb orb-1" aria-hidden="true"></div>
+  <div class="bg-orb orb-2" aria-hidden="true"></div>
+
+  <!-- Quick emergency bar (Public header utilities) -->
+  <header class="w-full max-w-5xl flex items-center justify-between z-20 mb-3 px-2">
+    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-white text-xs font-semibold tracking-wide">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      CANAL SEGURO CIFRADO TLS 1.3
+    </div>
+
+    <!-- Quick Exit Button -->
+    <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" 
+       class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 active:scale-95 transition-all text-white text-xs font-bold shadow-lg shadow-rose-900/30"
+       title="Salida Rápida para ocultar la pantalla en caso de emergencia">
+      <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+      Salida Rápida
+    </a>
+  </header>
+
+  <!-- Main Center Content Area -->
+  <main class="w-full max-w-[500px] z-20 my-auto">
+    <!-- Auth Card -->
+    <div class="bg-white/[0.96] dark:bg-[#1e1833]/[0.96] rounded-[28px] shadow-[0_24px_60px_rgba(78,16,177,0.22),0_4px_16px_rgba(91,33,182,0.12)] p-7 sm:p-9 border border-purple-100/60 dark:border-purple-900/40 backdrop-blur-md">
+      
+      <!-- Top Brand Header with Official Panther Logo and Slogan -->
+      <div class="flex flex-col items-center text-center mb-5">
+        <div class="flex items-center gap-2.5 mb-1.5">
+          <!-- Official Panther Emblem -->
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEWjaI83x4z8ASEk41NNc5dMmOBCB27yiQCpdTbv8S6JYk8pZ9U3xS9edWlqK0mYhKEH5Vd7ZV9cDEk2yb0QabroHrt0a2cRoRo96Y7PlpvDtDQrdsGe9N24y0v-eaQ5DWjnvC3NlGa6SEX6TuoWlE3PqTFnFygM7_xnj9S8xvC-H1ed3uWvL0qGCAG1HnUA6T-Q0XfxcUvXxcHT7XZvAWc78q8nIu_1Fdln5qQO85wUHUHtyg7aGKmSvPCTMYcPwMSA" alt="AlertaMujer Isotipo Oficial" class="w-10 h-10 object-contain rounded-full ring-2 ring-purple-600/30 shadow-md">
+          <div class="text-left">
+            <span class="text-xl font-extrabold tracking-tight text-[#2d1457] dark:text-purple-100">
+              ALERTA <span class="text-[#db079c]">MUJER</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Official Tagline Badge -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/50 border border-purple-200/70 dark:border-purple-700/60 text-[#7c3aed] dark:text-purple-300 text-[11px] font-bold tracking-wider uppercase mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#db079c]"></span>
+          SEGURIDAD PARA TODAS
+        </div>
+
+        <h1 class="text-2xl sm:text-[2rem] font-bold text-[#2d1457] dark:text-purple-50 leading-tight">
+          Crear cuenta
+        </h1>
+        <p class="text-xs sm:text-sm font-normal text-[#6b7280] dark:text-purple-200/70 mt-1">
+          Completa tus datos para comenzar tu red de protección
+        </p>
+      </div>
+
+      <!-- State Simulation Switcher (Visual Testing Bar) -->
+      <div class="bg-purple-50/70 dark:bg-purple-950/40 p-2 rounded-xl border border-purple-100 dark:border-purple-900/50 mb-5 text-[11px]">
+        <div class="flex items-center justify-between mb-1 text-purple-900 dark:text-purple-300 font-semibold px-1">
+          <span>SIMULAR ESTADO:</span>
+          <span id="active-state-label" class="text-purple-600 dark:text-purple-400">interactivo / válido</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="setUiState('default')" class="state-pill" id="pill-default">Vacío</button>
+          <button type="button" onclick="setUiState('valid')" class="state-pill active" id="pill-valid">Válido</button>
+          <button type="button" onclick="setUiState('loading')" class="state-pill" id="pill-loading">Enviando</button>
+          <button type="button" onclick="setUiState('error-server')" class="state-pill" id="pill-error-server">Error Email</button>
+          <button type="button" onclick="setUiState('success')" class="state-pill" id="pill-success">Éxito</button>
+        </div>
+      </div>
+
+      <!-- Server Error Banner (Conditional) -->
+      <div id="server-error-banner" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 animate-fade-in" role="alert">
+        <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0"></i>
+        <div>
+          <span class="font-bold">Error de registro:</span>
+          <p id="server-error-msg">El correo electrónico ya se encuentra registrado en el sistema. Intenta iniciar sesión.</p>
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="register-form" class="flex flex-col gap-3.5" novalidate aria-label="Formulario de registro de cuenta AlertaMujer">
+        
+        <!-- Grid 2 Columnas: Nombre + Apellido -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Campo Nombre -->
+          <div>
+            <label for="reg-nombre" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+              Nombre <span class="text-rose-500">*</span>
+            </label>
+            <div class="auth-input-container">
+              <i data-lucide="user" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+              <input type="text" id="reg-nombre" name="nombre" value="Camila" autocomplete="given-name" required
+                     placeholder="Ej: Camila"
+                     class="auth-input"
+                     aria-required="true">
+            </div>
+          </div>
+
+          <!-- Campo Apellido -->
+          <div>
+            <label for="reg-apellido" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+              Apellido <span class="text-rose-500">*</span>
+            </label>
+            <div class="auth-input-container">
+              <i data-lucide="user-check" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+              <input type="text" id="reg-apellido" name="apellido" value="Restrepo Silva" autocomplete="family-name" required
+                     placeholder="Ej: Restrepo"
+                     class="auth-input"
+                     aria-required="true">
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid 2 Columnas: Edad + Teléfono -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Campo Edad -->
+          <div>
+            <label for="reg-edad" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+              Edad <span class="text-rose-500">*</span>
+            </label>
+            <div class="auth-input-container">
+              <i data-lucide="calendar" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+              <input type="number" id="reg-edad" name="edad" value="26" min="14" max="100" required
+                     placeholder="Años"
+                     class="auth-input"
+                     aria-required="true">
+            </div>
+          </div>
+
+          <!-- Campo Teléfono -->
+          <div>
+            <label for="reg-telefono" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+              Teléfono Móvil (SOS) <span class="text-rose-500">*</span>
+            </label>
+            <div class="auth-input-container">
+              <i data-lucide="phone" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+              <input type="tel" id="reg-telefono" name="telefono" value="+57 312 8904512" autocomplete="tel" required
+                     placeholder="+57 300 123 4567"
+                     class="auth-input"
+                     aria-required="true">
+            </div>
+          </div>
+        </div>
+
+        <!-- Campo Correo Electrónico (Ancho Completo) -->
+        <div>
+          <label for="reg-email" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+            Correo electrónico <span class="text-rose-500">*</span>
+          </label>
+          <div class="auth-input-container">
+            <i data-lucide="mail" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+            <input type="email" id="reg-email" name="email" value="camila.restrepo@redmujer.org" autocomplete="email" required
+                   placeholder="ejemplo@correo.com"
+                   class="auth-input"
+                   aria-required="true">
+          </div>
+        </div>
+
+        <!-- Campo Contraseña con Toggle -->
+        <div>
+          <label for="reg-password" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+            Contraseña <span class="text-rose-500">*</span>
+          </label>
+          <div class="auth-input-container">
+            <i data-lucide="lock" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+            <input type="password" id="reg-password" name="password" value="Segura!2024*Pro" autocomplete="new-password" required
+                   placeholder="Mínimo 8 caracteres"
+                   class="auth-input has-right-btn"
+                   aria-required="true">
+            <button type="button" onclick="togglePassVisibility('reg-password', 'eye-icon-1')" 
+                    class="absolute right-3 text-slate-400 hover:text-purple-600 focus:outline-none p-1 transition-colors" 
+                    aria-label="Mostrar u ocultar contraseña">
+              <i data-lucide="eye" id="eye-icon-1" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Strength Meter Bar (4 Segmentos) -->
+          <div class="mt-2">
+            <div class="flex items-center justify-between text-[11px] mb-1">
+              <span class="text-slate-500 dark:text-purple-300/80">Fortaleza:</span>
+              <span id="strength-label" class="font-bold text-emerald-600 dark:text-emerald-400">Fuerte</span>
+            </div>
+            <div class="flex gap-1.5 w-full" id="strength-bars">
+              <div class="meter-seg bg-emerald-500" id="bar-1"></div>
+              <div class="meter-seg bg-emerald-500" id="bar-2"></div>
+              <div class="meter-seg bg-emerald-500" id="bar-3"></div>
+              <div class="meter-seg bg-emerald-500" id="bar-4"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campo Confirmar Contraseña con Toggle -->
+        <div>
+          <label for="reg-confirm-password" class="block text-xs font-semibold text-[#2d1457] dark:text-purple-200 mb-1">
+            Confirmar contraseña <span class="text-rose-500">*</span>
+          </label>
+          <div class="auth-input-container">
+            <i data-lucide="shield-check" class="w-4 h-4 text-purple-400 absolute left-3 pointer-events-none"></i>
+            <input type="password" id="reg-confirm-password" name="confirmPassword" value="Segura!2024*Pro" autocomplete="new-password" required
+                   placeholder="Repite tu contraseña"
+                   class="auth-input has-right-btn"
+                   aria-required="true">
+            <button type="button" onclick="togglePassVisibility('reg-confirm-password', 'eye-icon-2')" 
+                    class="absolute right-3 text-slate-400 hover:text-purple-600 focus:outline-none p-1 transition-colors" 
+                    aria-label="Mostrar u ocultar confirmación de contraseña">
+              <i data-lucide="eye" id="eye-icon-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <span id="password-match-msg" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1 flex items-center gap-1">
+            <i data-lucide="check" class="w-3 h-3"></i> Las contraseñas coinciden
+          </span>
+        </div>
+
+        <!-- Términos y Condiciones Checkbox -->
+        <div class="flex items-start gap-2.5 pt-1">
+          <input type="checkbox" id="reg-terms" checked required class="custom-checkbox mt-0.5">
+          <label for="reg-terms" class="text-xs text-[#2d1457] dark:text-purple-200/90 leading-snug cursor-pointer select-none">
+            Acepto los <a href="#" class="font-bold text-[#c900ae] hover:underline">Términos del Servicio</a> y la 
+            <a href="#" class="font-bold text-[#c900ae] hover:underline">Política de Protección de Datos Personales</a>.
+          </label>
+        </div>
+
+        <!-- Submit Button CTA -->
+        <button type="submit" id="btn-submit"
+                class="w-full mt-2 py-3.5 px-6 rounded-full text-white font-semibold text-sm tracking-wide shadow-[0_8px_24px_rgba(233,30,140,0.38)] hover:shadow-[0_12px_32px_rgba(233,30,140,0.48)] transition-all transform active:scale-[0.98] flex items-center justify-center gap-2"
+                style="background: var(--gradient-btn);">
+          <i data-lucide="shield" id="btn-icon" class="w-4 h-4"></i>
+          <span id="btn-text">🛡️ CREAR CUENTA</span>
+          <!-- Inline Spinner -->
+          <svg id="btn-spinner" class="hidden animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+
+      </form>
+
+      <!-- Footer Link to Login -->
+      <div class="mt-6 pt-4 border-t border-slate-100 dark:border-purple-900/50 text-center">
+        <p class="text-xs text-[#6b7280] dark:text-purple-300/80">
+          ¿Ya tienes cuenta?
+          <a href="#" class="font-bold text-[#c900ae] hover:text-[#9a07a7] hover:underline ml-1 inline-flex items-center gap-1 transition-colors">
+            Inicia sesión <i data-lucide="arrow-right" class="w-3.5 h-3.5 inline"></i>
+          </a>
+        </p>
+
+        <!-- Emergency contact reminder -->
+        <div class="mt-3 py-2 px-3 rounded-lg bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40 text-[11px] text-purple-900 dark:text-purple-300 flex items-center justify-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+          <span>¿En peligro inminente? Línea Nacional de Emergencias:</span>
+          <a href="tel:123" class="font-bold text-rose-600 underline">123 / 155</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer security guarantees -->
+  <footer class="w-full max-w-2xl text-center z-20 mt-4 text-[11px] text-white/80 space-y-1">
+    <div class="flex items-center justify-center gap-4 text-white/90">
+      <span class="flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i> Cifrado TLS 1.3 / 256-bit</span>
+      <span>•</span>
+      <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i> Ley de Protección de Datos de Víctimas</span>
+    </div>
+    <p class="text-white/60">© 2025 AlertaMujer Web. Protocolo Nacional de Respuesta y Monitoreo SOS.</p>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle Password Visibility
+    function togglePassVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    // Dynamic UI State Switcher for demonstration
+    function setUiState(state) {
+      // Clear active pills
+      document.querySelectorAll('.state-pill').forEach(btn => btn.classList.remove('active'));
+      const activePill = document.getElementById('pill-' + state);
+      if (activePill) activePill.classList.add('active');
+
+      const label = document.getElementById('active-state-label');
+      const btn = document.getElementById('btn-submit');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const errorBanner = document.getElementById('server-error-banner');
+      const inputs = document.querySelectorAll('.auth-input');
+
+      // Reset base states
+      errorBanner.classList.add('hidden');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btnSpinner.classList.add('hidden');
+      btnText.textContent = '🛡️ CREAR CUENTA';
+
+      if (state === 'default') {
+        label.textContent = 'vacío / deshabilitado';
+        inputs.forEach(i => { i.value = ''; i.classList.remove('error', 'valid'); });
+        document.getElementById('reg-terms').checked = false;
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        updateStrength(0);
+        document.getElementById('password-match-msg').classList.add('hidden');
+      } else if (state === 'valid') {
+        label.textContent = 'formulario completo válido';
+        document.getElementById('reg-nombre').value = 'Camila';
+        document.getElementById('reg-apellido').value = 'Restrepo Silva';
+        document.getElementById('reg-edad').value = '26';
+        document.getElementById('reg-telefono').value = '+57 312 8904512';
+        document.getElementById('reg-email').value = 'camila.restrepo@redmujer.org';
+        document.getElementById('reg-password').value = 'Segura!2024*Pro';
+        document.getElementById('reg-confirm-password').value = 'Segura!2024*Pro';
+        document.getElementById('reg-terms').checked = true;
+        updateStrength(4);
+        document.getElementById('password-match-msg').classList.remove('hidden');
+      } else if (state === 'loading') {
+        label.textContent = 'enviando a AuthService...';
+        btn.disabled = true;
+        btn.style.opacity = '0.85';
+        btnSpinner.classList.remove('hidden');
+        btnText.textContent = 'Creando cuenta...';
+      } else if (state === 'error-server') {
+        label.textContent = 'error de servidor (email duplicado)';
+        errorBanner.classList.remove('hidden');
+        document.getElementById('reg-email').classList.add('error');
+      } else if (state === 'success') {
+        label.textContent = 'cuenta creada con éxito (redirigiendo)';
+        btnText.textContent = '✓ ¡Cuenta Registrada! Redirigiendo...';
+        btn.style.background = 'linear-gradient(90deg, #16a34a 0%, #15803d 100%)';
+      }
+    }
+
+    // Helper to update strength bar visual
+    function updateStrength(level) {
+      const b1 = document.getElementById('bar-1');
+      const b2 = document.getElementById('bar-2');
+      const b3 = document.getElementById('bar-3');
+      const b4 = document.getElementById('bar-4');
+      const label = document.getElementById('strength-label');
+
+      [b1, b2, b3, b4].forEach(b => { b.className = 'meter-seg bg-slate-200'; });
+
+      if (level === 0) {
+        label.textContent = '—';
+        label.className = 'font-semibold text-slate-400';
+      } else if (level === 1) {
+        b1.className = 'meter-seg bg-rose-500';
+        label.textContent = 'Débil';
+        label.className = 'font-bold text-rose-600';
+      } else if (level === 2) {
+        b1.className = 'meter-seg bg-amber-500';
+        b2.className = 'meter-seg bg-amber-500';
+        label.textContent = 'Regular';
+        label.className = 'font-bold text-amber-600';
+      } else if (level === 3) {
+        b1.className = 'meter-seg bg-lime-500';
+        b2.className = 'meter-seg bg-lime-500';
+        b3.className = 'meter-seg bg-lime-500';
+        label.textContent = 'Buena';
+        label.className = 'font-bold text-lime-600';
+      } else if (level >= 4) {
+        b1.className = 'meter-seg bg-emerald-500';
+        b2.className = 'meter-seg bg-emerald-500';
+        b3.className = 'meter-seg bg-emerald-500';
+        b4.className = 'meter-seg bg-emerald-500';
+        label.textContent = 'Fuerte';
+        label.className = 'font-bold text-emerald-600';
+      }
+    }
+
+    // Form submit listener
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      setUiState('loading');
+      setTimeout(() => {
+        setUiState('success');
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

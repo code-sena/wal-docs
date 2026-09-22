@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlertaMujer - Zonas Cercanas (/dashboard/ubicacion/nearby-zones)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    :root {
+      --bg-base: #f5f4ff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f0eeff;
+      --border: #c4b5fd;
+      --text-primary: #1e1a3c;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+      --purple-deep: #7c3aed;
+      --purple-mid: #a78bfa;
+      --purple-light: #c4b5fd;
+      --purple-pale: #ede9fe;
+      --purple-pale-hover: #e0d8fc;
+      --pink: #ec4899;
+      --green: #16a34a;
+      --green-pale: #dcfce7;
+      --red: #dc2626;
+      --red-pale: #fee2e2;
+      --amber: #d97706;
+      --amber-pale: #fef3c7;
+      --blue: #3b82f6;
+      --blue-pale: #dbeafe;
+      --dash-radius-card: 12px;
+      --dash-shadow-card: 0 0 0 1.5px var(--border), 0 4px 16px rgba(124, 58, 237, 0.08);
+      --gradient-btn: linear-gradient(90deg, #650dc9 0%, #54048a 50%, #5c048f 100%);
+    }
+
+    [data-theme="dark"] {
+      --bg-base: #14101f;
+      --bg-card: #1e1833;
+      --bg-card-hover: #241d3d;
+      --border: #4c3a80;
+      --text-primary: #ede9fe;
+      --text-muted: #a8a0c4;
+      --text-dim: #766e94;
+      --purple-deep: #9d6ff0;
+      --purple-mid: #b79bf5;
+      --purple-light: #6d4fae;
+      --purple-pale: #2b204a;
+      --green: #4ade80;
+      --green-pale: rgba(74, 222, 128, 0.15);
+      --red: #f87171;
+      --red-pale: rgba(248, 113, 113, 0.15);
+      --amber: #fbbf24;
+      --amber-pale: rgba(251, 191, 36, 0.15);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Nunito', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .app-card {
+      background-color: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--dash-radius-card);
+      box-shadow: var(--dash-shadow-card);
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Leaflet customization & dark mode filter */
+    #nearbyMap {
+      height: 100%;
+      min-height: 580px;
+      width: 100%;
+      border-radius: calc(var(--dash-radius-card) - 2px);
+      z-index: 1;
+    }
+
+    [data-theme="dark"] #nearbyMap .leaflet-tile-pane {
+      filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
+    }
+
+    /* Pulsing user marker */
+    .user-pulse-marker {
+      position: relative;
+    }
+    .user-pulse-marker::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.35);
+      animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .custom-leaflet-popup .leaflet-popup-content-wrapper {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+      padding: 4px;
+    }
+    .custom-leaflet-popup .leaflet-popup-tip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+
+    /* Scrollbar */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 6px;
+    }
+    [data-theme="dark"] .custom-scroll::-webkit-scrollbar-thumb {
+      background: #4c3a80;
+    }
+
+    /* Active zone card highlight */
+    .zone-card.active-zone {
+      background-color: var(--purple-pale) !important;
+      border-left: 4px solid var(--purple-deep) !important;
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+  <!-- Main App Layout Structure (DashboardLayout) -->
+  <div class="flex flex-1 min-h-screen w-full">
+
+    <!-- 1. PERSISTENT SIDEBAR -->
+    <aside class="w-64 flex-shrink-0 bg-white border-r border-[#c4b5fd] flex flex-col justify-between hidden md:flex transition-colors duration-200" style="background-color: var(--bg-card); border-color: var(--border);" aria-label="Navegación principal">
+      <div>
+        <!-- Brand Header with Official Logo -->
+        <div class="p-5 border-b border-[#c4b5fd]/60 flex items-center space-x-3" style="border-color: var(--border);">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAz4ndouuFvs0Ay11QLTH3sxWRPCOjufdUy6BJ9uKIbkiJVNLe4onpUnm60m1_hN11kGXKqVhAz-Xox9IY8zWsMf4ixaHRb7XVWFrhxcgD8zuObsOZ-QBVm2pI5GzOGKDCRhChON67VKTD3LbJ1k0auJIdv0ZkBidmOLfoRP9ZbHRw8IZjB232zLG3YYNzpXw_IWQqPYlXkJFLu1KJCECUS4fn-V-MCekQkZvJAsvN9R6gVgqSZk9U7WHRsYTDiN1yipw" alt="Isotipo AlertaMujer" class="w-10 h-10 rounded-full shadow-md object-cover">
+          <div>
+            <div class="flex items-center space-x-1">
+              <span class="text-lg font-extrabold tracking-tight" style="color: var(--text-primary);">Alerta<span class="text-[#db079c]">Mujer</span></span>
+              <span class="w-2 h-2 rounded-full bg-[#16a34a]" title="Servicio activo"></span>
+            </div>
+            <p class="text-[9px] uppercase tracking-wider font-extrabold text-[#7c3aed]">SEGURIDAD PARA TODAS</p>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="p-3 space-y-1.5" aria-label="Menú del Dashboard">
+          <a href="/dashboard/home" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Home (Monitoreo)</span>
+          </a>
+
+          <!-- Subgroup Ubicación -->
+          <div class="pt-2 pb-1 px-3">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-[#9ca3af]">Módulo Geográfico</span>
+          </div>
+
+          <a href="/dashboard/ubicacion/nearby-zones" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all" style="background-color: var(--purple-pale); color: var(--purple-deep); border-left: 3px solid var(--purple-deep);" aria-current="page">
+            <svg class="w-5 h-5 text-[#7c3aed]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+            <span>Zonas Cercanas</span>
+            <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#ede9fe] text-[#7c3aed] border border-[#c4b5fd]">Radar</span>
+          </a>
+
+          <a href="/dashboard/phone-location" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Mi Ubicación (GPS)</span>
+          </a>
+
+          <a href="/dashboard/ubicacion/frequent-places" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span>Lugares Frecuentes</span>
+          </a>
+
+          <a href="/dashboard/location-history" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Historial Trayectoria</span>
+          </a>
+
+          <!-- Otros Módulos -->
+          <div class="pt-2 pb-1 px-3">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-[#9ca3af]">Seguridad & Alertas</span>
+          </div>
+
+          <a href="/dashboard/alert-history" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span>Historial Alertas</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#fee2e2] text-[#dc2626]">3</span>
+          </a>
+
+          <a href="/dashboard/evidence" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+            <span>Mis Evidencias</span>
+          </a>
+
+          <a href="/dashboard/device-status" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span>Estado Dispositivo</span>
+          </a>
+
+          <a href="/dashboard/emergency-contacts" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-[#ede9fe]/60" style="color: var(--text-muted);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>Contactos SOS</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer (Protocolo + Modo Sigilo) -->
+      <div class="p-4 space-y-3 border-t border-[#c4b5fd]/60" style="border-color: var(--border);">
+        <div class="p-2.5 rounded-xl bg-[#dcfce7]/70 border border-[#86efac] flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#16a34a] animate-pulse"></span>
+            <span class="font-bold text-[#166534]">Custodia Activa</span>
+          </div>
+          <span class="font-mono text-[10px] text-[#15803d] font-bold">NVL-1</span>
+        </div>
+
+        <button onclick="activarModoSigilo()" class="w-full py-2.5 px-3 rounded-xl border border-[#c4b5fd] bg-white hover:bg-[#ede9fe] text-xs font-bold flex items-center justify-center space-x-2 transition-all shadow-sm" style="background-color: var(--bg-card); color: var(--purple-deep);" title="Cierra sesión o camufla pantalla (Escape)">
+          <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+          <span>Modo Sigilo (Escape)</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- App Header / Topbar (Sticky) -->
+      <header class="h-16 bg-white border-b border-[#c4b5fd] px-6 flex items-center justify-between z-20 sticky top-0 transition-colors duration-200" style="background-color: var(--bg-card); border-color: var(--border);" aria-label="Cabecera del Dashboard">
+        <!-- Breadcrumb & Route info -->
+        <div class="flex items-center space-x-3">
+          <nav class="flex items-center space-x-2 text-xs font-semibold tracking-wide" aria-label="Breadcrumb">
+            <a href="/dashboard/home" class="hover:underline" style="color: var(--text-muted);">DASHBOARD</a>
+            <span style="color: var(--text-dim);">/</span>
+            <span style="color: var(--text-muted);">UBICACIÓN</span>
+            <span style="color: var(--text-dim);">/</span>
+            <span class="font-bold text-[#7c3aed]">ZONAS CERCANAS</span>
+          </nav>
+        </div>
+
+        <!-- Right Header Badges & Actions -->
+        <div class="flex items-center space-x-4">
+          <!-- Live Service Status Pill -->
+          <div class="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full bg-[#dcfce7] text-[#16a34a] border border-[#86efac] text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-[#16a34a] animate-ping"></span>
+            <span>Red Segura Activa</span>
+          </div>
+
+          <!-- GPS Precision Chip -->
+          <div class="hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-[#ede9fe] text-[#7c3aed] text-xs font-semibold border border-[#c4b5fd]">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Precisión GPS ±3m</span>
+          </div>
+
+          <!-- Dark / Light Theme Switcher -->
+          <button id="themeToggle" onclick="toggleTheme()" class="p-2 rounded-xl text-gray-500 hover:bg-[#ede9fe] transition-colors focus:outline-none focus:ring-2 focus:ring-[#7c3aed]" aria-label="Cambiar modo oscuro/claro" title="Alternar Modo Oscuro / Claro">
+            <svg id="themeIconSun" class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <svg id="themeIconMoon" class="w-5 h-5 text-purple-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </button>
+
+          <!-- Notification Bell -->
+          <div class="relative">
+            <a href="/dashboard/alert-history" class="p-2 rounded-xl text-gray-500 hover:bg-[#ede9fe] transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#7c3aed]" aria-label="Notificaciones de alerta">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span class="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#db079c] text-white text-[9px] font-bold flex items-center justify-center">3</span>
+            </a>
+          </div>
+
+          <!-- User Profile Dropdown / Card -->
+          <div class="flex items-center space-x-3 pl-3 border-l border-[#c4b5fd]/60" style="border-color: var(--border);">
+            <div class="text-right hidden sm:block">
+              <p class="text-xs font-bold leading-tight" style="color: var(--text-primary);">Ana García</p>
+              <p class="text-[10px] font-mono text-[#7c3aed] font-medium">ID: ALM-94827</p>
+            </div>
+            <a href="/dashboard/perfil" class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#db079c] text-white font-bold text-xs flex items-center justify-center shadow-md ring-2 ring-[#c4b5fd]/80 hover:opacity-95 transition-opacity" title="Ir al Perfil">
+              AG
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Body Container -->
+      <main class="flex-1 p-5 md:p-6 lg:p-7 max-w-[1720px] w-full mx-auto flex flex-col space-y-5">
+
+        <!-- Page Header & Overview Sub-bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2.5">
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight flex items-center space-x-2.5" style="color: var(--text-primary);">
+                <span>🗺️ Zonas Cercanas</span>
+              </h1>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#ede9fe] text-[#7c3aed] border border-[#c4b5fd]">
+                Radio 5 km
+              </span>
+            </div>
+            <p class="text-sm mt-1" style="color: var(--text-muted);">
+              Monitoreo cartográfico en vivo de perímetros de riesgo clasificados y zonas seguras según el reporte pericial de AlertaMujer.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex items-center flex-wrap gap-2.5">
+            <button onclick="centrarEnUsuaria()" class="px-3.5 py-2 rounded-xl text-xs font-bold border border-[#c4b5fd] bg-white hover:bg-[#ede9fe] transition-all flex items-center space-x-2 shadow-sm" style="background-color: var(--bg-card); color: var(--purple-deep);" title="Centrar mapa en mi coordenada actual">
+              <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+              <span>Mi Ubicación</span>
+            </button>
+
+            <button onclick="refrescarZonas()" class="px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md transition-all flex items-center space-x-2 active:scale-95" style="background: var(--gradient-btn);">
+              <svg id="refreshSpinner" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Actualizar Radar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. DESKTOP SPLIT LAYOUT: MAP (LEFT / FLEXIBLE) + PANEL (RIGHT / 360PX) -->
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px] gap-5 flex-1 min-h-[580px]">
+
+          <!-- CARD MAPA LEAFLET (IZQUIERDA) -->
+          <div class="app-card relative flex flex-col overflow-hidden shadow-sm" aria-label="Mapa interactivo de zonas de riesgo">
+            
+            <!-- Map Top Overlay Bar: Status and Legend -->
+            <div class="absolute top-3 left-3 right-3 z-10 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+              
+              <!-- Coordinates / Location pill -->
+              <div class="pointer-events-auto bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-[#c4b5fd] shadow-md flex items-center space-x-2 text-xs" style="background-color: var(--bg-card); border-color: var(--border);">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#7c3aed]"></span>
+                <span class="font-bold" style="color: var(--text-primary);">Tú: Cra 7 # 34-12</span>
+                <span class="text-[10px] text-gray-500">(Teusaquillo)</span>
+              </div>
+
+              <!-- Risk Legend Pill -->
+              <div class="pointer-events-auto bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-[#c4b5fd] shadow-md flex items-center space-x-3 text-xs font-bold" style="background-color: var(--bg-card); border-color: var(--border);">
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-3 h-3 rounded-full bg-[#ef4444] border border-[#dc2626]"></span>
+                  <span class="text-[#dc2626]">Alto</span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-3 h-3 rounded-full bg-[#f59e0b] border border-[#d97706]"></span>
+                  <span class="text-[#d97706]">Medio</span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="w-3 h-3 rounded-full bg-[#22c55e] border border-[#16a34a]"></span>
+                  <span class="text-[#16a34a]">Bajo / Seguro</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Leaflet Map Canvas -->
+            <div id="nearbyMap" class="flex-1" role="region" aria-label="Mapa interactivo con polígonos de zonas de riesgo"></div>
+
+            <!-- Map Bottom Bar / Floating Info strip -->
+            <div class="p-3 bg-white/95 border-t border-[#c4b5fd]/60 flex items-center justify-between text-xs" style="background-color: var(--bg-card); border-color: var(--border);">
+              <div class="flex items-center space-x-2 text-gray-500" style="color: var(--text-muted);">
+                <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Haz clic en un perímetro circular para ver detalles, índice de denuncias y CAI más cercano.</span>
+              </div>
+              <div class="hidden sm:flex items-center space-x-3 font-mono text-[11px] text-gray-500">
+                <span>Lat: 4.6285° N</span>
+                <span>Lng: 74.0648° W</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD PANEL DERECHA (360PX FIJO EN DESKTOP) -->
+          <div class="app-card flex flex-col h-full shadow-sm overflow-hidden" style="background-color: var(--bg-card);">
+            
+            <!-- Panel Header -->
+            <div class="p-4 border-b border-[#c4b5fd]/70 space-y-3" style="border-color: var(--border);">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="text-base font-bold" style="color: var(--text-primary);">Zonas Registradas</span>
+                  <span id="zoneCountBadge" class="text-xs px-2 py-0.5 rounded-full font-bold bg-[#ede9fe] text-[#7c3aed]">6 zonas</span>
+                </div>
+                <span class="text-[11px] font-semibold text-[#16a34a] bg-[#dcfce7] px-2 py-0.5 rounded-md">Live GPS</span>
+              </div>
+
+              <!-- Search Input with Debounce filter -->
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="searchZoneInput" 
+                  oninput="handleSearch(this.value)"
+                  placeholder="Buscar zona, barrio o CAI..." 
+                  class="w-full pl-9 pr-8 py-2 rounded-xl text-xs font-medium border border-[#c4b5fd] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] transition-all"
+                  style="background-color: var(--bg-base); color: var(--text-primary); border-color: var(--border);"
+                  aria-label="Buscar zona por nombre"
+                >
+                <button id="clearSearchBtn" onclick="clearSearch()" class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 hidden">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+
+              <!-- Level Filter Chips (app-chip) -->
+              <div class="flex items-center gap-1.5 pt-1 overflow-x-auto pb-1" role="radiogroup" aria-label="Filtrar zonas por nivel de riesgo">
+                <button onclick="filterByLevel('ALL')" id="chip-ALL" class="level-chip px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 bg-[#ede9fe] text-[#7c3aed] border-1.5 border-[#7c3aed]" aria-checked="true" style="border: 1.5px solid var(--purple-deep);">
+                  <span>Todos</span>
+                  <span class="text-[10px] opacity-80">(6)</span>
+                </button>
+                <button onclick="filterByLevel('ALTO')" id="chip-ALTO" class="level-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:bg-[#fee2e2]/60 hover:text-[#dc2626] transition-all flex items-center space-x-1 border border-transparent" aria-checked="false">
+                  <span class="w-2 h-2 rounded-full bg-[#ef4444]"></span>
+                  <span>Alto</span>
+                </button>
+                <button onclick="filterByLevel('MEDIO')" id="chip-MEDIO" class="level-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:bg-[#fef3c7]/60 hover:text-[#d97706] transition-all flex items-center space-x-1 border border-transparent" aria-checked="false">
+                  <span class="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+                  <span>Medio</span>
+                </button>
+                <button onclick="filterByLevel('BAJO')" id="chip-BAJO" class="level-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:bg-[#dcfce7]/60 hover:text-[#16a34a] transition-all flex items-center space-x-1 border border-transparent" aria-checked="false">
+                  <span class="w-2 h-2 rounded-full bg-[#22c55e]"></span>
+                  <span>Bajo</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Scrollable Zone Cards List -->
+            <div id="zonesListContainer" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scroll max-h-[520px]" style="display: flex; flex-direction: column;">
+              <!-- Dynamic Cards generated by JS -->
+            </div>
+
+            <!-- Empty State (Hidden by default) -->
+            <div id="emptyZonesState" class="hidden flex-1 p-6 flex flex-col items-center justify-center text-center space-y-3">
+              <div class="w-12 h-12 rounded-full bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-bold" style="color: var(--text-primary);">Sin zonas encontradas</p>
+                <p class="text-xs text-gray-500 mt-1" style="color: var(--text-muted);">No hay zonas de riesgo registradas que coincidan con los filtros aplicados.</p>
+              </div>
+              <button onclick="clearFilters()" class="text-xs font-bold text-[#7c3aed] hover:underline">Restablecer filtros</button>
+            </div>
+
+            <!-- Panel Footer: Summary & Recommendations -->
+            <div class="p-3 bg-[#ede9fe]/40 border-t border-[#c4b5fd]/60 flex items-center justify-between text-xs" style="border-color: var(--border);">
+              <div class="flex items-center space-x-2">
+                <span class="text-base">🛡️</span>
+                <span class="font-semibold text-gray-600 text-[11px]" style="color: var(--text-muted);">¿En riesgo? Presiona SOS de inmediato</span>
+              </div>
+              <a href="/dashboard/home" class="px-2.5 py-1 rounded-lg text-white text-[11px] font-bold bg-[#db079c] hover:bg-[#c205b8] transition-colors shadow-sm">
+                SOS 911
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 4. BOTTOM OPERATIONAL ADVISORY BANNER -->
+        <div class="p-4 rounded-xl border border-[#c4b5fd] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm" style="background-color: var(--bg-card); border-color: var(--border);">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-[#7c3aed]">Protocolo Geoperimetral Preventivo</h4>
+              <p class="text-xs text-gray-600 mt-0.5" style="color: var(--text-muted);">
+                Al ingresar en una zona marcada como <strong class="text-[#dc2626]">Riesgo Alto</strong>, tu dispositivo elevará automáticamente la frecuencia de telemetría a cada 5 segundos y habilitará el disparador de coacción silencioso.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <a href="/dashboard/alert-history" class="px-3.5 py-1.5 rounded-lg text-xs font-bold border border-[#c4b5fd] hover:bg-[#ede9fe] transition-colors" style="color: var(--purple-deep);">
+              Ver Historial de Alertas
+            </a>
+            <a href="/dashboard/device-status" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#ede9fe] text-[#7c3aed] hover:bg-[#e0d8fc] transition-colors">
+              Telemetría Dispositivo
+            </a>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Mobile Bottom Navigation (Visible only < 768px) -->
+      <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#c4b5fd] flex items-center justify-around z-30 px-2" style="background-color: var(--bg-card); border-color: var(--border);" aria-label="Navegación móvil">
+        <a href="/dashboard/home" class="flex flex-col items-center justify-center text-[10px] font-bold text-gray-500 hover:text-[#7c3aed]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span class="mt-0.5">Home</span>
+        </a>
+        <a href="/dashboard/ubicacion/nearby-zones" class="flex flex-col items-center justify-center text-[10px] font-bold text-[#7c3aed]" aria-current="page">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          <span class="mt-0.5">Zonas</span>
+        </a>
+        <a href="/dashboard/phone-location" class="flex flex-col items-center justify-center text-[10px] font-bold text-gray-500 hover:text-[#7c3aed]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+          <span class="mt-0.5">Ubicación</span>
+        </a>
+        <a href="/dashboard/alert-history" class="flex flex-col items-center justify-center text-[10px] font-bold text-gray-500 hover:text-[#7c3aed]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="mt-0.5">Alertas</span>
+        </a>
+        <a href="/dashboard/perfil" class="flex flex-col items-center justify-center text-[10px] font-bold text-gray-500 hover:text-[#7c3aed]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span class="mt-0.5">Perfil</span>
+        </a>
+      </nav>
+
+    </div>
+
+  </div>
+
+  <!-- LEAFLET & APPLICATION SCRIPT LOGIC -->
+  <script>
+    // 1. DATA MODEL: Mock data matching RiskZonesService.getZonas() for Bogotá
+    const mockZonas = [
+      {
+        id: 1,
+        name: "Parque Nacional y Entorno Universidades",
+        level: "ALTO",
+        alertCount: 14,
+        distance: "450 m",
+        lat: 4.6242,
+        lng: 74.0635,
+        radius: 420,
+        supportPoint: "CAI Teusaquillo (210m)",
+        description: "Reincidencia de acoso callejero e iluminación deficiente en senderos peatonales hacia la Cra 5."
+      },
+      {
+        id: 2,
+        name: "Zona Rosa y Pasajes Chapinero Central",
+        level: "ALTO",
+        alertCount: 19,
+        distance: "1.2 km",
+        lat: 4.6620,
+        lng: 74.0550,
+        radius: 480,
+        supportPoint: "CAI Virrey & Hospital Chapinero",
+        description: "Alta afluencia nocturna con 19 reportes de intimidación y hurto en fines de semana."
+      },
+      {
+        id: 3,
+        name: "Estación TransMilenio Calle 26",
+        level: "MEDIO",
+        alertCount: 8,
+        distance: "850 m",
+        lat: 4.6180,
+        lng: 74.0710,
+        radius: 350,
+        supportPoint: "Punto de Control Policía TM",
+        description: "Zona de transbordo masivo. Tránsito asistido recomendado después de las 21:00 hrs."
+      },
+      {
+        id: 4,
+        name: "Corredor Carrera Séptima (Cra 34 a 45)",
+        level: "MEDIO",
+        alertCount: 6,
+        distance: "280 m",
+        lat: 4.6290,
+        lng: 74.0665,
+        radius: 380,
+        supportPoint: "CAI Lourdes (350m)",
+        description: "Densidad de comercios y pasos peatonales. Monitoreo preventivo por cámaras distritales."
+      },
+      {
+        id: 5,
+        name: "Perímetro Seguro Galerías / Parkway",
+        level: "BAJO",
+        alertCount: 1,
+        distance: "1.5 km",
+        lat: 4.6360,
+        lng: 74.0750,
+        radius: 520,
+        supportPoint: "Comando de Policía Local Teusaquillo",
+        description: "Zona con alta presencia de patrullaje comunitario y botones de pánico vecinales activos."
+      },
+      {
+        id: 6,
+        name: "Zona Residencial Usaquén - Santa Bárbara",
+        level: "BAJO",
+        alertCount: 0,
+        distance: "3.8 km",
+        lat: 4.6930,
+        lng: 74.0320,
+        radius: 600,
+        supportPoint: "CAI Santa Bárbara",
+        description: "Área de baja conflictividad y red de cámaras de seguridad privada integradas."
+      }
+    ];
+
+    // User Location (Ana García)
+    const userLocation = {
+      lat: 4.6285,
+      lng: 74.0671,
+      address: "Cra 7 # 34-12, Teusaquillo"
+    };
+
+    let map;
+    let userMarker;
+    let circleLayers = {};
+    let currentFilterLevel = 'ALL';
+    let currentSearchQuery = '';
+    let selectedZoneId = null;
+
+    // Design Tokens for Circles
+    const levelStyles = {
+      ALTO: {
+        fillColor: '#ef4444',
+        color: '#dc2626',
+        fillOpacity: 0.25,
+        weight: 2,
+        badgeBg: '#fee2e2',
+        badgeText: '#dc2626',
+        label: 'Alto'
+      },
+      MEDIO: {
+        fillColor: '#f59e0b',
+        color: '#d97706',
+        fillOpacity: 0.25,
+        weight: 2,
+        badgeBg: '#fef3c7',
+        badgeText: '#d97706',
+        label: 'Medio'
+      },
+      BAJO: {
+        fillColor: '#22c55e',
+        color: '#16a34a',
+        fillOpacity: 0.25,
+        weight: 2,
+        badgeBg: '#dcfce7',
+        badgeText: '#16a34a',
+        label: 'Bajo'
+      }
+    };
+
+    // Initialize Map on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      renderZoneCards();
+    });
+
+    function initMap() {
+      // Create map centered near user
+      map = L.map('nearbyMap', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView([userLocation.lat, userLocation.lng], 14);
+
+      // Add Zoom Control at bottom right
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      // Add CartoDB Positron Base Tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        subdomains: 'abcd'
+      }).addTo(map);
+
+      // Add Attribution cleanly
+      L.control.attribution({ position: 'bottomleft', prefix: '© CartoDB · AlertaMujer GPS' }).addTo(map);
+
+      // User Marker with custom pulsed icon
+      const userIconHtml = `
+        <div class="user-pulse-marker w-5 h-5 rounded-full bg-[#7c3aed] border-2 border-white shadow-lg flex items-center justify-center cursor-pointer">
+          <div class="w-2 h-2 rounded-full bg-white"></div>
+        </div>
+      `;
+
+      const userIcon = L.divIcon({
+        className: 'custom-user-marker-container',
+        html: userIconHtml,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+
+      userMarker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+        .addTo(map)
+        .bindPopup(`
+          <div class="text-xs p-1">
+            <p class="font-bold text-[#7c3aed] text-sm">📍 Tu Ubicación Actual</p>
+            <p class="text-gray-700 font-medium">${userLocation.address}</p>
+            <p class="text-[10px] text-gray-500 mt-1">Margen satelital: ±3.2m · Custodia en vivo</p>
+          </div>
+        `, { className: 'custom-leaflet-popup' });
+
+      // Draw all Risk Circles
+      mockZonas.forEach(zone => {
+        const style = levelStyles[zone.level];
+        const circle = L.circle([zone.lat, zone.lng], {
+          radius: zone.radius,
+          fillColor: style.fillColor,
+          color: style.color,
+          fillOpacity: style.fillOpacity,
+          weight: style.weight
+        }).addTo(map);
+
+        // Accessibility attributes
+        if (circle._path) {
+          circle._path.setAttribute('role', 'button');
+          circle._path.setAttribute('aria-label', `Zona de riesgo ${zone.name}, Nivel ${zone.level}, ${zone.alertCount} alertas`);
+        }
+
+        // Popup for Circle
+        const popupContent = `
+          <div class="p-2 text-xs max-w-[240px]">
+            <div class="flex items-center justify-between mb-1.5 gap-2">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" style="background-color: ${style.badgeBg}; color: ${style.badgeText};">
+                Riesgo ${style.label}
+              </span>
+              <span class="font-mono text-[10px] text-gray-500">${zone.distance}</span>
+            </div>
+            <p class="font-bold text-sm leading-snug mb-1 text-gray-900">${zone.name}</p>
+            <p class="text-gray-600 text-[11px] mb-2 leading-tight">${zone.description}</p>
+            <div class="pt-1.5 border-t border-gray-200 flex items-center justify-between text-[10px]">
+              <span class="text-gray-500"><strong>${zone.alertCount}</strong> alertas registradas</span>
+              <span class="text-[#7c3aed] font-semibold">${zone.supportPoint.split('(')[0]}</span>
+            </div>
+          </div>
+        `;
+
+        circle.bindPopup(popupContent, { className: 'custom-leaflet-popup' });
+
+        circle.on('click', () => {
+          highlightZoneInPanel(zone.id);
+        });
+
+        circleLayers[zone.id] = circle;
+      });
+    }
+
+    // Render Cards in Right Panel
+    function renderZoneCards() {
+      const container = document.getElementById('zonesListContainer');
+      const emptyState = document.getElementById('emptyZonesState');
+      const countBadge = document.getElementById('zoneCountBadge');
+
+      const filtered = mockZonas.filter(zone => {
+        const matchesLevel = (currentFilterLevel === 'ALL') || (zone.level === currentFilterLevel);
+        const matchesQuery = zone.name.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+                             zone.description.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+                             zone.supportPoint.toLowerCase().includes(currentSearchQuery.toLowerCase());
+        return matchesLevel && matchesQuery;
+      });
+
+      countBadge.textContent = `${filtered.length} ${filtered.length === 1 ? 'zona' : 'zonas'}`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      container.innerHTML = filtered.map(zone => {
+        const style = levelStyles[zone.level];
+        const isSelected = zone.id === selectedZoneId;
+        return `
+          <div 
+            id="card-zone-${zone.id}"
+            onclick="selectAndFlyToZone(${zone.id})" 
+            class="zone-card p-3 rounded-xl border border-[#c4b5fd] bg-white hover:bg-[#ede9fe]/40 cursor-pointer transition-all duration-150 shadow-sm ${isSelected ? 'active-zone' : ''}"
+            style="background-color: var(--bg-card); border-color: var(--border);"
+            role="button"
+            tabindex="0"
+            aria-label="Zona ${zone.name}, Nivel ${zone.level}, ${zone.alertCount} alertas a ${zone.distance}"
+          >
+            <!-- Card Header: Level Badge + Distance -->
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase" style="background-color: ${style.badgeBg}; color: ${style.badgeText};">
+                ● Riesgo ${style.label}
+              </span>
+              <div class="flex items-center space-x-1 text-gray-500 font-mono text-xs">
+                <svg class="w-3.5 h-3.5 text-[#7c3aed]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                <span>${zone.distance}</span>
+              </div>
+            </div>
+
+            <!-- Zone Name -->
+            <h3 class="text-xs font-bold leading-snug tracking-tight mb-1" style="color: var(--text-primary);">
+              ${zone.name}
+            </h3>
+
+            <!-- Details: Count + Support Point -->
+            <div class="flex items-center justify-between text-[11px] text-gray-500 pt-1" style="color: var(--text-muted);">
+              <span class="flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5 text-[#dc2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span><strong>${zone.alertCount}</strong> incidentes</span>
+              </span>
+              <span class="truncate max-w-[150px] text-[10px] bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded font-medium">
+                ${zone.supportPoint}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Filter by Level
+    function filterByLevel(level) {
+      currentFilterLevel = level;
+
+      // Update chips styles
+      const levels = ['ALL', 'ALTO', 'MEDIO', 'BAJO'];
+      levels.forEach(lvl => {
+        const btn = document.getElementById(`chip-${lvl}`);
+        if (!btn) return;
+        if (lvl === level) {
+          btn.className = 'level-chip px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 bg-[#ede9fe] text-[#7c3aed] border-1.5';
+          btn.style.borderColor = 'var(--purple-deep)';
+          btn.setAttribute('aria-checked', 'true');
+        } else {
+          btn.className = 'level-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:bg-[#ede9fe]/40 transition-all flex items-center space-x-1 border border-transparent';
+          btn.style.borderColor = 'transparent';
+          btn.setAttribute('aria-checked', 'false');
+        }
+      });
+
+      renderZoneCards();
+
+      // Show/hide circles on map
+      mockZonas.forEach(zone => {
+        const circle = circleLayers[zone.id];
+        if (!circle) return;
+        if (level === 'ALL' || zone.level === level) {
+          if (!map.hasLayer(circle)) map.addLayer(circle);
+        } else {
+          if (map.hasLayer(circle)) map.removeLayer(circle);
+        }
+      });
+    }
+
+    // Search Query with debounce
+    let debounceTimer;
+    function handleSearch(val) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        currentSearchQuery = val.trim();
+        const clearBtn = document.getElementById('clearSearchBtn');
+        if (currentSearchQuery.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+        renderZoneCards();
+      }, 200);
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchZoneInput');
+      input.value = '';
+      currentSearchQuery = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderZoneCards();
+    }
+
+    function clearFilters() {
+      clearSearch();
+      filterByLevel('ALL');
+    }
+
+    // Fly to Zone on Click
+    function selectAndFlyToZone(zoneId) {
+      selectedZoneId = zoneId;
+      const zone = mockZonas.find(z => z.id === zoneId);
+      if (!zone) return;
+
+      // Highlight active card
+      document.querySelectorAll('.zone-card').forEach(el => el.classList.remove('active-zone'));
+      const activeCard = document.getElementById(`card-zone-${zoneId}`);
+      if (activeCard) {
+        activeCard.classList.add('active-zone');
+        activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Fly map to circle
+      map.flyTo([zone.lat, zone.lng], 15, {
+        duration: 1.2,
+        easeLinearity: 0.25
+      });
+
+      // Open circle popup
+      const circle = circleLayers[zoneId];
+      if (circle) {
+        setTimeout(() => {
+          circle.openPopup();
+        }, 1100);
+      }
+    }
+
+    function highlightZoneInPanel(zoneId) {
+      selectedZoneId = zoneId;
+      document.querySelectorAll('.zone-card').forEach(el => el.classList.remove('active-zone'));
+      const activeCard = document.getElementById(`card-zone-${zoneId}`);
+      if (activeCard) {
+        activeCard.classList.add('active-zone');
+        activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Centrar en Usuaria
+    function centrarEnUsuaria() {
+      selectedZoneId = null;
+      document.querySelectorAll('.zone-card').forEach(el => el.classList.remove('active-zone'));
+      map.flyTo([userLocation.lat, userLocation.lng], 15, {
+        duration: 1.2
+      });
+      userMarker.openPopup();
+    }
+
+    // Refrescar Zonas
+    function refrescarZonas() {
+      const spinner = document.getElementById('refreshSpinner');
+      spinner.classList.add('animate-spin');
+      setTimeout(() => {
+        spinner.classList.remove('animate-spin');
+        centrarEnUsuaria();
+      }, 600);
+    }
+
+    // Theme Toggle (Dark / Light)
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'light';
+      const target = current === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', target);
+
+      const sun = document.getElementById('themeIconSun');
+      const moon = document.getElementById('themeIconMoon');
+
+      if (target === 'dark') {
+        sun.classList.add('hidden');
+        moon.classList.remove('hidden');
+      } else {
+        sun.classList.remove('hidden');
+        moon.classList.add('hidden');
+      }
+    }
+
+    // Modo Sigilo (Escape)
+    function activarModoSigilo() {
+      window.location.href = "https://www.google.com";
+    }
+
+    // Keyboard shortcut for Escape (Modo Sigilo)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        activarModoSigilo();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlertaMujer - Lugares Frecuentes</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              magenta: '#db079c',
+              purpleDeep: '#7c3aed',
+              purpleMid: '#a78bfa',
+              purpleLight: '#c4b5fd',
+              purplePale: '#ede9fe',
+              purpleHover: '#e0d8fc',
+              base: '#f5f4ff',
+              card: '#ffffff',
+              textPrimary: '#1e1a3c',
+              textMuted: '#6b7280',
+              textDim: '#9ca3af',
+              green: '#16a34a',
+              greenPale: '#dcfce7',
+              amber: '#d97706',
+              amberPale: '#fef3c7',
+              red: '#dc2626',
+              redPale: '#fee2e2'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Nunito', 'sans-serif']
+          },
+          borderRadius: {
+            'card': '12px',
+            'btn': '50px'
+          },
+          boxShadow: {
+            'card': '0 0 0 1.5px #c4b5fd, 0 4px 16px rgba(124, 58, 237, 0.08)',
+            'btn': '0 8px 24px rgba(219, 7, 156, 0.28)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-base: #f5f4ff;
+      --bg-card: #ffffff;
+      --border: #c4b5fd;
+      --purple-deep: #7c3aed;
+      --purple-pale: #ede9fe;
+      --text-primary: #1e1a3c;
+      --text-muted: #6b7280;
+    }
+    body {
+      background-color: #f5f4ff;
+      color: #1e1a3c;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.2);
+      border: 1.5px solid #c4b5fd;
+      padding: 4px;
+    }
+    .leaflet-popup-content {
+      margin: 8px 12px;
+      line-height: 1.4;
+    }
+    .custom-map-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #db079c);
+      color: white;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.45);
+      border: 2px solid white;
+    }
+    .custom-map-pin.safe {
+      background: linear-gradient(135deg, #16a34a, #059669);
+    }
+    .custom-map-pin.work {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+    /* Modal transitions */
+    .modal-backdrop {
+      background-color: rgba(30, 26, 60, 0.6);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased bg-[#f5f4ff]">
+
+  <!-- APP CONTAINER -->
+  <div class="flex flex-1 min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white border-r border-[#c4b5fd] flex flex-col justify-between shrink-0 hidden md:flex z-20">
+      <div>
+        <!-- Brand Header with Official Logo & Slogan -->
+        <div class="p-5 border-b border-[#ede9fe] flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full overflow-hidden shrink-0 border border-[#7c3aed]/30 shadow-sm flex items-center justify-center bg-purple-900">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjoK6khuTHkbIwOyh3s9_bycwNpe89gxbS8AxW0wCWUtfGwHXi5yOvHYDhTvhy23pnJbWNL0nLbsZsColQjy6mVYXRpZEdnYp069QQY3iXz_DOYT2otxrvRYjrWfI11Sfj9EtE8Fi-J25K2hc6IgSyn23YT_R3ov_VpsX6Cn7xtRbmbm9jVE2UZF0TCJgD0xEgHVsxaYdefEVXg9Xtdr18JMO9OwBEDdnd_GqWYOFygECJijUv0m5boFNKRPOPNX7g_w" alt="Isotipo AlertaMujer" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-black text-lg tracking-tight text-[#1e1a3c]">Alerta<span class="text-[#db079c]">Mujer</span></span>
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+            <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#7c3aed]">Seguridad para todas</p>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="p-4 space-y-1.5 text-sm font-semibold">
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#6b7280] hover:bg-[#f5f4ff] hover:text-[#7c3aed] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Home (Monitoreo)</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#6b7280] hover:bg-[#f5f4ff] hover:text-[#7c3aed] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span>Historial de Alertas</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#6b7280] hover:bg-[#f5f4ff] hover:text-[#7c3aed] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>Contactos SOS</span>
+            <span class="ml-auto bg-[#ede9fe] text-[#7c3aed] text-xs px-2 py-0.5 rounded-full font-bold">3/5</span>
+          </a>
+          <!-- Active link: Ubicación / Lugares Frecuentes -->
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#ede9fe] text-[#7c3aed] shadow-sm font-bold">
+            <svg class="w-5 h-5 text-[#7c3aed]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Lugares Frecuentes</span>
+            <span class="ml-auto w-2 h-2 rounded-full bg-[#7c3aed]"></span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#6b7280] hover:bg-[#f5f4ff] hover:text-[#7c3aed] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span>Estado Dispositivo</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#6b7280] hover:bg-[#f5f4ff] hover:text-[#7c3aed] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span>Mis Evidencias</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#6b7280] hover:bg-[#f5f4ff] hover:text-[#7c3aed] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span>Asistencia & Recursos</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Quick Escape / Sigilo -->
+      <div class="p-4 border-t border-[#ede9fe] bg-[#faf8ff] space-y-3">
+        <div class="flex items-center justify-between text-xs text-[#6b7280]">
+          <span class="flex items-center gap-1.5 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Custodia Nivel 1
+          </span>
+          <span class="px-1.5 py-0.5 bg-[#dcfce7] text-[#16a34a] rounded font-bold text-[10px]">ACTIVA</span>
+        </div>
+        <button onclick="toggleModal('escape-modal')" class="w-full py-2.5 px-3 bg-[#ede9fe] hover:bg-[#e0d8fc] text-[#7c3aed] text-xs font-bold rounded-xl border border-[#c4b5fd] flex items-center justify-center gap-2 transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+          Modo Sigilo (Escape)
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col overflow-y-auto">
+
+      <!-- TOPBAR -->
+      <header class="h-16 bg-white border-b border-[#c4b5fd] px-6 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-3">
+          <button class="md:hidden text-[#1e1a3c] p-1.5 hover:bg-[#f5f4ff] rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="text-xs font-semibold text-[#6b7280] hidden sm:block">
+            DASHBOARD <span class="mx-1.5 text-[#c4b5fd]">/</span> <span class="text-[#7c3aed] font-bold">UBICACIÓN & LUGARES FRECUENTES</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Status Badge -->
+          <div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-[#dcfce7] border border-[#86efac] text-[#16a34a] text-xs font-bold rounded-full">
+            <span class="w-2 h-2 rounded-full bg-[#16a34a] animate-ping"></span>
+            <span>Red Segura Activa</span>
+          </div>
+
+          <!-- Theme toggle icon -->
+          <button class="p-2 text-[#6b7280] hover:text-[#7c3aed] hover:bg-[#ede9fe] rounded-lg transition" title="Modo Claro / Oscuro">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </button>
+
+          <!-- Notifications -->
+          <button class="relative p-2 text-[#6b7280] hover:text-[#7c3aed] hover:bg-[#ede9fe] rounded-lg transition" title="Notificaciones">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#dc2626]"></span>
+          </button>
+
+          <!-- User info -->
+          <div class="flex items-center gap-3 pl-3 border-l border-[#ede9fe]">
+            <div class="text-right hidden sm:block">
+              <div class="text-xs font-bold text-[#1e1a3c]">Ana García</div>
+              <div class="text-[10px] text-[#6b7280] font-mono">ID: ALM-94827</div>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#db079c] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+              AG
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW BODY -->
+      <main class="p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+
+        <!-- TITLE AND ACTIONS BAR -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <div class="w-9 h-9 rounded-xl bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center font-bold">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <h1 class="text-2xl md:text-3xl font-extrabold text-[#1e1a3c] tracking-tight">Lugares Frecuentes</h1>
+            </div>
+            <p class="text-sm text-[#6b7280] mt-1">
+              Guarda y gestiona tus ubicaciones habituales (casa, trabajo, refugios) para priorizar el auxilio y geocercas SOS inmediatas.
+            </p>
+          </div>
+
+          <!-- Top CTA button -->
+          <div class="flex items-center gap-3">
+            <button onclick="centrarUbicacionActual()" class="px-3.5 py-2.5 bg-white border border-[#c4b5fd] hover:border-[#7c3aed] text-[#7c3aed] font-semibold text-xs rounded-xl shadow-sm flex items-center gap-2 transition">
+              <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Centrar en mi ubicación</span>
+            </button>
+            <button onclick="abrirModalAgregar()" class="px-4 py-2.5 bg-gradient-to-r from-[#7c3aed] to-[#db079c] hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition transform active:scale-95">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              <span>AGREGAR LUGAR</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- INFO / CONTEXT BANNER -->
+        <div class="bg-[#ede9fe] border-l-4 border-[#7c3aed] rounded-xl p-4 flex items-start gap-3 shadow-sm">
+          <div class="text-[#7c3aed] shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="text-xs text-[#1e1a3c] flex-1">
+            <span class="font-bold text-[#7c3aed]">Geocercas de Protección Activa:</span> Los lugares designados como <strong class="text-emerald-700">«Zona Segura»</strong> desactivan alarmas por coacción accidental y notifican a tu red de contactos cuando llegas sana y salva. Al emitir una señal SOS, la central policial recibe la proximidad a tu lugar seguro más cercano en Bogotá.
+          </div>
+          <span class="text-[10px] bg-white text-[#7c3aed] font-bold px-2 py-0.5 rounded-full border border-[#c4b5fd] shrink-0">GPS Calibrado ±3m</span>
+        </div>
+
+        <!-- SECTION 1: MAPA CARD -->
+        <section class="bg-white rounded-xl border border-[#c4b5fd] shadow-[0_0_0_1.5px_#c4b5fd,0_4px_16px_rgba(124,58,237,0.08)] overflow-hidden">
+          <!-- Card Header -->
+          <div class="px-5 py-4 border-b border-[#ede9fe] flex flex-wrap items-center justify-between gap-3 bg-[#faf8ff]">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#7c3aed]"></span>
+              <h2 class="font-bold text-sm text-[#1e1a3c]">Mapa de Referencia y Cobertura Geográfica</h2>
+              <span class="text-xs text-[#6b7280] font-normal">(4 marcadores registrados en Bogotá D.C.)</span>
+            </div>
+            <!-- Legend / Badges -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#dcfce7] text-[#16a34a] rounded-lg font-semibold text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-[#16a34a]"></span>
+                Lugar Seguro (2)
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#ede9fe] text-[#7c3aed] rounded-lg font-semibold text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-[#7c3aed]"></span>
+                Frecuente (1)
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#fee2e2] text-[#dc2626] rounded-lg font-semibold text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-[#dc2626]"></span>
+                Alerta de Precaución (1)
+              </span>
+            </div>
+          </div>
+
+          <!-- Leaflet Map Canvas -->
+          <div class="relative w-full h-[360px] md:h-[420px] bg-[#e2e8f0]">
+            <div id="leaflet-frequent-map" class="w-full h-full z-0"></div>
+
+            <!-- Floating Map Control Widget -->
+            <div class="absolute bottom-4 left-4 z-[400] bg-white/90 backdrop-blur-md p-3 rounded-xl border border-[#c4b5fd] shadow-lg text-xs space-y-1.5 max-w-xs">
+              <div class="font-bold text-[#1e1a3c] flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#7c3aed]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Zona Activa: Chapinero & Usaquén
+              </div>
+              <p class="text-[11px] text-[#6b7280]">Haz clic sobre cualquier marcador para inspeccionar el radio de resguardo perimetral.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: MIS LUGARES (GRID 2 COLUMNAS) -->
+        <section class="bg-white rounded-xl border border-[#c4b5fd] shadow-[0_0_0_1.5px_#c4b5fd,0_4px_16px_rgba(124,58,237,0.08)] p-6 space-y-6">
+          
+          <!-- Card Header & Filter Chips -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#ede9fe]">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-lg font-bold text-[#1e1a3c]">Mis Lugares Guardados</h2>
+                <span class="px-2.5 py-0.5 rounded-full bg-[#ede9fe] text-[#7c3aed] font-extrabold text-xs">4 registrados</span>
+              </div>
+              <p class="text-xs text-[#6b7280] mt-0.5">Lugares priorizados para el envío de patrullas policiales o geocercas automáticas.</p>
+            </div>
+
+            <!-- Type Filter Tabs -->
+            <div class="flex items-center gap-1.5 bg-[#f5f4ff] p-1 rounded-xl border border-[#c4b5fd]/60 text-xs">
+              <button onclick="filtrarLugares('todos')" id="filter-todos" class="px-3 py-1.5 rounded-lg font-bold bg-[#7c3aed] text-white shadow-sm transition">Todos (4)</button>
+              <button onclick="filtrarLugares('casa')" id="filter-casa" class="px-3 py-1.5 rounded-lg font-semibold text-[#6b7280] hover:text-[#7c3aed] transition">Casas (1)</button>
+              <button onclick="filtrarLugares('trabajo')" id="filter-trabajo" class="px-3 py-1.5 rounded-lg font-semibold text-[#6b7280] hover:text-[#7c3aed] transition">Trabajo (1)</button>
+              <button onclick="filtrarLugares('otro')" id="filter-otro" class="px-3 py-1.5 rounded-lg font-semibold text-[#6b7280] hover:text-[#7c3aed] transition">Otros (2)</button>
+            </div>
+          </div>
+
+          <!-- Places Grid (2 columns on desktop, 1 on mobile) -->
+          <div id="places-grid-container" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            <!-- Card 1: Casa Principal -->
+            <div class="place-item p-4 rounded-xl border border-[#c4b5fd] bg-gradient-to-br from-white to-[#faf8ff] hover:shadow-md transition-all relative group" data-category="casa">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-[#dcfce7] text-[#16a34a] flex items-center justify-center text-xl shrink-0 border border-[#86efac]">
+                    🏠
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-base font-bold text-[#1e1a3c]">Casa Principal (Apartamento)</h3>
+                      <!-- Badge seguro -->
+                      <span class="px-2 py-0.5 bg-[#dcfce7] text-[#16a34a] rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                        Zona Segura
+                      </span>
+                    </div>
+                    <p class="text-xs text-[#6b7280] flex items-center gap-1.5 mt-1">
+                      <svg class="w-3.5 h-3.5 text-[#7c3aed] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      Carrera 15 # 85-30, Apto 402, Chapinero
+                    </p>
+                    <div class="flex items-center gap-3 mt-3 text-[11px] text-[#6b7280]">
+                      <span class="bg-[#ede9fe] text-[#7c3aed] px-2 py-0.5 rounded font-bold">Tipo: Casa</span>
+                      <span>Geocerca: <strong>100m</strong></span>
+                      <span class="text-emerald-700 font-semibold flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        Alerta Inmediata Desactivada
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actions buttons -->
+                <div class="flex items-center gap-1 shrink-0">
+                  <button onclick="editarLugar('Casa Principal', 'casa', 'Carrera 15 # 85-30, Apto 402, Chapinero')" class="p-2 text-[#7c3aed] hover:bg-[#ede9fe] rounded-lg transition" title="Editar lugar" aria-label="Editar Casa Principal">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                  </button>
+                  <button onclick="confirmarEliminar('Casa Principal (Apartamento)')" class="p-2 text-[#dc2626] hover:bg-[#fee2e2] rounded-lg transition" title="Eliminar lugar" aria-label="Eliminar Casa Principal">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Oficina / Coworking -->
+            <div class="place-item p-4 rounded-xl border border-[#c4b5fd] bg-gradient-to-br from-white to-[#faf8ff] hover:shadow-md transition-all relative group" data-category="trabajo">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center text-xl shrink-0 border border-[#c4b5fd]">
+                    🏢
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-base font-bold text-[#1e1a3c]">Oficina Central (Trabajo)</h3>
+                      <!-- Badge frecuente -->
+                      <span class="px-2 py-0.5 bg-[#ede9fe] text-[#7c3aed] rounded-full text-[10px] font-bold uppercase tracking-wider">
+                        Lugar Frecuente
+                      </span>
+                    </div>
+                    <p class="text-xs text-[#6b7280] flex items-center gap-1.5 mt-1">
+                      <svg class="w-3.5 h-3.5 text-[#7c3aed] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      Calle 72 # 10-24, Torre A, Piso 6, Financial District
+                    </p>
+                    <div class="flex items-center gap-3 mt-3 text-[11px] text-[#6b7280]">
+                      <span class="bg-[#ede9fe] text-[#7c3aed] px-2 py-0.5 rounded font-bold">Tipo: Trabajo</span>
+                      <span>Horario habitual: <strong>8:00am - 5:30pm</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <button onclick="editarLugar('Oficina Central', 'trabajo', 'Calle 72 # 10-24, Torre A, Piso 6, Financial District')" class="p-2 text-[#7c3aed] hover:bg-[#ede9fe] rounded-lg transition" title="Editar lugar" aria-label="Editar Oficina Central">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                  </button>
+                  <button onclick="confirmarEliminar('Oficina Central (Trabajo)')" class="p-2 text-[#dc2626] hover:bg-[#fee2e2] rounded-lg transition" title="Eliminar lugar" aria-label="Eliminar Oficina Central">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Casa Familiar (Mamá / Contacto #1) -->
+            <div class="place-item p-4 rounded-xl border border-[#c4b5fd] bg-gradient-to-br from-white to-[#faf8ff] hover:shadow-md transition-all relative group" data-category="otro">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-[#dcfce7] text-[#16a34a] flex items-center justify-center text-xl shrink-0 border border-[#86efac]">
+                    ⭐
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-base font-bold text-[#1e1a3c]">Casa de Mamá (Refugio Primario)</h3>
+                      <!-- Badge seguro -->
+                      <span class="px-2 py-0.5 bg-[#dcfce7] text-[#16a34a] rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                        Zona Segura
+                      </span>
+                    </div>
+                    <p class="text-xs text-[#6b7280] flex items-center gap-1.5 mt-1">
+                      <svg class="w-3.5 h-3.5 text-[#7c3aed] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      Avenida Calle 127 # 48-12, Santa Bárbara, Usaquén
+                    </p>
+                    <div class="flex items-center gap-3 mt-3 text-[11px] text-[#6b7280]">
+                      <span class="bg-[#ede9fe] text-[#7c3aed] px-2 py-0.5 rounded font-bold">Tipo: Refugio Familiar</span>
+                      <span>Contacto vinculado: <strong>Carmen García</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <button onclick="editarLugar('Casa de Mamá', 'otro', 'Avenida Calle 127 # 48-12, Santa Bárbara, Usaquén')" class="p-2 text-[#7c3aed] hover:bg-[#ede9fe] rounded-lg transition" title="Editar lugar" aria-label="Editar Casa de Mamá">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                  </button>
+                  <button onclick="confirmarEliminar('Casa de Mamá (Refugio Primario)')" class="p-2 text-[#dc2626] hover:bg-[#fee2e2] rounded-lg transition" title="Eliminar lugar" aria-label="Eliminar Casa de Mamá">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Estación / Parada Frecuente (Zona de Riesgo/Alerta) -->
+            <div class="place-item p-4 rounded-xl border border-[#c4b5fd] bg-gradient-to-br from-white to-[#faf8ff] hover:shadow-md transition-all relative group" data-category="otro">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-[#fee2e2] text-[#dc2626] flex items-center justify-center text-xl shrink-0 border border-[#fca5a5]">
+                    📍
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-base font-bold text-[#1e1a3c]">Estación TransMilenio Calle 76</h3>
+                      <!-- Badge riesgo/precaución -->
+                      <span class="px-2 py-0.5 bg-[#fee2e2] text-[#dc2626] rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#dc2626]"></span>
+                        Monitoreo Activo
+                      </span>
+                    </div>
+                    <p class="text-xs text-[#6b7280] flex items-center gap-1.5 mt-1">
+                      <svg class="w-3.5 h-3.5 text-[#7c3aed] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      Avenida Caracas con Calle 76, Tránsito Nocturno
+                    </p>
+                    <div class="flex items-center gap-3 mt-3 text-[11px] text-[#6b7280]">
+                      <span class="bg-[#ede9fe] text-[#7c3aed] px-2 py-0.5 rounded font-bold">Tipo: Punto de Tránsito</span>
+                      <span class="text-amber-700 font-semibold">Sensor SOS por sacudida habilitado</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <button onclick="editarLugar('Estación TransMilenio Calle 76', 'otro', 'Avenida Caracas con Calle 76')" class="p-2 text-[#7c3aed] hover:bg-[#ede9fe] rounded-lg transition" title="Editar lugar" aria-label="Editar Estación">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                  </button>
+                  <button onclick="confirmarEliminar('Estación TransMilenio Calle 76')" class="p-2 text-[#dc2626] hover:bg-[#fee2e2] rounded-lg transition" title="Eliminar lugar" aria-label="Eliminar Estación">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Empty State (Hidden by default, shown if all deleted) -->
+          <div id="empty-state" class="hidden p-8 text-center rounded-xl border border-dashed border-[#c4b5fd] bg-[#faf8ff]">
+            <div class="w-14 h-14 mx-auto rounded-full bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center text-2xl mb-3">
+              📍
+            </div>
+            <h4 class="text-base font-bold text-[#1e1a3c]">No tienes lugares frecuentes guardados</h4>
+            <p class="text-xs text-[#6b7280] max-w-sm mx-auto mt-1 mb-4">
+              Agrega tu casa, oficina o lugares habituales para que el sistema de custodia AlertaMujer proteja tus rutas automáticas.
+            </p>
+            <button onclick="abrirModalAgregar()" class="px-4 py-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold text-xs rounded-xl shadow-sm transition">
+              ➕ AGREGAR PRIMER LUGAR
+            </button>
+          </div>
+
+          <!-- Bottom Advice Card -->
+          <div class="bg-[#fcf8ff] border border-[#c4b5fd] rounded-xl p-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-lg bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center font-bold shrink-0">🛡️</span>
+              <div class="text-xs">
+                <span class="font-bold text-[#1e1a3c]">¿Cómo funcionan las alertas en tus lugares frecuentes?</span>
+                <p class="text-[#6b7280]">Al ingresar a un lugar frecuente seguro, tus contactos reciben un pin discreto de llegada garantizada.</p>
+              </div>
+            </div>
+            <button onclick="centrarUbicacionActual()" class="text-xs text-[#7c3aed] font-bold hover:underline shrink-0">Verificar cobertura GPS →</button>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- MODAL 1: AGREGAR / EDITAR LUGAR (app-modal size="md") -->
+  <div id="modal-lugar" class="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-lugar-title">
+    <div class="bg-white rounded-2xl border border-[#c4b5fd] shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-[#ede9fe] bg-[#faf8ff] flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-[#ede9fe] text-[#7c3aed] flex items-center justify-center font-bold">
+            📍
+          </div>
+          <div>
+            <h3 id="modal-lugar-title" class="font-bold text-base text-[#1e1a3c]">Agregar Lugar Frecuente</h3>
+            <p class="text-[11px] text-[#6b7280]">Configura tu punto en el mapa y el protocolo de protección.</p>
+          </div>
+        </div>
+        <button onclick="cerrarModal('modal-lugar')" class="text-[#6b7280] hover:text-[#1e1a3c] p-1.5 rounded-lg hover:bg-gray-100 transition" aria-label="Cerrar modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="form-lugar" onsubmit="guardarLugar(event)" class="p-6 space-y-4">
+        
+        <!-- Nombre del lugar -->
+        <div>
+          <label for="lugar-nombre" class="block text-xs font-bold text-[#1e1a3c] mb-1.5">Nombre del lugar *</label>
+          <input type="text" id="lugar-nombre" required placeholder="Ej. Casa de campo, Gimnasio, Universidad..." class="w-full px-3.5 py-2.5 bg-[#faf8ff] border border-[#c4b5fd] rounded-xl text-xs text-[#1e1a3c] focus:outline-none focus:border-[#7c3aed] focus:ring-2 focus:ring-[#ede9fe] transition">
+        </div>
+
+        <!-- Tipo de lugar -->
+        <div class="grid grid-cols-3 gap-2">
+          <label class="cursor-pointer">
+            <input type="radio" name="tipo-lugar" value="casa" class="peer sr-only" checked>
+            <div class="p-2.5 text-center rounded-xl border border-[#c4b5fd] peer-checked:border-[#7c3aed] peer-checked:bg-[#ede9fe] peer-checked:text-[#7c3aed] text-[#6b7280] transition hover:bg-gray-50">
+              <div class="text-base mb-0.5">🏠</div>
+              <div class="text-[11px] font-bold">Casa</div>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="tipo-lugar" value="trabajo" class="peer sr-only">
+            <div class="p-2.5 text-center rounded-xl border border-[#c4b5fd] peer-checked:border-[#7c3aed] peer-checked:bg-[#ede9fe] peer-checked:text-[#7c3aed] text-[#6b7280] transition hover:bg-gray-50">
+              <div class="text-base mb-0.5">🏢</div>
+              <div class="text-[11px] font-bold">Trabajo</div>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="tipo-lugar" value="otro" class="peer sr-only">
+            <div class="p-2.5 text-center rounded-xl border border-[#c4b5fd] peer-checked:border-[#7c3aed] peer-checked:bg-[#ede9fe] peer-checked:text-[#7c3aed] text-[#6b7280] transition hover:bg-gray-50">
+              <div class="text-base mb-0.5">📍</div>
+              <div class="text-[11px] font-bold">Otro</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="lugar-direccion" class="text-xs font-bold text-[#1e1a3c]">Dirección o Coordenadas *</label>
+            <button type="button" onclick="usarUbicacionActualEnForm()" class="text-[11px] text-[#7c3aed] hover:underline font-bold flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18l3.5-7.5L8 7l7.5 3.5L12 18z"/></svg>
+              Usar mi ubicación actual
+            </button>
+          </div>
+          <input type="text" id="lugar-direccion" required placeholder="Ej. Calle 100 # 15-20, Bogotá" class="w-full px-3.5 py-2.5 bg-[#faf8ff] border border-[#c4b5fd] rounded-xl text-xs text-[#1e1a3c] focus:outline-none focus:border-[#7c3aed] focus:ring-2 focus:ring-[#ede9fe] transition">
+        </div>
+
+        <!-- Opciones de seguridad -->
+        <div class="p-3 bg-[#f5f4ff] rounded-xl border border-[#c4b5fd] space-y-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="check-zona-segura" checked class="w-4 h-4 rounded text-[#7c3aed] focus:ring-[#7c3aed] border-gray-300">
+            <span class="text-xs font-bold text-[#1e1a3c]">Designar como «Zona Segura» de resguardo</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="check-notificar-llegada" checked class="w-4 h-4 rounded text-[#7c3aed] focus:ring-[#7c3aed] border-gray-300">
+            <span class="text-xs text-[#6b7280]">Notificar por SMS a mi contacto prioritario al llegar</span>
+          </label>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onclick="cerrarModal('modal-lugar')" class="px-4 py-2.5 text-xs font-bold text-[#6b7280] hover:bg-gray-100 rounded-xl transition">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-submit-lugar" class="px-5 py-2.5 bg-gradient-to-r from-[#7c3aed] to-[#db079c] text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 transition flex items-center gap-2">
+            <span>Guardar Lugar</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CONFIRMAR ELIMINAR (app-modal size="sm" variant="danger") -->
+  <div id="modal-eliminar" class="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-eliminar-title">
+    <div class="bg-white rounded-2xl border border-red-300 shadow-2xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-5 text-center space-y-3">
+        <div class="w-12 h-12 mx-auto rounded-full bg-[#fee2e2] text-[#dc2626] flex items-center justify-center text-xl">
+          🗑️
+        </div>
+        <h3 id="modal-eliminar-title" class="text-base font-extrabold text-[#1e1a3c]">¿Eliminar este lugar frecuente?</h3>
+        <p class="text-xs text-[#6b7280]">
+          Estás a punto de eliminar <strong id="nombre-lugar-eliminar" class="text-[#dc2626]">...</strong> de tu lista de geocercas protegidas.
+        </p>
+        <div class="flex items-center justify-center gap-3 pt-3">
+          <button onclick="cerrarModal('modal-eliminar')" class="px-4 py-2 text-xs font-bold text-[#6b7280] hover:bg-gray-100 rounded-xl transition">
+            Cancelar
+          </button>
+          <button onclick="ejecutarEliminacion()" class="px-5 py-2 bg-[#dc2626] hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+            Sí, Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: MODO SIGILO (ESCAPE RÁPIDO) -->
+  <div id="escape-modal" class="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl border border-[#c4b5fd] p-6 max-w-sm w-full text-center space-y-4">
+      <div class="text-3xl">🤫</div>
+      <h3 class="text-lg font-bold text-[#1e1a3c]">Modo Sigilo de Emergencia</h3>
+      <p class="text-xs text-[#6b7280]">
+        Al presionar escape se enmascarará inmediatamente la interfaz simulando un visor de notas o clima neutral.
+      </p>
+      <div class="flex gap-2">
+        <button onclick="toggleModal('escape-modal')" class="flex-1 py-2 text-xs font-bold text-[#6b7280] bg-gray-100 rounded-xl">Cerrar</button>
+        <button onclick="window.location.href='https://google.com'" class="flex-1 py-2 text-xs font-bold text-white bg-[#dc2626] rounded-xl shadow">Salir ahora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAFLET INITIALIZATION AND INTERACTION SCRIPT -->
+  <script>
+    let map;
+    let markers = [];
+
+    // Data mockup matching wireframe
+    const placesData = [
+      {
+        id: 1,
+        title: "Casa Principal (Apartamento)",
+        type: "Casa",
+        category: "casa",
+        address: "Carrera 15 # 85-30, Chapinero",
+        lat: 4.6710,
+        lng: -74.0560,
+        safe: true,
+        icon: "🏠"
+      },
+      {
+        id: 2,
+        title: "Oficina Central (Trabajo)",
+        type: "Trabajo",
+        category: "trabajo",
+        address: "Calle 72 # 10-24, Financial District",
+        lat: 4.6560,
+        lng: -74.0595,
+        safe: false,
+        icon: "🏢"
+      },
+      {
+        id: 3,
+        title: "Casa de Mamá (Refugio Primario)",
+        type: "Otro",
+        category: "otro",
+        address: "Avenida Calle 127 # 48-12, Santa Bárbara",
+        lat: 4.7085,
+        lng: -74.0480,
+        safe: true,
+        icon: "⭐"
+      },
+      {
+        id: 4,
+        title: "Estación TransMilenio Calle 76",
+        type: "Otro",
+        category: "otro",
+        address: "Avenida Caracas con Calle 76",
+        lat: 4.6628,
+        lng: -74.0620,
+        safe: false,
+        icon: "📍"
+      }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+    });
+
+    function initMap() {
+      // Centro en Bogotá D.C.
+      map = L.map('leaflet-frequent-map', {
+        zoomControl: true,
+        scrollWheelZoom: true
+      }).setView([4.6740, -74.0560], 13);
+
+      // CartoDB Positron tiles for clean modern purple-friendly contrast
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; AlertaMujer',
+        maxZoom: 19
+      }).addTo(map);
+
+      // Add pins
+      placesData.forEach(place => {
+        const pinHtml = `
+          <div class="custom-map-pin ${place.safe ? 'safe' : (place.category === 'trabajo' ? 'work' : '')}" title="${place.title}">
+            <span style="font-size: 16px;">${place.icon}</span>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          html: pinHtml,
+          className: '',
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
+          popupAnchor: [0, -20]
+        });
+
+        const marker = L.marker([place.lat, place.lng], { icon: customIcon }).addTo(map);
+
+        const popupContent = `
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <span style="font-weight:800; font-size:13px; color:#1e1a3c;">${place.title}</span>
+              ${place.safe ? '<span style="background:#dcfce7; color:#16a34a; font-size:9px; font-weight:800; padding:2px 6px; border-radius:10px;">ZONA SEGURA</span>' : ''}
+            </div>
+            <p style="font-size:11px; color:#6b7280; margin:0 0 6px 0;">${place.address}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #ede9fe; padding-top:4px;">
+              <span style="font-size:10px; font-weight:700; color:#7c3aed;">Tipo: ${place.type}</span>
+              <button onclick="editarLugar('${place.title}', '${place.category}', '${place.address}')" style="font-size:10px; color:#7c3aed; font-weight:800; background:none; border:none; cursor:pointer;">Editar</button>
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        markers.push(marker);
+
+        // Optional circle buffer for safe zones
+        if (place.safe) {
+          L.circle([place.lat, place.lng], {
+            color: '#16a34a',
+            fillColor: '#86efac',
+            fillOpacity: 0.15,
+            radius: 350
+          }).addTo(map);
+        }
+      });
+    }
+
+    function centrarUbicacionActual() {
+      if (map) {
+        map.flyTo([4.6710, -74.0560], 15, {
+          duration: 1.2
+        });
+      }
+    }
+
+    // Modal helpers
+    function toggleModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function cerrarModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+
+    function abrirModalAgregar() {
+      document.getElementById('modal-lugar-title').innerText = "Agregar Lugar Frecuente";
+      document.getElementById('lugar-nombre').value = "";
+      document.getElementById('lugar-direccion').value = "";
+      document.getElementById('modal-lugar').classList.remove('hidden');
+    }
+
+    function editarLugar(nombre, categoria, direccion) {
+      document.getElementById('modal-lugar-title').innerText = `Editar Lugar: ${nombre}`;
+      document.getElementById('lugar-nombre').value = nombre;
+      document.getElementById('lugar-direccion').value = direccion;
+      
+      const radios = document.getElementsByName('tipo-lugar');
+      radios.forEach(r => {
+        if (r.value === categoria) r.checked = true;
+      });
+
+      document.getElementById('modal-lugar').classList.remove('hidden');
+    }
+
+    function usarUbicacionActualEnForm() {
+      document.getElementById('lugar-direccion').value = "Carrera 15 # 85-30, Chapinero (GPS Actual ±3.2m)";
+    }
+
+    function guardarLugar(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-lugar');
+      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Guardando...`;
+      
+      setTimeout(() => {
+        btn.innerHTML = `<span>Guardar Lugar</span>`;
+        cerrarModal('modal-lugar');
+      }, 700);
+    }
+
+    let lugarAEliminarNombre = "";
+    function confirmarEliminar(nombre) {
+      lugarAEliminarNombre = nombre;
+      document.getElementById('nombre-lugar-eliminar').innerText = nombre;
+      document.getElementById('modal-eliminar').classList.remove('hidden');
+    }
+
+    function ejecutarEliminacion() {
+      cerrarModal('modal-eliminar');
+      // Feedback visual
+      const items = document.querySelectorAll('.place-item');
+      if (items.length > 0) {
+        items[items.length - 1].remove();
+      }
+    }
+
+    function filtrarLugares(tipo) {
+      const tabs = ['todos', 'casa', 'trabajo', 'otro'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`filter-${t}`);
+        if (t === tipo) {
+          btn.className = "px-3 py-1.5 rounded-lg font-bold bg-[#7c3aed] text-white shadow-sm transition";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg font-semibold text-[#6b7280] hover:text-[#7c3aed] transition";
+        }
+      });
+
+      const cards = document.querySelectorAll('.place-item');
+      cards.forEach(c => {
+        if (tipo === 'todos' || c.getAttribute('data-category') === tipo) {
+          c.classList.remove('hidden');
+        } else {
+          c.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
