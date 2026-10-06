@@ -1,83 +1,82 @@
-# Contrato de API — Alerta Mujer
+# API Contract — Alerta Mujer
 
-> **Qué es este documento.** La forma exacta de cada petición y de cada respuesta de la API, con
-> **todas** las decisiones de comportamiento tomadas. Basado en el código real de
-> `backend/Backend-ALERTA-MUJER/backend-monolith` (controladores, entidades y `db/init.sql`) y en
-> los contratos OpenAPI de `entregar/07-api/contracts/openapi/`.
+> **What this document is.** The exact shape of every request and every response of the API, with
+> **all** behavioral decisions taken. Based on the real code of
+> `backend/Backend-ALERTA-MUJER/backend-monolith` (controllers, entities and `db/init.sql`) and on
+> the OpenAPI contracts in `entregar/07-api/contracts/openapi/`.
 
-**Para qué sirve.** Para que web (`web/Frond-end-Web/alerta-mujer-web`) y móvil
-(`movile/Frontend-movil`) puedan integrarse sin inventarse nada, y para que los servicios
-`am-identity-service`, `am-alert-service`, `am-resource-service` y `am-admin-service` implementen
-el mismo contrato cuando se separen del monolito.
+**What it is for.** So that web (`web/Frond-end-Web/alerta-mujer-web`) and mobile
+(`movile/Frontend-movil`) can integrate without inventing anything, and so that the
+`am-identity-service`, `am-alert-service`, `am-resource-service` and `am-admin-service` services
+implement the same contract when they are split out of the monolith.
 
 ---
 
-## 1. Convenciones comunes
+## 1. Common conventions
 
-| Aspecto | Valor |
+| Aspect | Value |
 |---|---|
-| Base directa (monolito) | `http://localhost:8080` |
-| Base vía gateway (planificado) | `http://localhost:8080` enrutando a `:3001`–`:3004` |
-| Formato | JSON, UTF-8 |
-| Nombres de campo | camelCase en JSON (comportamiento de Jackson sobre entidades JPA) |
-| Autenticación | `Authorization: Bearer <jwt>` |
-| Token | Lo emite `POST /api/auth/login`, expira en 24 h (`jwt.expiration=86400000`) |
-| Identificadores | `integer` autoincremental (ver nota de deuda abajo) |
-| Fechas | ISO 8601 emitidas por el servidor (`timestamp`) |
-| CORS | Configurable con `CORS_ORIGIN` (`*` por defecto en desarrollo) |
+| Direct base (monolith) | `http://localhost:8080` |
+| Base via gateway (planned) | `http://localhost:8080` routing to `:3001`–`:3004` |
+| Format | JSON, UTF-8 |
+| Field names | camelCase in JSON (Jackson default behavior over JPA entities) |
+| Authentication | `Authorization: Bearer <jwt>` |
+| Token | Issued by `POST /api/auth/login`, expires in 24 h (`jwt.expiration=86400000`) |
+| Identifiers | auto-increment `integer` (see debt note below) |
+| Dates | ISO 8601 emitted by the server (`timestamp`) |
+| CORS | Configurable with `CORS_ORIGIN` (`*` by default in development) |
 | Health check | `GET /health` → `{status, service, type}` |
 
 ### 1.1 Roles
 
-Dos, y solo dos: `user` y `administrator` (tabla `role`). Las rutas `/api/admin/**` exigen rol
-`administrator`; el resto requiere cualquier cuenta autenticada. Las lecturas públicas son
+Two, and only two: `user` and `administrator` (`role` table). `/api/admin/**` routes require the
+`administrator` role; the rest require any authenticated account. Public reads are
 `GET /api/zones`, `GET /api/zones/{id}`, `GET /api/zones/city/{city}`, `GET /api/zones/type/{type}`,
 `GET /api/resources`, `GET /api/resources/{id}`, `GET /api/resources/city/{city}`,
-`GET /api/resources/type/{type}` y `/health`.
+`GET /api/resources/type/{type}` and `/health`.
 
-### 1.2 Formato de error
+### 1.2 Error format
 
-Hoy el backend responde errores con el cuerpo por defecto de Spring Boot
-(`timestamp`, `status`, `error`, `message`, `path`). Formato objetivo unificado (pendiente de
-implementar, ver deuda):
+Today the backend responds with Spring Boot's default error body
+(`timestamp`, `status`, `error`, `message`, `path`). Target unified format (pending implementation,
+see debt):
 
 ```json
 {
   "error": "VALIDATION_ERROR",
-  "message": "El campo email es obligatorio",
+  "message": "The email field is required",
   "details": [{"field": "email", "message": "required"}]
 }
 ```
 
-| Código | Cuándo |
+| Code | When |
 |---|---|
-| 200 | Éxito con cuerpo |
-| 201 | Creación exitosa |
-| 204 | Éxito sin cuerpo |
-| 400 | Error de validación del cliente |
-| 401 | No autenticado (token ausente/inválido) |
-| 403 | Autenticado sin permiso (rol incorrecto) |
-| 404 | Recurso no encontrado |
-| 409 | Conflicto (unicidad: email, device_uuid, …) |
-| 500 | Error interno |
+| 200 | Success with body |
+| 201 | Successful creation |
+| 204 | Success without body |
+| 400 | Client validation error |
+| 401 | Not authenticated (missing/invalid token) |
+| 403 | Authenticated without permission (wrong role) |
+| 404 | Resource not found |
+| 409 | Conflict (uniqueness: email, device_uuid, …) |
+| 500 | Internal error |
 
-### 1.3 Nota importante sobre DTOs
+### 1.3 Important note about DTOs
 
-El monolito actual recibe y devuelve **entidades JPA directamente** o `Map<String, Object>` en
-registro/login/actualizaciones parciales. Esto es deuda declarada: las entidades exponen más de lo
-necesario (p. ej. `passwordHash` en `account` si se serializa mal) y no aplican validaciones de
-formato en la frontera. La especificación de abajo documenta el comportamiento observable hoy y el
-formato objetivo (los campos marcados ⭐).
+The current monolith receives and returns **JPA entities directly** or `Map<String, Object>` in
+register/login/partial updates. This is declared debt: entities expose more than needed (e.g.
+`passwordHash` on `account` if serialized poorly) and no format validations are applied at the
+boundary. The specification below documents observable behavior today and the target format.
 
 ---
 
-## 2. Autenticación — `/api/auth`
+## 2. Authentication — `/api/auth`
 
-Público.
+Public.
 
 ### `POST /api/auth/register`
 
-Crea `users` + `account` + `user_profile` con rol `user`.
+Creates `users` + `account` + `user_profile` with role `user`.
 
 **Request**
 ```json
@@ -91,10 +90,10 @@ Crea `users` + `account` + `user_profile` con rol `user`.
 
 **Response 201**
 ```json
-{ "id": 42, "email": "ana@example.com", "message": "Registro exitoso" }
+{ "id": 42, "email": "ana@example.com", "message": "Registration successful" }
 ```
 
-**Errores:** 400 validación · 409 email/teléfono duplicado.
+**Errors:** 400 validation · 409 duplicate email/phone.
 
 ### `POST /api/auth/login`
 
@@ -108,23 +107,23 @@ Crea `users` + `account` + `user_profile` con rol `user`.
 { "token": "<jwt>", "type": "Bearer", "expiresIn": 86400000, "user": { "id": 42, "email": "ana@example.com", "role": "user" } }
 ```
 
-**Errores:** 401 credenciales inválidas · 403 cuenta bloqueada (`account.status != active`).
+**Errors:** 401 invalid credentials · 403 blocked account (`account.status != active`).
 
 ### `POST /api/auth/forgot-password`
 
-**Request** `{ "email": "ana@example.com" }` → 200 siempre (no revela si el correo existe).
-Hoy es un mock: crea el `recovery_request` y no envía correo real.
+**Request** `{ "email": "ana@example.com" }` → always 200 (does not reveal whether the email
+exists). Today it is a mock: creates the `recovery_request` and sends no real email.
 
 ### `POST /api/auth/reset-password`
 
-**Request** `{ "token": "<token>", "newPassword": "Nueva123*" }` → 200. Mock sin validación real
-del token (deuda).
+**Request** `{ "token": "<token>", "newPassword": "Nueva123*" }` → 200. Mock without real token
+validation (debt).
 
 ---
 
-## 3. Perfil de usuaria — `/api/users`
+## 3. User profile — `/api/users`
 
-Requiere JWT.
+Requires JWT.
 
 ### `GET /api/users/me` → `User`
 
@@ -139,30 +138,30 @@ Requiere JWT.
 
 ### `PUT /api/users/me`
 
-**Request:** `Map` con campos a actualizar (`firstName`, `lastName`, `telephone`, …).
-**Response:** el `User` actualizado. **Errores:** 400 · 404.
+**Request:** `Map` with fields to update (`firstName`, `lastName`, `telephone`, …).
+**Response:** the updated `User`. **Errors:** 400 · 404.
 
 ---
 
-## 4. Alertas — `/api/alerts`
+## 4. Alerts — `/api/alerts`
 
-Requiere JWT. Núcleo del dominio (ADR-002 / alert-service futuro).
+Requires JWT. Core of the domain (ADR-002 / future alert-service).
 
-| Método | Ruta | Descripción |
+| Method | Route | Description |
 |---|---|---|
-| GET | `/api/alerts` | Lista todas (admin/depuración) |
-| GET | `/api/alerts/{id}` | Detalle |
-| GET | `/api/alerts/user/{userProfileId}` | Historial de una usuaria |
-| POST | `/api/alerts` | Crear/activar alerta |
-| PUT | `/api/alerts/{id}` | Actualizar (estado, fin, cancelación) |
-| DELETE | `/api/alerts/{id}` | Borrar |
+| GET | `/api/alerts` | List all (admin/debug) |
+| GET | `/api/alerts/{id}` | Detail |
+| GET | `/api/alerts/user/{userProfileId}` | History of a user |
+| POST | `/api/alerts` | Create/activate alert |
+| PUT | `/api/alerts/{id}` | Update (status, end, cancellation) |
+| DELETE | `/api/alerts/{id}` | Delete |
 
 **POST**
 ```json
 {
   "userProfileId": 7, "deviceId": 3, "alertType": "main",
   "activationMethod": "panic_button", "status": "active",
-  "message": "Necesito ayuda", "latitude": 4.710989, "longitude": -74.072090
+  "message": "I need help", "latitude": 4.710989, "longitude": -74.072090
 }
 ```
 
@@ -175,46 +174,46 @@ Requiere JWT. Núcleo del dominio (ADR-002 / alert-service futuro).
 
 ---
 
-## 5. Contactos de emergencia — `/api/contacts`
+## 5. Emergency contacts — `/api/contacts`
 
-Requiere JWT. CRUD completo: `GET /api/contacts`, `GET /api/contacts/{id}`,
+Requires JWT. Full CRUD: `GET /api/contacts`, `GET /api/contacts/{id}`,
 `GET /api/contacts/user/{userProfileId}`, `POST`, `PUT /api/contacts/{id}`, `DELETE /api/contacts/{id}`.
 
-**POST ejemplo**
+**POST example**
 ```json
-{ "userProfileId": 7, "contactName": "Mamá", "telephone": "+573109998877", "email": "mama@example.com", "relationship": "madre" }
+{ "userProfileId": 7, "contactName": "Mom", "telephone": "+573109998877", "email": "mom@example.com", "relationship": "mother" }
 ```
 
 ---
 
-## 6. Ubicaciones frecuentes — `/api/frequent-locations`
+## 6. Frequent locations — `/api/frequent-locations`
 
-Requiere JWT. `GET /api/frequent-locations`, `GET /api/frequent-locations/{id}`,
+Requires JWT. `GET /api/frequent-locations`, `GET /api/frequent-locations/{id}`,
 `GET /api/frequent-locations/user/{userId}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
 
 ```json
-{ "userProfileId": 7, "name": "Casa", "address": "Cra 50 # 12-34", "city": "Bogotá",
+{ "userProfileId": 7, "name": "Home", "address": "Cra 50 # 12-34", "city": "Bogotá",
   "latitude": 4.65, "longitude": -74.08, "notes": "", "riskLevel": "low", "isActive": true }
 ```
 
 ---
 
-## 7. Evidencia — `/api/evidences`
+## 7. Evidence — `/api/evidences`
 
-Requiere JWT: `GET /`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
+Requires JWT: `GET /`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
 
 ```json
 { "alertId": 15, "mediaType": "video", "fileUrl": "https://storage.example/ev/15.mp4" }
 ```
 
-`mediaType`: `photo | video | audio`. El binario vive fuera de la BD (el contrato actual guarda
-solo la URL).
+`mediaType`: `photo | video | audio`. The binary lives outside the DB (the current contract only
+stores the URL).
 
 ---
 
-## 8. Dispositivos — `/api/devices`
+## 8. Devices — `/api/devices`
 
-Requiere JWT: `GET /`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
+Requires JWT: `GET /`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
 
 ```json
 { "accountId": 18, "deviceUuid": "uuid-…", "brand": "Samsung", "model": "A54",
@@ -223,11 +222,11 @@ Requiere JWT: `GET /`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
 
 ---
 
-## 9. Zonas — `/api/zones`
+## 9. Zones — `/api/zones`
 
-GET públicos; POST/PUT/DELETE requieren JWT (idealmente rol admin).
+Public GETs; POST/PUT/DELETE require JWT (ideally admin role).
 
-| Método | Ruta |
+| Method | Route |
 |---|---|
 | GET | `/api/zones` |
 | GET | `/api/zones/{id}` |
@@ -236,40 +235,40 @@ GET públicos; POST/PUT/DELETE requieren JWT (idealmente rol admin).
 | POST/PUT/DELETE | `/api/zones`, `/api/zones/{id}` |
 
 ```json
-{ "name": "Parque Central", "zoneType": "risk", "riskLevel": "high",
+{ "name": "Central Park", "zoneType": "risk", "riskLevel": "high",
   "description": "…", "address": "…", "city": "Bogotá",
   "latitude": 4.61, "longitude": -74.07, "radiusMeters": 300, "isActive": true }
 ```
 
 ---
 
-## 10. Reportes de zona — `/api/zone-reports`
+## 10. Zone reports — `/api/zone-reports`
 
-Requiere JWT.
+Requires JWT.
 
 `GET /` · `GET /{id}` · `GET /zone/{zoneId}` · `GET /my/{userProfileId}` · `GET /status/{status}` ·
 `POST /` · `PUT /{id}/approve` (`{ "adminId": 1 }`) · `PUT /{id}/reject` (`{ "adminId": 1 }`) ·
 `DELETE /{id}`.
 
 ```json
-{ "zoneId": 6, "userProfileId": 7, "classification": "dangerous", "comment": "Se ve alumbrado deficiente", "status": "pending" }
+{ "zoneId": 6, "userProfileId": 7, "classification": "dangerous", "comment": "Poor street lighting", "status": "pending" }
 ```
 
 `classification`: `safe | dangerous | regular` · `status`: `pending | approved | rejected`.
 
 ---
 
-## 11. Recursos de emergencia — `/api/resources`
+## 11. Emergency resources — `/api/resources`
 
-GET públicos; escritura con JWT.
+Public GETs; writes require JWT.
 
 `GET /` · `GET /{id}` · `GET /city/{city}` · `GET /type/{type}` · `POST` · `PUT /{id}` · `DELETE /{id}`.
 
 `resourceType`: `emergency_line | hospital | health_center | police_station | police_post | shelter | support_organization`.
 
-## 12. Llamadas a recursos — `/api/resource-calls`
+## 12. Resource calls — `/api/resource-calls`
 
-Requiere JWT: `GET /`, `GET /{id}`, `GET /user/{userProfileId}`, `GET /resource/{emergencyResourceId}`,
+Requires JWT: `GET /`, `GET /{id}`, `GET /user/{userProfileId}`, `GET /resource/{emergencyResourceId}`,
 `GET /alert/{alertId}`, `POST`, `PUT /{id}`, `DELETE /{id}`.
 
 ```json
@@ -281,55 +280,55 @@ Requiere JWT: `GET /`, `GET /{id}`, `GET /user/{userProfileId}`, `GET /resource/
 
 ---
 
-## 13. Administración — `/api/admin`
+## 13. Administration — `/api/admin`
 
-Requiere JWT con rol `administrator`.
+Requires JWT with the `administrator` role.
 
-| Método | Ruta | Descripción |
+| Method | Route | Description |
 |---|---|---|
-| GET | `/api/admin/users` | Todas las usuarias |
-| GET | `/api/admin/alerts` | Todas las alertas |
-| GET | `/api/admin/contacts` | Todos los contactos |
-| GET | `/api/admin/evidences` | Toda la evidencia |
-| GET | `/api/admin/devices` | Todos los dispositivos |
-| GET | `/api/admin/zones` | Zonas |
-| GET | `/api/admin/reports` | Reportes de zona |
-| GET | `/api/admin/audit-logs` | Auditoría |
-| POST | `/api/admin/audit-logs` | Registrar entrada |
-| GET | `/api/admin/user-reports` | Reportes de usuarios |
-| GET | `/api/admin/user-reports/pending` | Pendientes |
-| PUT | `/api/admin/user-reports/{id}` | Resolver (`{ "status": "resolved", "adminId": 1 }`) |
+| GET | `/api/admin/users` | All users |
+| GET | `/api/admin/alerts` | All alerts |
+| GET | `/api/admin/contacts` | All contacts |
+| GET | `/api/admin/evidences` | All evidence |
+| GET | `/api/admin/devices` | All devices |
+| GET | `/api/admin/zones` | Zones |
+| GET | `/api/admin/reports` | Zone reports |
+| GET | `/api/admin/audit-logs` | Audit log |
+| POST | `/api/admin/audit-logs` | Register entry |
+| GET | `/api/admin/user-reports` | User reports |
+| GET | `/api/admin/user-reports/pending` | Pending |
+| PUT | `/api/admin/user-reports/{id}` | Resolve (`{ "status": "resolved", "adminId": 1 }`) |
 
 ---
 
-## 14. Trazabilidad requisito → endpoint
+## 14. Requirement → endpoint traceability
 
-| Requisito (SRS) | Endpoint(s) |
+| Requirement (SRS) | Endpoint(s) |
 |---|---|
-| FR1 permisos dispositivo | (cliente móvil) · se reflejan en `device_permission` |
-| FR2 cuentas | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/forgot-password` |
-| FR4 alertas | `POST/PUT /api/alerts`, `/api/alerts/user/{id}` |
-| FR4.3 contactos | `/api/contacts/**` |
-| FR6 evidencia | `/api/evidences/**` |
-| FR9 zonas/mapa | `GET /api/zones/**`, `/api/zone-reports/**` |
-| FR7 directorio | `GET /api/resources/**`, `/api/resource-calls/**` |
-| FR12 portal usuaria | `/api/users/me`, `/api/frequent-locations/**`, `/api/evidences/**` |
-| FR13 panel admin | `/api/admin/**`, `/api/zones` escritura |
-| RNF14 RBAC | guards JWT (401/403) en todos los anteriores |
+| FR1 device permissions | (mobile client) · reflected in `device_permission` |
+| FR2 accounts | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/forgot-password` |
+| FR4 alerts | `POST/PUT /api/alerts`, `/api/alerts/user/{id}` |
+| FR4.3 contacts | `/api/contacts/**` |
+| FR6 evidence | `/api/evidences/**` |
+| FR9 zones/map | `GET /api/zones/**`, `/api/zone-reports/**` |
+| FR7 directory | `GET /api/resources/**`, `/api/resource-calls/**` |
+| FR12 user portal | `/api/users/me`, `/api/frequent-locations/**`, `/api/evidences/**` |
+| FR13 admin panel | `/api/admin/**`, `/api/zones` writes |
+| RNF14 RBAC | JWT guards (401/403) on all of the above |
 
-## 15. Deuda declarada del contrato
+## 15. Declared contract debt
 
-| # | Deuda | Plan |
+| # | Debt | Plan |
 |---|---|---|
-| A1 | Controllers exponen entidades JPA y `Map` en vez de DTOs | Introducir capa DTO + validación Bean Validation |
-| A2 | `POST /api/auth/forgot-password` y `reset-password` son mock | Flujo real con `recovery_request` |
-| A3 | IDs `integer` en JSON; `wal-docs` habla de `uuid` | Unificar con el contrato a publicar |
-| A4 | Error format de Spring por defecto | Adoptar el formato §1.2 |
-| A5 | Gateway (`gateway/`) y servicios `am-*` sin lógica | Implementar contratos por servicio (`entregar/07-api/contracts/openapi/`) |
-| A6 | Sin paginación en listados | `?page=&size=` cuando crezca el volumen |
+| A1 | Controllers expose JPA entities and `Map` instead of DTOs | Introduce DTO layer + Bean Validation |
+| A2 | `POST /api/auth/forgot-password` and `reset-password` are mock | Real flow with `recovery_request` |
+| A3 | `integer` ids in JSON; `wal-docs` speaks of `uuid` | Unify with the published contract |
+| A4 | Spring's default error format | Adopt format §1.2 |
+| A5 | Gateway (`gateway/`) and `am-*` services without logic | Implement contracts per service (`entregar/07-api/contracts/openapi/`) |
+| A6 | No pagination on list endpoints | `?page=&size=` when volume grows |
 
-## Correlaciones
+## Correlations
 
-- Esquema de datos → [`data-model.md`](data-model.md)
-- Arquitectura general → [`arquitectura-panoramica.md`](arquitectura-panoramica.md)
-- Contratos OpenAPI por servicio → `07-api/contracts/openapi/`
+- Data schema → [`data-model.md`](data-model.md)
+- General architecture → [`arquitectura-panoramica.md`](arquitectura-panoramica.md)
+- OpenAPI contracts per service → `contracts/openapi/`

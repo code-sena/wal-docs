@@ -1,158 +1,155 @@
-# Arquitectura, vista panorámica — Alerta Mujer
+# Architecture, Panoramic View — Alerta Mujer
 
-**Qué habla con qué, por dónde y con qué permiso.** Un solo documento para tener el conjunto en la
-cabeza antes de abrir cualquier otro.
+**What talks to what, through where, and with what permission.** A single document to hold the
+whole system in your head before opening any other.
 
-- **Fecha:** 2026-10-06
-- **Alcance:** la forma del sistema y la comunicación entre `backend/Backend-ALERTA-MUJER`,
-  `web/Frond-end-Web/alerta-mujer-web`, `movile/Frontend-movil` y `wal-docs`.
-- **De dónde sale cada afirmación:** del `docker-compose.yml`, de `application.properties` y de
-  `wal-docs/05-architecture`. La documentación manda en la intención; el código manda en lo
-  observable.
+- **Date:** 2026-10-06
+- **Scope:** the shape of the system and the communication between `backend/Backend-ALERTA-MUJER`,
+  `web/Frond-end-Web/alerta-mujer-web`, `movile/Frontend-movil` and `wal-docs`.
+- **Where each statement comes from:** `docker-compose.yml`, `application.properties` and
+  `wal-docs/05-architecture`. Documentation rules intent; code rules what is observable.
 
-**Lo que este documento no trae, a propósito:**
+**What this document deliberately leaves out:**
 
-| No está aquí | Está en |
+| Not here | It is in |
 |---|---|
-| La forma exacta de cada petición y respuesta | [`api-contract.md`](api-contract.md) |
-| El modelo de datos tabla por tabla | [`data-model.md`](data-model.md) |
-| El porqué de la decisión de microservicios | `wal-docs/05-architecture/decisions/records/ADR-002-architectural-style.md` |
-| Requisitos y casos de uso | `wal-docs/04-requirements/` y `wal-docs/01-context/` |
+| The exact shape of each request and response | [`api-contract.md`](api-contract.md) |
+| The data model table by table | [`data-model.md`](data-model.md) |
+| The why of the microservices decision | `wal-docs/05-architecture/decisions/records/ADR-002-architectural-style.md` |
+| Requirements and use cases | `wal-docs/04-requirements/` and `wal-docs/01-context/` |
 
-> Si este documento contradice alguna vez al código levantado, gana el código.
+> If this document ever contradicts the running code, the code wins.
 
 ---
 
-## 1. Tres clientes, un backend, una base
+## 1. Three clients, one backend, one database
 
-El sistema tiene **tres puntas** y un corazón:
+The system has **three tips** and one heart:
 
-- **App móvil** (`movile/Frontend-movil`) — React Native 0.81 + Expo 54, arquitectura MVVM por
-  feature. Es el canal principal: botón de pánico, contactos, mapa, historial.
+- **Mobile app** (`movile/Frontend-movil`) — React Native 0.81 + Expo 54, MVVM architecture per
+  feature. The main channel: panic button, contacts, map, history.
 - **Web** (`web/Frond-end-Web/alerta-mujer-web`) — Angular 21, SCSS/Tailwind/Bootstrap, Leaflet.
-  Landing pública, portal de usuaria y panel administrador.
+  Public landing, user portal, and admin panel.
 - **Backend** (`backend/Backend-ALERTA-MUJER/backend-monolith`) — Spring Boot 3.2, Java 17,
-  Spring Security + JWT, Spring Data JPA. Puerto **8080**.
-- **PostgreSQL 16** — base `alerta_mujer`, esquema cargado por `db/init.sql`, host **5433** vía
+  Spring Security + JWT, Spring Data JPA. Port **8080**.
+- **PostgreSQL 16** — database `alerta_mujer`, schema loaded by `db/init.sql`, host **5433** via
   Docker.
 
-Flujo: las dos apps hablan **solo con el backend por HTTP** (`http://localhost:8080` en web; URL
-inyectable `EXPO_PUBLIC_API_URL` en móvil), con `Authorization: Bearer <jwt>` puesto por un
-interceptor (`jwt.interceptor.ts` en web, `api.ts` de axios en móvil). El backend es el único que
-toca la base. La base **nunca** se expone a los clientes.
+Flow: both apps talk **only to the backend over HTTP** (`http://localhost:8080` on web; injectable
+`EXPO_PUBLIC_API_URL` on mobile), with `Authorization: Bearer <jwt>` set by an interceptor
+(`jwt.interceptor.ts` on web, the axios `api.ts` on mobile). The backend is the only one that
+touches the database. The database is **never** exposed to the clients.
 
-Servicios externos previstos (solo los llama el backend): **Firebase Cloud Messaging** (push),
-proveedor SMS (Twilio) y servicio de email.
-
----
-
-## 2. La forma objetivo vs. la forma real
-
-Aquí vive la decisión estructural más importante del conjunto, y hay que decirla con honestidad:
-
-- **Objetivo (ADR-002, documentado en `wal-docs`):** cuatro microservicios Spring Boot con
-  arquitectura hexagonal — `identity-service` (:3001), `alert-service` (:3002),
-  `resource-service` (:3003), `admin-service` (:3004) — detrás de un `gateway` que valida JWT, con
-  ownership lógico de tablas por servicio sobre un PostgreSQL compartido.
-- **Realidad hoy (código):** un **monolito** (`backend-monolith`, :8080) que implementa todos los
-  dominios con la misma silueta interna (`identity`, `alerts`, `devices`, `evidence`, `zones`,
-  `resources`, `admin`, `infrastructure`), y los servicios `am-*` existen como esqueleto (solo
-  `am-identity-service` tiene código funcional duplicado). El `gateway/` rutea pero en la práctica
-  los clientes apuntan al monolito.
-
-Implicación práctica: **todo lo nuevo se documenta contra el contrato del monolito** ([
-`api-contract.md`](api-contract.md)), que es lo que web y móvil realmente consumen, y los
-contratos OpenAPI de `07-api/contracts/openapi/` son la promesa que deberían cumplir los cuatro
-servicios cuando se separen.
+Planned external services (only the backend calls them): **Firebase Cloud Messaging** (push), SMS
+provider (Twilio) and email service.
 
 ---
 
-## 3. Qué cruza cada frontera
+## 2. Target shape vs. real shape
 
-| Tramo | Cómo viaja | Quién autoriza | Qué lleva |
+Here lives the most important structural decision of the system, and it must be stated honestly:
+
+- **Target (ADR-002, documented in `wal-docs`):** four Spring Boot microservices with hexagonal
+  architecture — `identity-service` (:3001), `alert-service` (:3002), `resource-service` (:3003),
+  `admin-service` (:3004) — behind a `gateway` that validates JWT, with per-service logical table
+  ownership over a shared PostgreSQL.
+- **Reality today (code):** a **monolith** (`backend-monolith`, :8080) that implements all domains
+  with the same internal silhouette (`identity`, `alerts`, `devices`, `evidence`, `zones`,
+  `resources`, `admin`, `infrastructure`), and the `am-*` services exist as skeleton (only
+  `am-identity-service` has functional duplicated code). The `gateway/` routes, but in practice
+  clients point at the monolith.
+
+Practical implication: **everything new is documented against the monolith contract** ([
+`api-contract.md`](api-contract.md)), which is what web and mobile really consume, and the OpenAPI
+contracts in `contracts/openapi/` are the promise the four services should fulfill when split.
+
+---
+
+## 3. What crosses each boundary
+
+| Hop | How it travels | Who authorizes | What it carries |
 |---|---|---|---|
-| Móvil → backend | HTTPS/HTTP a `:8080`, axios + interceptor | JWT en cabecera | JSON (alertas, contactos, ubicación…) |
-| Web → backend | HTTP a `:8080`, HttpClient + interceptor | JWT en cabecera | JSON |
-| Backend → Postgres | TCP 5432 (interno Docker), JPA/Hibernate | Cadena `DATABASE_URL` | SQL |
-| Docker host → Postgres | TCP `:5433`, **solo desarrollo** | `POSTGRES_USER/PASSWORD` | psql / herramientas |
-| Backend → FCM/SMS/email | HTTPS saliente | Claves en entorno | Push, SMS, correo |
+| Mobile → backend | HTTP/HTTPS to `:8080`, axios + interceptor | JWT in header | JSON (alerts, contacts, location…) |
+| Web → backend | HTTP to `:8080`, HttpClient + interceptor | JWT in header | JSON |
+| Backend → Postgres | TCP 5432 (inside Docker), JPA/Hibernate | `DATABASE_URL` connection string | SQL |
+| Docker host → Postgres | TCP `:5433`, **development only** | `POSTGRES_USER/PASSWORD` | psql / tools |
+| Backend → FCM/SMS/email | Outbound HTTPS | Keys in environment | Push, SMS, email |
 
-Tres cosas que la lista de endpoints no enseña:
+Three things the endpoint list does not teach:
 
-- **El token lo pone un interceptor en cada cliente.** Ninguna pantalla ni componente sabe que
-  existe la cabecera; 401/403 se traducen en redirigir a login (web: `role.guard.ts`).
-- **`ddl-auto=none`.** El backend **no** crea ni altera el esquema: lo hace `db/init.sql` al crear
-  el volumen. Un cambio de entidad sin migración SQL no se manifiesta (y ahí nace la deuda D3 de
-  [`data-model.md`](data-model.md)).
-- **CORS abierto (`*`) en desarrollo.** Web (`localhost:4200`) y Expo no cruzan origen contra el
-  mismo host en producción; el valor está parametrizado por `CORS_ORIGIN`.
+- **The token is set by an interceptor on each client.** No screen or component knows the header
+  exists; 401/403 are translated into redirect to login (web: `role.guard.ts`).
+- **`ddl-auto=none`.** The backend does **not** create or alter the schema: `db/init.sql` does it
+  when the volume is created. An entity change without a SQL migration does not manifest (and that
+  is where debt D3 of [`data-model.md`](data-model.md) is born).
+- **Open CORS (`*`) in development.** Web (`localhost:4200`) and Expo do not cross origin against
+  the same host in production; the value is parameterized via `CORS_ORIGIN`.
 
 ---
 
-## 4. La misma silueta a los dos lados del backend
+## 4. The same silhouette on both sides of the backend
 
-El monolito repite, por dominio, el mismo corte:
+The monolith repeats, per domain, the same cut:
 
 ```
-<dominio>/
-  domain/model/          ← entidades JPA (la regla de negocio)
-  application/service/   ← casos de uso
+<domain>/
+  domain/model/          ← JPA entities (business rules)
+  application/service/   ← use cases
   infrastructure/
-    controller/          ← adaptador REST
-    repository/          ← adaptador JPA
+    controller/          ← REST adapter
+    repository/          ← JPA adapter
 ```
 
-No es simetría decorativa: permite levantar el slice `identity` sin tocar `alerts`, probar la
-regla de una alerta sin levantar el servidor, y es el paso previo natural a separar
-`am-identity-service`, `am-alert-service`, etc. El riesgo a vigilar: que un `new` de
-infraestructura aparezca fuera de su capa y rompa la hexagonal en silencio — igual que en el
-objetivo de ADR-002.
+This is not decorative symmetry: it allows lifting the `identity` slice without touching `alerts`,
+testing an alert rule without starting the server, and is the natural previous step to splitting
+`am-identity-service`, `am-alert-service`, etc. The risk to watch: an infrastructure `new` showing
+up outside its layer and silently breaking the hexagon — same as in ADR-002's target.
 
 ---
 
-## 5. La regla de dependencia
+## 5. The dependency rule
 
-Dentro de cada dominio la flecha va una sola vez: `controller → service → repository → model`, y el
-modelo **no** conoce a Spring Data ni a la base. Es lo que hace comprobable la arquitectura: se
-verifica abriendo los paquetes/`pom.xml`, no confiando en la disciplina. En movil se repite la
-misma disciplina con MVVM por feature (`view` / `viewModel` / `models`), y en web con
+Inside each domain the arrow goes once: `controller → service → repository → model`, and the model
+**does not** know Spring Data or the database. That is what makes the architecture checkable: it is
+verified by opening the packages/`pom.xml`, not by trusting anyone's discipline. Mobile repeats the
+same discipline with MVVM per feature (`view` / `viewModel` / `models`), and web with
 `core/services` + `features/` + `shared/`.
 
 ---
 
-## 6. El arranque, que es donde el orden importa
+## 6. Startup, where order matters
 
-`docker-compose.yml` encadena las dos puertas por condición, no por orden:
+`docker-compose.yml` chains the two gates by condition, not by order:
 
-1. `postgres` arranca y solo cuando `pg_isready` responde (healthcheck)…
-2. …arranca `backend`, que exige `DATABASE_URL` alcanzable y `JWT_SECRET` presente, aplica
-   `ddl-auto=none` (no toca el esquema) y escucha en `:8080`.
-3. Web (`ng serve`) y móvil (Expo) arrancan aparte y apuntan a `:8080`.
+1. `postgres` starts and only when `pg_isready` answers (healthcheck)…
+2. …`backend` starts, requires `DATABASE_URL` reachable and `JWT_SECRET` present, applies
+   `ddl-auto=none` (does not touch the schema) and listens on `:8080`.
+3. Web (`ng serve`) and mobile (Expo) start separately and point at `:8080`.
 
-Dos detalles que valen por sí solos:
+Two details are worth it by themselves:
 
-- **Sin `JWT_SECRET` el backend no debería firmar.** El compose trae un default de desarrollo; en
-  cualquier entorno real hay que sobreescribirlo en `.env`, porque un default publicado reparte
-  tokens falsificables.
-- **`db/init.sql` solo se ejecuta con el volumen vacío.** Recrear el esquema exige borrar el
-  volumen `postgres_data`; para evolucionar sin borrar, hace falta el changelog (deuda D3).
+- **Without `JWT_SECRET` the backend should not sign.** The compose ships a development default;
+  in any real environment it must be overridden in `.env`, because a published default hands out
+  forgeable tokens.
+- **`db/init.sql` only runs with an empty volume.** Recreating the schema requires deleting the
+  `postgres_data` volume; to evolve without deleting, the changelog is needed (debt D3).
 
-Mezclar arranques (levantar el monolito a mano y a la vez el compose) recrea contenedores y quita
-puertos publicados sin avisar.
+Mixing startups (starting the monolith by hand and the compose at the same time) recreates
+containers and drops published ports without warning.
 
 ---
 
-## 7. Divergencia encontrada al dibujar esto
+## 7. Divergence found while drawing this
 
-`wal-docs/05-architecture/overview.md` §4 describe **cuatro servicios** y ownership de tablas por
-servicio; `wal-docs/09-microservices/service-catalog.md` aún habla de `auth-service :3001`; el
-código real es un monolito en `:8080` con cuatro esquemas en una sola base. No se corrige a la
-fuerza: queda declarado como deuda A5/D4 en [`api-contract.md`](api-contract.md) y
-[`data-model.md`](data-model.md), y este documento manda la anatomía real de hoy.
+`wal-docs/05-architecture/overview.md` §4 describes **four services** and per-service table
+ownership; `wal-docs/09-microservices/service-catalog.md` still speaks of `auth-service :3001`; the
+real code is a monolith on `:8080` with four schemas in a single database. It is not force-fixed:
+it is declared as debt A5/D4 in [`api-contract.md`](api-contract.md) and
+[`data-model.md`](data-model.md), and this document governs the real anatomy of today.
 
-## Correlaciones
+## Correlations
 
-- Endpoints reales → [`api-contract.md`](api-contract.md)
-- Tablas y reglas → [`data-model.md`](data-model.md)
-- Decisiones y patrones → `wal-docs/05-architecture/`
-- Cómo levantar todo → raíz de `backend/Backend-ALERTA-MUJER` (`COMO_INICIAR.md`)
+- Real endpoints → [`api-contract.md`](api-contract.md)
+- Tables and rules → [`data-model.md`](data-model.md)
+- Decisions and patterns → `wal-docs/05-architecture/`
+- How to bring everything up → root of `backend/Backend-ALERTA-MUJER` (`COMO_INICIAR.md`)

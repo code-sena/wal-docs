@@ -1,58 +1,58 @@
-# 07 — Contratos de API
+# 07 — API Contracts
 
-> **Qué es esto.** La especificación formal de cómo se comunican entre sí las piezas del backend y
-> con el exterior. En Alerta Mujer el contrato vigente de cara a web y móvil es el del monolito en
-> `:8080` (ver [`../api-contract.md`](../api-contract.md)); este directorio guarda los contratos
-> OpenAPI por servicio para cuando el monolito se separe en los cuatro servicios de ADR-002.
+> **What is this?** The formal specification of how the backend pieces communicate with each other
+> and with the outside world. In Alerta Mujer the contract in force for web and mobile is the
+> monolith's on `:8080` (see [`api-contract.md`](api-contract.md)); this directory holds the
+> per-service OpenAPI contracts for when the monolith is split into ADR-002's four services.
 
-## Por qué los contratos son críticos en microservicios
+## Why contracts are critical in microservices
 
-En un monolito, cambiar una función es fácil: el compilador dice qué rompes. En microservicios,
-cambiar una API puede romper otros servicios en producción sin que nadie avise.
+In a monolith, changing a function is easy: the compiler tells you what you break. In
+microservices, changing an API can silently break other services in production.
 
-**Desarrollo contract-first:** se diseña la API antes de implementarla. Así web, móvil y los
-servicios trabajan en paralelo con un contrato acordado.
+**Contract-first development:** design the API before implementing it. This way web, mobile, and
+the services work in parallel with an agreed contract.
 
 ---
 
-## Qué hay aquí y cómo llenarlo
+## What is here and how to fill it in
 
-### `contracts/openapi/api-gateway.yaml` ✅ REAL (parcial)
-Punto único de entrada previsto: valida JWT, enruta y aplica rate limiting/CORS. Hoy los clientes
-apuntan directo al monolito; este contrato es la promesa del gateway.
+### `contracts/openapi/api-gateway.yaml` ✅ REAL (partial)
+Planned single entry point: validates JWT, routes, applies rate limiting/CORS. Today clients point
+directly at the monolith; this contract is the gateway's promise.
 
-### `contracts/openapi/auth-service.yaml` ✅ REAL (parcial)
-El contrato del servicio de identidad (registro, login, renovación de sesión). Nota de divergencia:
-el código actual expone estos endpoints bajo `/api/auth/**` en el monolito y en
-`am-identity-service` (:3001), que es el único servicio con código funcional.
+### `contracts/openapi/auth-service.yaml` ✅ REAL (partial)
+The identity service contract (registration, login, session renewal). Divergence note: current
+code exposes these endpoints under `/api/auth/**` in the monolith and in `am-identity-service`
+(:3001), the only service with functional code.
 
 ### `contracts/openapi/_shared.yaml`
-Esquemas y componentes reutilizables entre contratos (paginación, errores, seguridad).
+Reusable schemas and components across contracts (pagination, errors, security).
 
 ### `contracts/openapi/_template-service.yaml`
-Plantilla para añadir el contrato de un nuevo servicio. Duplícala como `service-name.yaml`.
+Template for adding a new service contract. Duplicate it as `service-name.yaml`.
 
-### Faltan (deuda)
-| Servicio | Puerto | Bounded contexts | Estado |
+### Missing (debt)
+| Service | Port | Bounded contexts | Status |
 |---|---|---|---|
-| identity-service | 3001 | Identity and Accounts | Código parcial; falta `identity-service.yaml` propio |
-| alert-service | 3002 | Alert Management, contactos, evidencia, notificaciones | Esqueleto → falta `alert-service.yaml` |
-| resource-service | 3003 | Zonas y recursos de ayuda | Esqueleto → falta `resource-service.yaml` |
-| admin-service | 3004 | Administración y moderación | Esqueleto → falta `admin-service.yaml` |
+| identity-service | 3001 | Identity and Accounts | Partial code; missing own `identity-service.yaml` |
+| alert-service | 3002 | Alert Management, contacts, evidence, notifications | Skeleton → missing `alert-service.yaml` |
+| resource-service | 3003 | Zones and help resources | Skeleton → missing `resource-service.yaml` |
+| admin-service | 3004 | Administration and moderation | Skeleton → missing `admin-service.yaml` |
 
-### Estructura mínima de cada contrato
+### Minimum structure for each contract
 
 ```yaml
 openapi: 3.0.3
 info:
-  title: [Nombre del servicio] API
+  title: [Service Name] API
   version: 1.0.0
 servers:
   - url: http://localhost:3001
 paths:
-  /recurso:
+  /resource:
     get:
-      summary: Listar recursos
+      summary: List resources
       responses:
         '200': { description: OK }
 components:
@@ -64,18 +64,18 @@ security:
 
 ---
 
-## Correlación con el resto del proyecto
+## Correlations with the rest of the project
 
-| Este directorio | Se alimenta de | Alimenta a |
+| This directory | Fed by | Feeds into |
 |---|---|---|
-| `contracts/openapi/` | `../api-contract.md`, `wal-docs/04-requirements/` | `09-microservices/services/` (implementación) |
-| `_shared.yaml` | `../api-contract.md` §1.2 (errores) | Todos los contratos |
-| `api-gateway.yaml` | `wal-docs/05-architecture/overview.md` | Clientes web y móvil |
+| `contracts/openapi/` | `api-contract.md`, `wal-docs/04-requirements/` | `09-microservices/services/` (implementation) |
+| `_shared.yaml` | `api-contract.md` §1.2 (errors) | All contracts |
+| `api-gateway.yaml` | `wal-docs/05-architecture/overview.md` | Web and mobile clients |
 
-## Preguntas que esta sección debe responder
+## Questions this section must answer
 
-- ¿Cómo se llama cada endpoint y qué hace? → `../api-contract.md`
-- ¿Qué datos recibe y devuelve? → esquemas en cada `*.yaml`
-- ¿Cómo se autentica el cliente? → `bearerAuth` JWT, 24 h
-- ¿Qué errores devuelve? → `_shared.yaml` y `api-contract.md` §1.2
-- ¿Cómo versiono sin romper consumidores? → prefijo `/api/v1` al publicar la v1 formal (pendiente)
+- What is each endpoint called and what does it do? → `api-contract.md`
+- What data does it receive and return? → schemas in each `*.yaml`
+- How does the client authenticate? → `bearerAuth` JWT, 24 h
+- What errors can it return? → `_shared.yaml` and `api-contract.md` §1.2
+- How do I version without breaking consumers? → `/api/v1` prefix when the formal v1 ships (pending)
