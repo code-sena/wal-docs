@@ -1,151 +1,81 @@
-# 07 — API Contracts
+# 07 — Contratos de API
 
-> **What is this?** The formal specification of how microservices communicate with each other
-> and with the outside world. The contract is the promise a service makes to its consumers.
+> **Qué es esto.** La especificación formal de cómo se comunican entre sí las piezas del backend y
+> con el exterior. En Alerta Mujer el contrato vigente de cara a web y móvil es el del monolito en
+> `:8080` (ver [`../api-contract.md`](../api-contract.md)); este directorio guarda los contratos
+> OpenAPI por servicio para cuando el monolito se separe en los cuatro servicios de ADR-002.
 
-## Why contracts are critical in microservices
+## Por qué los contratos son críticos en microservicios
 
-In a monolith, changing a function is easy: the compiler tells you what you break.
-In microservices, a change to an API can silently break other services in production.
+En un monolito, cambiar una función es fácil: el compilador dice qué rompes. En microservicios,
+cambiar una API puede romper otros servicios en producción sin que nadie avise.
 
-**Contract-first development:** design the API before implementing it. This way the team
-can work in parallel (frontend, backend, other services) with an agreed contract.
+**Desarrollo contract-first:** se diseña la API antes de implementarla. Así web, móvil y los
+servicios trabajan en paralelo con un contrato acordado.
 
 ---
 
-## What is here and how to fill it in
+## Qué hay aquí y cómo llenarlo
 
-### `guidelines.md` ⭐
-The project's REST standards. **The entire team must follow this before designing an endpoint.**
+### `contracts/openapi/api-gateway.yaml` ✅ REAL (parcial)
+Punto único de entrada previsto: valida JWT, enruta y aplica rate limiting/CORS. Hoy los clientes
+apuntan directo al monolito; este contrato es la promesa del gateway.
 
-**Key topics to define:**
-```markdown
-## Versioning
-- URL: /api/v1/resources (version in the URL)
-- Header: Accept: application/vnd.api+json;version=1
+### `contracts/openapi/auth-service.yaml` ✅ REAL (parcial)
+El contrato del servicio de identidad (registro, login, renovación de sesión). Nota de divergencia:
+el código actual expone estos endpoints bajo `/api/auth/**` en el monolito y en
+`am-identity-service` (:3001), que es el único servicio con código funcional.
 
-## Endpoint naming
-- Plural for collections: GET /users
-- Nouns, not verbs: GET /users/{id}/orders (not: GET /getUserOrders)
-- snake_case or kebab-case for URLs
+### `contracts/openapi/_shared.yaml`
+Esquemas y componentes reutilizables entre contratos (paginación, errores, seguridad).
 
-## Pagination
-- ?page=1&limit=20 (offset-based)
-- ?cursor=xyz (cursor-based for large volumes)
+### `contracts/openapi/_template-service.yaml`
+Plantilla para añadir el contrato de un nuevo servicio. Duplícala como `service-name.yaml`.
 
-## Standard responses
-| Code | When to use it |
-|------|----------------|
-| 200 | Success with body |
-| 201 | Successful creation |
-| 204 | Success without body |
-| 400 | Client error (validation) |
-| 401 | Not authenticated |
-| 403 | Not authorized |
-| 404 | Resource not found |
-| 422 | Unprocessable entity |
-| 500 | Server error |
+### Faltan (deuda)
+| Servicio | Puerto | Bounded contexts | Estado |
+|---|---|---|---|
+| identity-service | 3001 | Identity and Accounts | Código parcial; falta `identity-service.yaml` propio |
+| alert-service | 3002 | Alert Management, contactos, evidencia, notificaciones | Esqueleto → falta `alert-service.yaml` |
+| resource-service | 3003 | Zonas y recursos de ayuda | Esqueleto → falta `resource-service.yaml` |
+| admin-service | 3004 | Administración y moderación | Esqueleto → falta `admin-service.yaml` |
 
-## Error format
-{
-  "error": "VALIDATION_ERROR",
-  "message": "The email field is required",
-  "details": [{"field": "email", "message": "required"}]
-}
-```
+### Estructura mínima de cada contrato
 
-### `authentication.md` ⭐
-The system's authentication and authorization strategy.
-**Fill in:** what mechanism (JWT, OAuth2, API Key), authentication flow, expiration policies,
-refresh token handling, RBAC (roles and permissions).
-
-### `contracts/openapi/` ⭐⭐
-One `.yaml` file per microservice with the OpenAPI 3.0 contract.
-
-**File name:** `service-name.yaml`
-
-**Minimum structure for each contract:**
 ```yaml
 openapi: 3.0.3
 info:
-  title: [Service Name] API
+  title: [Nombre del servicio] API
   version: 1.0.0
-  description: [What this service does]
-
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Local
-
+  - url: http://localhost:3001
 paths:
-  /resources:
+  /recurso:
     get:
-      summary: List resources
-      tags: [Resources]
-      parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
+      summary: Listar recursos
       responses:
-        '200':
-          description: List of resources
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResourceList'
-
+        '200': { description: OK }
 components:
-  schemas:
-    Resource:
-      type: object
-      required: [id, name]
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-  
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
 security:
   - bearerAuth: []
 ```
 
-### `_shared.yaml`
-Reusable schemas and components across all contracts (pagination, errors, etc.)
-
 ---
 
-## Recommended tools
+## Correlación con el resto del proyecto
 
-- **Swagger Editor** — Online editor for OpenAPI
-- **Redocly** — Generates HTML documentation from the YAML (already configured in `redocly.yaml`)
-- **Postman / Insomnia** — For testing the contracts
-- **OpenAPI Generator** — Generates client/server code from the YAML
+| Este directorio | Se alimenta de | Alimenta a |
+|---|---|---|
+| `contracts/openapi/` | `../api-contract.md`, `wal-docs/04-requirements/` | `09-microservices/services/` (implementación) |
+| `_shared.yaml` | `../api-contract.md` §1.2 (errores) | Todos los contratos |
+| `api-gateway.yaml` | `wal-docs/05-architecture/overview.md` | Clientes web y móvil |
 
----
+## Preguntas que esta sección debe responder
 
-## Correlations with other sections
-
-| This section is fed by... | And feeds into... |
-|---------------------------|-------------------|
-| `04-requirements/functional.md` → what it must do | Endpoints implementing each FR |
-| `06-data/models.md` → what data exists | Schemas in the contracts |
-| `02-domain/domain-events.md` | Event publishing endpoints |
-| Contracts here | `09-microservices/[service]/` that implements them |
-| Contracts here | `11-quality/testing-strategy.md` → contract tests |
-
----
-
-## Questions this section must answer
-
-- What is each endpoint called and what does it do?
-- What data does it receive and what does it return?
-- How does the client authenticate?
-- What errors can the service return?
-- How do I version the API without breaking consumers?
+- ¿Cómo se llama cada endpoint y qué hace? → `../api-contract.md`
+- ¿Qué datos recibe y devuelve? → esquemas en cada `*.yaml`
+- ¿Cómo se autentica el cliente? → `bearerAuth` JWT, 24 h
+- ¿Qué errores devuelve? → `_shared.yaml` y `api-contract.md` §1.2
+- ¿Cómo versiono sin romper consumidores? → prefijo `/api/v1` al publicar la v1 formal (pendiente)
