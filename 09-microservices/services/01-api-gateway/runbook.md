@@ -1,114 +1,71 @@
 # Runbook — API Gateway
 
-> Procedimientos de operación para quien esté en guardia.
-> Cada sección es ejecutable sin contexto adicional.
-
-**Servicio:** api-gateway
-**Puerto local:** 8080
-**Versión:** 1.0
-**Última actualización:** [YYYY-MM-DD]
+> There is no gateway to operate. This runbook explains how to check the three entry points that
+> the clients call directly.
 
 ---
 
-## 1. Información rápida
+## 1. Quick information
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Puerto local | 8080 |
-| URL producción | `https://api.[dominio]/` |
-| URL staging | `https://staging.api.[dominio]/` |
-| Dashboard Grafana | [URL del panel de gateway] |
-| Canal de alertas | [#alerts] |
-| Escalamiento | [Tech Lead — contacto] |
-| RTO objetivo | 5 min (es la puerta de entrada — P0 inmediato) |
-| RPO objetivo | N/A (stateless) |
+| Process | None — routing in the clients |
+| Entry points | `alerta-mujer-auth`, `alerta-mujer-alert`, `alerta-mujer-evidence` on Render |
+| Hosting | Render, free plan (services sleep after 15 minutes) |
+| Monitor | UptimeRobot, `/actuator/health` every 5 minutes |
+| Owner | Backend team |
 
 ---
 
-## 2. Verificar salud
+## 2. Check health
 
 ```bash
-# Health check público (no requiere autenticación)
-curl https://api.[dominio]/health
-
-# Respuesta esperada:
-# {"status": "ok", "timestamp": "2024-01-15T10:30:00Z"}
-
-# Si hay problemas, verificar los upstreams:
-curl -H "Authorization: Bearer [token-dev]" https://api.[dominio]/api/v1/auth/health
+curl https://alerta-mujer-auth.onrender.com/actuator/health
+curl https://alerta-mujer-alert.onrender.com/actuator/health
+curl https://alerta-mujer-evidence.onrender.com/actuator/health
+# Expected response for each:
+# {"status":"UP"}
 ```
+
+The first request to a sleeping service can take up to about 90 seconds.
 
 ---
 
-## 3. Alertas frecuentes
+## 3. Frequent alerts
 
-### Alta tasa de errores 502/503 (upstream no responde)
+### The app or the web cannot reach a service
 
-**Síntoma:** Los servicios detrás del gateway devuelven 502 o 503.
+1. Check the three health endpoints above.
+2. If one does not answer, open its **Logs** tab in Render and look at the last startup.
+3. Check that the client points to the right URL (`eas.json` for the APK, `environment.prod.ts` for the web).
 
-```bash
-# Ver a qué servicio corresponden los errores
-kubectl logs -n [ns] -l app=api-gateway --tail=200 | grep '"status":50'
+### Many 401 responses
 
-# Verificar que los pods del servicio afectado estén running
-kubectl get pods -n [ns] -l app=[servicio-afectado]
-```
+1. The token expired: the mobile app refreshes it automatically; the web closes the session.
+2. If all users get 401 at once, check that `JWT_SECRET` is the same in the three services.
 
-**Árbol de decisión:**
-- ¿El servicio afectado tiene pods `Running`? → El problema puede ser una excepción no manejada. Ver los logs del servicio.
-- ¿Los pods están en `CrashLoopBackOff`? → El servicio se cayó. Escalar el runbook del servicio afectado.
-- ¿Todos los servicios están caídos? → Problema de red o del gateway mismo. Ver sección 3.3.
+### Many 403 responses from the web
 
-### Alta tasa de errores 401 (token inválido)
-
-**Síntoma:** Muchos 401. Puede ser ataque o clave JWT rotada.
-
-```bash
-# Ver IPs con más 401s
-kubectl logs -n [ns] -l app=api-gateway --tail=500 | \
-  grep '"status":401' | jq '.ip' | sort | uniq -c | sort -rn | head
-```
-
-- ¿Una IP sola genera todos los 401? → Posible ataque. Agregar a denylist.
-- ¿Muchas IPs generan 401 después de un deploy? → La clave pública JWT puede haber cambiado. Verificar variables de ambiente del gateway.
-
-### Rate limit disparado globalmente
-
-```bash
-# Ver cuántas peticiones bloqueadas por rate limit
-kubectl logs -n [ns] -l app=api-gateway --tail=200 | grep '"status":429'
-```
-
-Si el rate limit está disparado en condiciones normales, el límite puede ser muy bajo.
-Coordinar con Tech Lead antes de modificarlo.
+1. Check `CORS_ORIGIN` in the three services: it must be the current Vercel domain.
+2. For `/internal/**`, check `INTERNAL_API_KEY` in the three services.
 
 ---
 
 ## 4. Rollback
 
-El API Gateway es stateless — el rollback es un redeploy de la versión anterior:
-
-```bash
-kubectl rollout history deployment/api-gateway -n [ns]
-kubectl rollout undo deployment/api-gateway -n [ns]
-kubectl rollout status deployment/api-gateway -n [ns]
-```
+Each service is rolled back from Render by redeploying a previous commit of `main`, or by reverting
+the pull request and letting Render publish again. The routing in the clients changes only with a new
+web deployment (Vercel) or a new APK.
 
 ---
 
-## 5. Escalar el gateway
+## 5. Scaling
 
-```bash
-# Escalar horizontalmente (sin downtime, stateless)
-kubectl scale deployment/api-gateway -n [ns] --replicas=3
-kubectl get pods -n [ns] -l app=api-gateway
-```
+Not applicable on the free plan. Moving to a plan without sleep is the first step if traffic grows.
 
 ---
 
-## 6. Post-incidente
+## 6. Post-incident
 
-- [ ] Gateway respondiendo con latencia P95 < 50ms
-- [ ] Zero 5xx en los últimos 5 minutos
-- [ ] Incidente registrado en `13-operations/incident-management.md`
-- [ ] Si el incidente causó SLA breach: notificar al Tech Lead
+Record what happened, the affected service, the time to recover and the action taken in
+`13-operations/incident-management.md`.

@@ -1,76 +1,140 @@
 # Functional Requirements — Woman Alert
 
-> All FRs come from the SRS (Section 3.2). The "Source (US)" column indicates whether a user story already exists in `03-product/product-backlog.md`; where it says "Pending", it represents a real gap — an FR without a user story yet, not invented data. For the actual implementation status of each FR (done / in progress / under reconstruction / pending), see `04-requirements/traceability-matrix.md` — this table does not repeat it to avoid having the same data in two locations that could become out of sync.
+> All FRs come from SRS v2.6 (28/10/2026), which renamed the requirements to the `RF-<MODULE>-<NNN>` scheme. The "Previous ID" column keeps the identifier used in earlier versions of the SRS (RF1.1 to RF20.2) so older documents can still be traced. The status is the one recorded in the SRS after comparing each requirement with the code published in `main`: **Implemented** means the feature exists in the code; it is only considered **verified** when there is a recorded test (see `04-requirements/traceability-matrix.md` and `11-quality/testing-strategy.md`). The full acceptance criteria are in Document 02.
+
+Summary: 102 functional requirements — 99 implemented, 3 in development. RF-ACT-004 (lock screen and power button activation) was retired on 23/10/2026 and is not listed.
 
 ## Mobile (primary channel)
 
-| ID     | Module               | Description                                                                                                                                                                                                | Source (US)        | Priority |
-| ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------- |
-| FR1.1  | Permissions          | The app must request access to the contact list to register emergency contacts                                                                                                                             | HU-MOVIL-005       | High     |
-| FR1.2  | Permissions          | The app must request the necessary permissions to make emergency calls                                                                                                                                     | HU-MOVIL-005       | Medium   |
-| FR1.3  | Permissions          | The app must request access to location services to obtain and share the user's location                                                                                                                   | HU-MOVIL-005       | High     |
-| FR1.4  | Permissions          | The app must request permission to display alerts, status, and event notifications                                                                                                                         | HU-MOVIL-005       | High     |
-| FR1.5  | Permissions          | The app must request microphone access to record audio/voice messages                                                                                                                                      | HU-MOVIL-005       | Medium   |
-| FR1.6  | Permissions          | The app must request camera access to capture evidence                                                                                                                                                     | HU-MOVIL-005       | Medium   |
-| FR2.1  | Users                | The system must allow users to create an account with the required information                                                                                                                             | HU-MOVIL-006       | High     |
-| FR2.2  | Users                | The user must be able to add, view, modify, and delete their emergency contacts                                                                                                                            | HU-MOVIL-002       | High     |
-| FR2.3  | Users                | The user must be able to recover access to their account                                                                                                                                                   | HU-MOVIL-006       | Medium   |
-| FR3.1  | Home/Dashboard       | The app must display an interactive guide to its main features                                                                                                                                             | HU-MOVIL-007       | Low      |
-| FR3.2  | Home/Dashboard       | The user must be able to view their current location and registered locations                                                                                                                              | HU-MOVIL-007       | Medium   |
-| FR3.3  | Home/Dashboard       | The app must be able to display relevant reminders, warnings, and updates                                                                                                                                  | HU-MOVIL-007       | Low      |
-| FR4.1  | Alerts               | The system must send alert information together with the user's location through the configured channels                                                                                                   | HU-MOVIL-001       | High     |
-| FR4.2  | Alerts               | When an alert is activated, the system must notify the associated emergency contacts                                                                                                                       | HU-MOVIL-001       | High     |
-| FR4.3  | Alerts               | The system must allow the user's location to be shared while an alert is active                                                                                                                            | HU-MOVIL-001       | High     |
-| FR4.4  | Alerts               | The system must record which activation method triggered each alert (only as a label for history/analysis; it does not change the priority or urgency with which it is processed, which is always maximum) | HU-MOVIL-001 (AC3) | Medium   |
-| FR4.5  | Alerts               | The system may generate reminders or mini-alerts according to configured rules                                                                                                                             | HU-MOVIL-001 (AC3) | Low      |
-| FR5.1  | Activation           | The user must be able to activate an alert through a quick-access widget                                                                                                                                   | HU-MOVIL-001       | High     |
-| FR5.2  | Activation           | The system must be able to detect sudden movement as an activation mechanism                                                                                                                               | HU-MOVIL-001       | High     |
-| FR5.3  | Activation           | The system must be able to use physical device buttons as an activation mechanism                                                                                                                          | HU-MOVIL-001       | High     |
-| FR5.4  | Activation           | The system must be able to request discreet confirmation of the activation when applicable                                                                                                                 | HU-MOVIL-001 (AC3) | Medium   |
-| FR6.1  | Evidence             | The app must allow video to be captured as emergency evidence                                                                                                                                              | HU-MOVIL-003       | Medium   |
-| FR6.2  | Evidence             | The app must allow audio to be recorded as evidence                                                                                                                                                        | HU-MOVIL-003       | Medium   |
-| FR6.3  | Evidence             | The system must store and back up evidence associated with an alert                                                                                                                                        | HU-MOVIL-003       | Medium   |
-| FR7.1  | Emergency Resources  | The system must allow users to consult available emergency numbers, organizations, and help centers                                                                                                        | HU-MOVIL-004       | Medium   |
-| FR8.1  | Notifications        | The system must be able to generate high-priority notifications related to emergencies                                                                                                                     | HU-MOVIL-009       | Medium   |
-| FR8.2  | Notifications        | The system must keep certain notifications visible while an alert is active                                                                                                                                | HU-MOVIL-009       | Medium   |
-| FR9.1  | Smart Map            | The system must allow users to view safe and high-risk areas                                                                                                                                               | HU-MOVIL-004       | Medium   |
-| FR9.2  | Smart Map            | The system must allow users to register zones when they have permission to do so                                                                                                                           | HU-MOVIL-004 (AC3) | Low      |
-| FR9.3  | Smart Map            | The system must allow users to locate nearby help centers using geographic information                                                                                                                     | HU-MOVIL-004       | Medium   |
-| FR10.1 | Internationalization | The app must allow the interface language to be changed                                                                                                                                                    | HU-MOVIL-008       | Low      |
-| FR11.1 | Personalization      | The app must allow the visual theme to be changed (light/dark)                                                                                                                                             | HU-MOVIL-008       | Low      |
+| ID | Module | Description | Previous ID | User story | Status |
+|----|--------|-------------|-------------|------------|--------|
+| RF-PER-001 | Permissions | Request permission to access the phone's contact list | RF1.1 | — | Implemented |
+| RF-PER-002 | Permissions | Request the location permissions needed to see locations, record routes and update the location during an alert | RF1.3 | — | Implemented |
+| RF-PER-003 | Permissions | Request permission to show system notifications about alerts, status changes and other events | RF1.4 | — | Implemented |
+| RF-PER-004 | Permissions | Request microphone access before any feature that records audio | RF1.5 | — | Implemented |
+| RF-PER-005 | Permissions | Request camera access before any feature that records video as evidence | RF1.6 | — | Implemented |
+| RF-PER-006 | Permissions | Show a permissions and protection section with the status of every permission and phone setting used by the protection features | New | — | Implemented |
+| RF-USU-001 | Account and access | Create an account with the registration form, validating the required data before completing it | RF2.1 | HU-USU-001 | Implemented |
+| RF-USU-002 | Account and access | Recover access with prior verification (6-digit code by email, valid 15 min, 5 attempts) and an effective password reset | RF2.3 | HU-USU-002 | Implemented |
+| RF-USU-003 | Account and access | Log in to the app with email and password or with a Google account; complete missing registration data when needed | RF2.4 | HU-USU-001 | Implemented |
+| RF-USU-004 | Account and access | Log out from the app options, ending the authenticated session | RF2.5 | — | Implemented |
+| RF-USU-006 | Account and access | Delete her own account from the app | — | — | Implemented |
+| RF-USU-007 | Account and access | Accept the terms and conditions and the privacy policy to complete the registration in the app and on the web | New | — | In development |
+| RF-USU-008 | Account and access | View and edit the profile: photo, name, email, phone, birth date, department and municipality | New | — | Implemented |
+| RF-CON-001 | Trusted contacts | Register, view, edit and delete the trusted contacts that receive the alert notices | RF2.2 | HU-CON-001 | Implemented |
+| RF-INI-001 | Start and guide | Provide a tutorial that explains the main features and the purpose of each permission | RF3.1 | — | Implemented |
+| RF-ALE-001 | Alerts | Activate an alert with the activation methods and register it with its status, date, time and available location | RF4.1 | HU-ACT-001 | Implemented |
+| RF-ALE-002 | Alerts | Notify every trusted contact automatically when the alert is activated, recording the result per recipient and channel (email and push) | RF4.2 | HU-ALE-001 | Implemented |
+| RF-ALE-003 | Alerts | Obtain and update the user's location while the alert is active, when permissions and connectivity allow it | RF4.3 | HU-ALE-002 | Implemented |
+| RF-ALE-004 | Alerts | Identify the alert modality according to the activation method used | RF4.4 | — | Implemented |
+| RF-ALE-005 | Alerts | Ask follow-up questions in the defined situations and notify the contacts if the user does not answer in time | RF4.5 | — | Implemented |
+| RF-ALE-006 | Alerts | Resend the notice once per alert if no contact opens it within 5 minutes, using the latest location | RF4.6 | HU-ALE-001 | Implemented |
+| RF-ALE-007 | Alerts | Manage the alert duration: question at minute 25, 30-minute extension if she answers yes, saving mode and notice if she does not, absolute limit of 2 hours | RF16.1 | — | Implemented |
+| RF-ALE-009 | Alerts | Warn the contacts when an active alert stops receiving the location for the configured time, with the last recorded location | — | — | Implemented |
+| RF-ALE-010 | Alerts | Exchange text messages between the user and her contacts during the alert | — | — | Implemented |
+| RF-ALE-011 | Alerts | Send each contact an email with a link that shows the map, route, messages, time active, number of locations and recordings | New | — | Implemented |
+| RF-ALE-012 | Alerts | Show the alert timer and let the user finish the episode with "I'm OK" (cancellation PIN required if configured) | New | — | Implemented |
+| RF-ALE-013 | Alerts | Let the user check the tracking of the notices sent to each contact from the alert history | New | — | Implemented |
+| RF-ACT-001 | Activation methods | Activate an alert by detecting a shake of the phone through the accelerometer | RF5.1 | — | Implemented |
+| RF-ACT-002 | Activation methods | Start an alert from a quick-access widget on the home screen | RF5.2 | — | Implemented |
+| RF-ACT-003 | Activation methods | Start an alert addressed to a specific contact from the contacts section | RF5.3 | — | Implemented |
+| RF-ACT-005 | Activation methods | Start an alert manually with the emergency button on the home screen, followed by a 5-second countdown | RF5.5 | HU-ACT-001 | Implemented |
+| RF-ACT-006 | Activation methods | Open a 5-second window after any activation request during which the alert can be cancelled before it is issued (RN-08) | RF5.6 | HU-ACT-002 | Implemented |
+| RF-ACT-007 | Activation methods | Configure a 4 to 6 digit duress PIN that simulates the cancellation while the contacts are notified silently | New | — | Implemented |
+| RF-ACT-008 | Activation methods | Configure a 4 to 6 digit cancellation PIN required to cancel or finish an issued alert | New | — | Implemented |
+| RF-ACT-009 | Activation methods | Cancel the activation during the 5-second window by pressing volume-down four times quickly | New | — | Implemented |
+| RF-ACT-010 | Activation methods | Enable or disable each activation method from the settings (SOS button, single contact, shake, trip and widget) | New | — | Implemented |
+| RF-ACT-011 | Activation methods | Treat the "Notify me if I don't arrive" trip as an activation method in which the server creates the alert | New | — | Implemented |
+| RF-EVI-001 | Evidence | Record video with the camera as evidence, after the permission is granted | RF6.1 | HU-EVI-001 | Implemented |
+| RF-EVI-002 | Evidence | Record audio with the microphone as evidence, after the permission is granted | RF6.2 | HU-EVI-001 | Implemented |
+| RF-EVI-003 | Evidence | Store the audio and video evidence, link it to the alert and keep it for a defined period (30 days) | RF6.3 | HU-EVI-001 | Implemented |
+| RF-EVI-004 | Evidence | Keep a copy of the evidence in the app's internal storage, outside the gallery, with options to download, share or delete it | — | — | Implemented |
+| RF-REC-001 | Emergency resources | Provide an assistance module with the three assistance channels: 123, purple line and mental health line | RF7.1 | HU-REC-001 | Implemented |
+| RF-REC-002 | Emergency resources | Open the phone dialer with the selected number; the user starts the call manually | RF7.2 y RF1.2 | HU-REC-001 | Implemented |
+| RF-NOT-001 | Notifications | Show informative notices and messages about states, warnings and results of the actions | RF3.3 | — | Implemented |
+| RF-NOT-002 | Notifications | Show emergency notifications according to the permissions granted | RF8.1 | — | Implemented |
+| RF-NOT-003 | Notifications | Keep a visible notification while an alert is active, when the operating system allows it | RF8.2 | — | Implemented |
+| RF-NOT-004 | Notifications | Show the alerts issued by people who registered the user as a trusted contact | — | — | Implemented |
+| RF-NOT-005 | Notifications | Enable discreet mode (neutral texts in fixed notifications) and configure notification preferences | New | — | Implemented |
+| RF-NOT-006 | Notifications | Notify the user's other phones when the account signs in from a new phone | New | — | Implemented |
+| RF-NOT-007 | Notifications | Show the list of notifications received, such as risk zone notices and end of a contact's alert, with the elapsed time | New | — | Implemented |
+| RF-UBI-001 | Map and location | Show the current location on the map when location services and permissions are available, including the last recorded location | RF9.1 y RF3.2 | HU-UBI-001 | Implemented |
+| RF-UBI-002 | Map and location | Consult the recorded routes from the map module | RF9.2 | — | Implemented |
+| RF-UBI-003 | Map and location | Consult the frequent or saved places | RF9.3 | — | Implemented |
+| RF-UBI-004 | Map and location | Consult the geographic information linked to the user's alerts | RF9.4 | — | Implemented |
+| RF-UBI-005 | Map and location | Show auxiliary zones on the mobile map as circles, together with the current location | RF18.2 | — | Implemented |
+| RF-UBI-006 | Map and location | Save a zone or place with name, address, city, neighborhood, description, notes and safety level, and edit or delete it | New | — | Implemented |
+| RF-UBI-007 | Map and location | Create a route by choosing origin and destination on the map or from saved places, and save it | New | — | Implemented |
+| RF-UBI-008 | Map and location | Share the current or a saved location with the phone's share options and open navigation in an external maps app | New | — | Implemented |
+| RF-HIS-001 | History | Show in the mobile history the contacts notified for each alert and the notice status per channel | RF18.1 | HU-HIS-001 | Implemented |
+| RF-HIS-002 | History | Show the alert history with totals by status (sent, cancelled, in progress) and, per alert, date, reason, status and location | New | — | Implemented |
+| RF-IDI-001 | Language | Select the interface language between Spanish, English, French and Portuguese (app and web) | RF10.1 | — | Implemented |
+| RF-TEM-001 | Visual theme | Customize the appearance: six themes in the app (light, dark and four color themes) and a theme service on the web | RF11.1 y RNF009 | — | Implemented |
+| RF-TRA-001 | Trips | Start a trip with destination and estimated arrival time from the current location; only one active trip per user | — | — | Implemented |
+| RF-TRA-002 | Trips | Create an alert from the server, without depending on the phone's signal, when arrival is not confirmed or the signal is lost during the trip | — | — | Implemented |
+| RF-TRA-003 | Trips | Accompany the user automatically when she leaves a frequent place and notify her contacts with the last location when needed | New | — | Implemented |
 
 ## Web Platform — Authenticated User
 
-| ID     | Module   | Description                                                                             | Source (US)        | Priority |
-| ------ | -------- | --------------------------------------------------------------------------------------- | ------------------ | -------- |
-| FR12.1 | User Web | The web platform must allow the user to authenticate                                    | HU-WEB-USUARIA-001 | High     |
-| FR12.2 | User Web | The user must be able to view and manage their profile information from the web         | HU-WEB-USUARIA-001 | Medium   |
-| FR12.3 | User Web | The user must be able to view the alerts associated with their account from the web     | HU-WEB-USUARIA-001 | Medium   |
-| FR12.4 | User Web | The user must be able to view their alert, location, and event history from the web     | HU-WEB-USUARIA-001 | Medium   |
-| FR12.5 | User Web | The user must be able to view information about their locations and alerts from the web | HU-WEB-USUARIA-001 | Medium   |
-| FR12.6 | User Web | The user must be able to view evidence associated with their own alerts from the web    | HU-WEB-USUARIA-001 | Medium   |
+| ID | Module | Description | Previous ID | User story | Status |
+|----|--------|-------------|-------------|------------|--------|
+| RF-USU-005 | Account and access | Log in to the web with a Google account through Firebase Authentication, with a valid configuration per domain | RF19.1 | — | Implemented |
+| RF-USU-009 | Account and access | Change the account password from the web settings | New | — | Implemented |
+| RF-WEB-001 | User web portal | Log in to the web with email and password or with Google and access the features authorized for the account | RF12.1 | HU-WEB-001 | Implemented |
+| RF-WEB-002 | User web portal | View and edit the profile on the web; today the settings only allow changing password, theme and notifications and requesting deletion | RF12.2 | — | In development |
+| RF-WEB-003 | User web portal | Consult the alerts registered for the account | RF12.3 | HU-WEB-001 | Implemented |
+| RF-WEB-004 | User web portal | Consult the history of alerts and events of the account | RF12.4 | HU-HIS-001 | Implemented |
+| RF-WEB-005 | User web portal | View the location information linked to the alerts and records | RF12.5 | HU-WEB-001 | Implemented |
+| RF-WEB-006 | User web portal | Consult the evidence of her own alerts | RF12.6 | HU-EVI-002 | Implemented |
+| RF-WEB-007 | User web portal | Offer a landing page that explains Woman Alert, answers frequent questions and offers the APK download | New | — | Implemented |
+| RF-WEB-008 | User web portal | Consult and add emergency contacts, synchronized with the app | New | — | Implemented |
+| RF-WEB-009 | User web portal | Show the assistance lines, the care centers with directions and the history of manual calls | New | — | Implemented |
+| RF-WEB-010 | User web portal | Show the status of the linked phone: permissions, remaining session time, alert reception, last location, connectivity and linked devices | New | — | Implemented |
+| RF-WEB-011 | User web portal | Show the alerts of the people who registered the user as an emergency contact | New | — | Implemented |
+| RF-WEB-012 | User web portal | Download the audio and video evidence and keep up to five; the rest are deleted after 30 days | New | — | Implemented |
+| RF-WEB-013 | User web portal | Show a home page with a summary of the account and the protection status | New | — | Implemented |
 
 ## Web Platform — Administrator
 
-| ID      | Module    | Description                                                                                                                                                     | Source (US)      | Priority |
-| ------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | -------- |
-| FR13.1  | Admin Web | The administrator must be able to view and manage registered users                                                                                              | HU-WEB-ADMIN-001 | High     |
-| FR13.2  | Admin Web | The administrator must be able to view alerts generated by users                                                                                                | HU-WEB-ADMIN-001 | High     |
-| FR13.3  | Admin Web | The administrator must be able to create, view, modify, and delete zones and their risk level                                                                   | HU-WEB-ADMIN-002 | Medium   |
-| FR13.4  | Admin Web | The administrator must be able to generate filtered reports (date/type/status/city) and download them in PDF/Excel format or print them                         | HU-WEB-ADMIN-001 | Medium   |
-| FR13.5  | Admin Web | The administrator must be able to view the emergency contacts of a specific user                                                                                | HU-WEB-ADMIN-003 | Medium   |
-| FR13.6  | Admin Web | The administrator must be able to view information about users' devices (brand, model, version, GPS status, permission status)                                  | HU-WEB-ADMIN-003 | Low      |
-| FR13.7  | Admin Web | The administrator must be able to view evidence related to alerts                                                                                               | HU-WEB-ADMIN-003 | Medium   |
-| FR13.8  | Admin Web | The administrator must be able to manage general system parameters (maximum SOS time, emergency number, administrative email, notifications, visual parameters) | HU-WEB-ADMIN-004 | Medium   |
-| FR13.9  | Admin Web | The system must record administrator actions (administrator, action, date, time, IP)                                                                            | HU-WEB-ADMIN-001 | Medium   |
-| FR13.10 | Admin Web | The administrator must be able to view reported users, review the reasons, and execute administrative actions                                                   | HU-WEB-ADMIN-005 | Medium   |
+| ID | Module | Description | Previous ID | User story | Status |
+|----|--------|-------------|-------------|------------|--------|
+| RF-CON-002 | Trusted contacts | Configure a limit of trusted contacts per account and validate it on the server (default 5, range 1 to 20) | RF17.1 | HU-CON-001 | Implemented |
+| RF-ALE-008 | Alerts | Allow authorized administrators to change the alert status between active, attended, cancelled and expired | RF16.2 | — | Implemented |
+| RF-ADM-001 | Administration | Consult and manage registered users with paginated results, according to the role permissions | RF13.1 | HU-ADM-001 | Implemented |
+| RF-ADM-002 | Administration | Consult the registered alerts and the information of each event | RF13.2 | HU-ADM-001 | Implemented |
+| RF-ADM-003 | Administration | Create, view, edit and delete geographic zones and manage their risk classification | RF13.3 | — | Implemented |
+| RF-ADM-004 | Administration | Consult and generate reports with filters by date, type, status and city; create, edit and delete reports and export them to PDF and CSV | RF13.4 | HU-ADM-001 | Implemented |
+| RF-ADM-005 | Administration | Consult, per trusted contact, the notice status and the relationship, without showing the contact's personal data | RF13.5 | — | Implemented |
+| RF-ADM-006 | Administration | Consult the devices linked to the users and change their status | RF13.6 | — | Implemented |
+| RF-ADM-007 | Administration | Consult the evidence linked to the alerts, see statistics and record the review | RF13.7 | — | Implemented |
+| RF-ADM-008 | Administration | Consult and modify the enabled configuration parameters, with confirmation before saving and effective application | RF13.8 | HU-ADM-002 | Implemented |
+| RF-ADM-009 | Administration | Consult the reports made about users and execute the enabled moderation actions | RF13.10 | HU-ADM-001 | Implemented |
+| RF-ADM-010 | Administration | Show the technical status of the system through a restricted service and screen | RF20.1 | — | Implemented |
+| RF-ADM-011 | Administration | Show a dashboard with users, attended and cancelled alerts, alerts by time of day, zones with more incidents and comparisons | New | — | Implemented |
+| RF-ADM-012 | Administration | Create, view, edit and delete the help points shown by the app | New | — | Implemented |
+| RF-AUD-001 | Audit | Record in the audit log the tracked administrative operations with actor, role, IP, date, time, operation and origin (web, mobile or scheduled task) | RF13.9 y RF14.1 | HU-ADM-003 | Implemented |
+| RF-AUD-002 | Audit | Record the previous and new value when system parameters change, without exposing secrets | RF14.2 | HU-ADM-002 | In development |
+| RF-AUD-003 | Audit | Prevent editing or deleting audit records through the normal operations of the application (RN-04) | RF14.3 | — | Implemented |
+| RF-AUD-004 | Audit | Consult, filter and export the audit log and list the actors available for the filters | RF14.4 | HU-ADM-003 | Implemented |
+| RF-SES-001 | Admin session | Record the administrative session events: successful login, failed attempt, password change and logout (voluntary or by inactivity) | RF15.1 | — | Implemented |
+| RF-SES-002 | Admin session | Close administrative sessions automatically after the configured inactivity threshold | RF15.2 | HU-SES-001 | Implemented |
+| RF-SES-003 | Admin session | Let the administrator change the password from "My profile", requiring the current password and at least eight characters | RF15.3 | — | Implemented |
+| RF-CFG-001 | Public configuration | Publish to the apps the public configuration, including the minimum allowed app version, without exposing secret parameters | RF17.2 | — | Implemented |
 
 ## Note on Anonymity
 
-The SRS explicitly clarifies that there is no FR dedicated to "anonymity": the possibility of sending an alert without identifying oneself should be included as an acceptance criterion for FR4/FR5, rather than as a separate module. This is noted here so that this detail is not lost when transferring the information to `traceability-matrix.md`.
+Woman Alert does not offer anonymous use: every alert belongs to an authenticated account, and the owner of alerts, contacts, locations, routes and zone reports is always taken from the JWT, never from the request body. What the system does protect is the privacy of third parties and the discretion of the user:
+
+- Trusted contacts do not need an account. They follow the alert through a tracking link with 256 random bits; only its hash is stored and it stops working 2 hours after the alert ends.
+- The administration never sees the personal data of the contacts: only, per contact, the notice status and the relationship (RF-ADM-005). It only sees the route of active or attended alerts.
+- Discreet mode, the duress PIN and cancelling with the volume button exist so that a person watching the phone does not discover the alert.
+- Deleting an account requires two administrators and anonymizes the personal data.
 
 ## Correlations
 
-* Formalized user stories → `04-requirements/user-stories.md`
-* Non-functional requirements → `04-requirements/non-functional.md`
-* Traceability matrix → `04-requirements/traceability-matrix.md`
+- Non-functional requirements → `04-requirements/non-functional.md`
+- User stories → `04-requirements/user-stories.md`
+- Traceability with use cases and tests → `04-requirements/traceability-matrix.md`
+- Business rules and entities → `02-domain/entities-and-rules.md`
+- Product backlog → `03-product/product-backlog.md`
+- API that implements each module → `07-api/api-contract.md`

@@ -1,102 +1,106 @@
-# Ejemplo: Diagrama C4 Nivel Contenedor
+# C4 Container Diagram — Woman Alert
 
-> Este archivo muestra cómo documentar el sistema con un diagrama C4 Level 2 (Container).
-> El diagrama usa Mermaid, que renderiza nativamente en GitHub, GitLab y la mayoría de
-> editores modernos (VS Code con extensión, Obsidian, etc.).
->
-> **Instrucción:** Copia esta estructura, reemplaza los servicios de ejemplo (api-gateway,
-> auth-service) por los servicios reales de tu proyecto, y muévelo a `diagrams/source/c4-container.md`.
+> C4 Level 2 (Container) diagram of the system deployed from `main` on 28/10/2026. It uses Mermaid,
+> which renders natively on GitHub, GitLab and most modern editors (VS Code with an extension,
+> Obsidian, etc.).
 
 ---
 
-## Sistema de ejemplo: plataforma de gestión de [X]
+## System: Woman Alert
 
 ```mermaid
 C4Container
-    title Diagrama de Contenedores — [Nombre del Sistema]
+    title Container Diagram — Woman Alert
 
-    Person(usuario, "Usuario / Cliente", "Accede al sistema desde el navegador o app móvil")
-    Person(admin, "Administrador", "Gestiona configuración y usuarios del sistema")
+    Person(usuaria, "User", "Activates alerts from the Android app; consults her information on the web")
+    Person(contacto, "Trusted contact", "Receives the notice by email (and push if they have the app); follows the alert without an account")
+    Person(admin, "Administrator", "Manages users, alerts, zones, reports, evidence, moderation and configuration")
 
-    System_Boundary(sistema, "[Nombre del Sistema]") {
+    System_Boundary(sistema, "Woman Alert") {
 
-        Container(frontend, "Frontend Web", "React / Vue / Angular", "Interfaz de usuario. SPA servida como archivos estáticos.")
+        Container(movil, "Mobile app", "Expo 54, React Native 0.81, TypeScript, Kotlin module", "Only channel that activates alerts. MVVM by feature. Foreground services for shake, recording, trips and automatic protection.")
 
-        Container(gateway, "API Gateway", "[Tu framework]", "Punto único de entrada. Autentica tokens JWT, enruta al servicio correcto, aplica rate limiting.")
+        Container(web, "Web", "Angular 21", "Landing with APK download, public tracking page, user portal and admin panel under /admin.")
 
-        Container(auth, "Auth Service", "[Tu stack]", "Gestiona autenticación (login/registro/refresh). Dueño de la entidad User y Role.")
+        Container(auth, "Auth Service", "Java 17, Spring Boot 3.2", "identity, devices, settings, admin. Issues JWT. Applies the Liquibase migrations.")
 
-        Container(servicio_a, "[Servicio A]", "[Tu stack]", "[Responsabilidad principal del servicio A. Dueño de [Entidad A].]")
+        Container(alert, "Alert Service", "Java 17, Spring Boot 3.2", "alerts, notifications, zones, resources. Notices, tracking, trips, automatic protection, scheduled tasks.")
 
-        Container(servicio_b, "[Servicio B]", "[Tu stack]", "[Responsabilidad principal del servicio B. Dueño de [Entidad B].]")
+        Container(evidence, "Evidence Service", "Java 17, Spring Boot 3.2", "Evidence upload, SHA-256, download, review and 30-day retention.")
 
-        ContainerDb(db_auth, "BD Auth", "PostgreSQL", "Usuarios, roles, refresh tokens.")
-        ContainerDb(db_a, "BD [Servicio A]", "[Motor elegido]", "Datos del dominio de [Servicio A].")
-        ContainerDb(db_b, "BD [Servicio B]", "[Motor elegido]", "Datos del dominio de [Servicio B].")
-        ContainerDb(redis, "Redis", "Redis", "Token blacklist, rate limiting, caché compartida.")
-        ContainerDb(broker, "Message Broker", "Kafka / RabbitMQ", "Eventos de dominio entre servicios.")
+        ContainerDb(db, "PostgreSQL 16", "Render PostgreSQL", "Schemas identity, alert, resource, admin, notification. 35 tables. Each service owns its schemas.")
     }
 
-    System_Ext(ext_email, "Servicio de Email", "Sendgrid / SES / SMTP")
-    System_Ext(ext_pago, "Pasarela de pago", "[Si aplica al proyecto]")
+    System_Ext(fcm, "Firebase", "Cloud Messaging (push) and Google login verification")
+    System_Ext(mail, "Resend", "Email by HTTP API (Brevo as alternative)")
+    System_Ext(b2, "Backblaze B2", "S3-compatible storage for evidence")
+    System_Ext(maps, "Map tiles", "MapLibre + OpenFreeMap, Leaflet + OpenStreetMap, Nominatim")
 
-    %% Relaciones Usuario → Sistema
-    Rel(usuario, frontend, "Usa", "HTTPS")
-    Rel(admin, frontend, "Administra", "HTTPS")
-    Rel(frontend, gateway, "API calls", "HTTPS / REST")
+    %% People → system
+    Rel(usuaria, movil, "Activates alerts, configures contacts", "Android")
+    Rel(usuaria, web, "Consults her information", "HTTPS")
+    Rel(contacto, web, "Opens the tracking link", "HTTPS")
+    Rel(admin, web, "Administers", "HTTPS")
 
-    %% Gateway → Servicios
-    Rel(gateway, auth, "Verifica tokens / enruta", "HTTP interno")
-    Rel(gateway, servicio_a, "Enruta peticiones", "HTTP interno")
-    Rel(gateway, servicio_b, "Enruta peticiones", "HTTP interno")
+    %% Clients → services (no gateway: routing by path)
+    Rel(movil, auth, "Login, profile, devices", "HTTPS / REST + JWT")
+    Rel(movil, alert, "Alerts, location, contacts, trips", "HTTPS / REST + JWT")
+    Rel(movil, evidence, "Uploads evidence", "HTTPS / multipart")
+    Rel(web, auth, "Login, admin panel", "HTTPS / REST + JWT")
+    Rel(web, alert, "Portal data, public tracking", "HTTPS / REST")
+    Rel(web, evidence, "Views and downloads evidence", "HTTPS / REST + JWT")
 
-    %% Servicios → BD (cada servicio tiene su propia BD)
-    Rel(auth, db_auth, "Lee / escribe", "SQL")
-    Rel(auth, redis, "Token blacklist", "Redis protocol")
-    Rel(gateway, redis, "Rate limiting", "Redis protocol")
-    Rel(servicio_a, db_a, "Lee / escribe", "SQL / NoSQL")
-    Rel(servicio_b, db_b, "Lee / escribe", "SQL / NoSQL")
+    %% Internal calls
+    Rel(auth, alert, "AlertsApi, ZonesApi", "RPC /internal (X-Internal-Key)")
+    Rel(alert, auth, "IdentityApi, DevicesApi, SettingsApi", "RPC /internal")
+    Rel(alert, evidence, "EvidenceApi", "RPC /internal")
+    Rel(evidence, alert, "AlertsApi, IdentityApi", "RPC /internal")
 
-    %% Comunicación asíncrona
-    Rel(auth, broker, "Publica eventos (user.registered)", "Async")
-    Rel(servicio_a, broker, "Publica / consume eventos", "Async")
-    Rel(servicio_b, broker, "Consume eventos de [Servicio A]", "Async")
+    %% Database
+    Rel(auth, db, "Reads / writes identity, admin; migrates", "SQL")
+    Rel(alert, db, "Reads / writes alert, resource, notification", "SQL")
+    Rel(evidence, db, "Reads / writes alert.evidence", "SQL")
 
-    %% Sistemas externos
-    Rel(servicio_b, ext_email, "Envía notificaciones", "HTTPS / SMTP")
-    Rel(servicio_a, ext_pago, "Procesa pagos", "HTTPS")
+    %% External systems
+    Rel(alert, fcm, "Push notices", "HTTPS")
+    Rel(auth, fcm, "Verifies Google tokens", "HTTPS")
+    Rel(alert, mail, "Alert, end and recovery emails", "HTTPS")
+    Rel(evidence, b2, "Stores files", "HTTPS / S3")
+    Rel(movil, maps, "Map tiles and address search", "HTTPS")
+    Rel(web, maps, "Map tiles", "HTTPS")
 ```
 
 ---
 
-## Cómo usar este diagrama
+## How to use this diagram
 
-1. **Renderizar en GitHub:** El diagrama se renderiza automáticamente al hacer push. No se necesita ninguna herramienta adicional.
+1. **Render on GitHub:** the diagram renders automatically on push. No extra tool is needed.
 
-2. **Renderizar en VS Code:** Instalar la extensión "Markdown Preview Mermaid Support" o usar la extensión oficial de Mermaid.
+2. **Render in VS Code:** install the "Markdown Preview Mermaid Support" extension or the official Mermaid extension.
 
-3. **Exportar como imagen:** Usar la [CLI de Mermaid](https://github.com/mermaid-js/mermaid-cli):
+3. **Export as an image:** use the [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli):
 ```bash
 mmdc -i c4-container-example.md -o ../exports/c4-container.svg
 ```
 
-4. **Actualizar el diagrama:** El diagrama vive en Git junto al código. Cuando cambies la arquitectura (nuevo servicio, nuevo motor de BD), actualiza el diagrama en el mismo PR.
+4. **Update the diagram:** the diagram lives in Git next to the documentation. When the architecture changes (new service, gateway, new storage), update it in the same pull request.
 
 ---
 
-## Convenciones para este proyecto
+## Conventions for this project
 
-| Elemento | Color / Estilo | Cuándo usarlo |
+| Element | Color / Style | When to use it |
 |----------|---------------|---------------|
-| `Container` | Azul | Microservicio o aplicación deployable |
-| `ContainerDb` | Cilindro azul | Base de datos, caché, broker |
-| `Person` | Icono persona | Actor humano |
-| `System_Ext` | Gris | Sistema de terceros que no controlas |
+| `Container` | Blue | Deployable service or client application |
+| `ContainerDb` | Blue cylinder | Database |
+| `Person` | Person icon | Human actor (user, contact, administrator) |
+| `System_Ext` | Gray | Third-party system we do not control |
 
 ---
 
-## Correlaciones
+## Correlations
 
-- Catálogo de servicios → `09-microservices/service-catalog.md`
-- Detalles de cada servicio → `09-microservices/services/`
-- Índice de todos los diagramas → `08-uml/diagram-index.md`
+- Service catalog → `09-microservices/service-catalog.md`
+- Details of each service → `09-microservices/services/`
+- Index of all diagrams → `08-uml/diagram-index.md`
+- Architecture overview → `05-architecture/overview.md`

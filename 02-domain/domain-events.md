@@ -14,8 +14,8 @@
 | **Name** | `UserRegistered` |
 | **Bounded Context** | Identity and Accounts |
 | **Aggregate** | User |
-| **Trigger** | A record is created in `user` + `account` + `user_profile` (RF2.1) |
-| **Consumers** | Administration and Moderation (the user becomes available for lookup and management, RF13.1) |
+| **Trigger** | A record is created in `user` + `account` + `user_profile` (RF-USU-001) |
+| **Consumers** | Administration and Moderation (the user becomes available for lookup and management, RF-ADM-001) |
 
 **Payload:**
 ```json
@@ -56,7 +56,7 @@
 | **Name** | `RecoveryRequested`, `RecoveryCompleted` |
 | **Bounded Context** | Identity and Accounts |
 | **Aggregate** | RecoveryRequest |
-| **Trigger** | A `recovery_request` is created (`status = pending`) / the token moves to `used` (RF2.3) |
+| **Trigger** | A `recovery_request` is created (`status = pending`) / the token moves to `used` (RF-USU-002) |
 | **Consumers** | Notifications (sending the token via `method`: `email` \| `telephone`) |
 
 ---
@@ -68,7 +68,7 @@
 | **Name** | `EmergencyContactAdded` |
 | **Bounded Context** | Emergency Contacts |
 | **Aggregate** | EmergencyContact |
-| **Trigger** | A record is created in `emergency_contact` (RF2.2) — requires at least `contact_name` and `telephone` (`telephone` is `NOT NULL`) |
+| **Trigger** | A record is created in `emergency_contact` (RF-CON-001) — requires at least `contact_name` and `telephone` (`telephone` is `NOT NULL`) |
 | **Consumers** | Alert Management (to know who to notify via `alert_contact`) |
 
 ---
@@ -80,7 +80,7 @@
 | **Name** | `AlertActivated` |
 | **Bounded Context** | Alert Management |
 | **Aggregate** | Alert |
-| **Trigger** | An `alert` is created with `status = 'active'`, a `device_id` (`NOT NULL`), and an `activation_method` of `panic_button \| widget \| sudden_movement \| physical_button \| discreet_confirmation \| automatic` (RF5) |
+| **Trigger** | An `alert` is created with `status = 'active'`, a `device_id` (`NOT NULL`), and an `activation_method` of `panic_button \| contact \| suspicious_movement \| widget \| signal_lost \| auto` (RF-ACT) |
 | **Consumers** | Notifications (creates records in `alert_contact` for each `emergency_contact`), Evidence, Administration |
 
 **Payload (actual fields):**
@@ -91,8 +91,10 @@
   "payload": {
     "user_profile_id": "int",
     "device_id": "int",
-    "alert_type": "main | mini | reminder",
-    "activation_method": "panic_button | widget | sudden_movement | physical_button | discreet_confirmation | automatic",
+    "alert_type": "main",
+    "activation_method": "panic_button | contact | suspicious_movement | widget | signal_lost | auto",
+    "latitude": "numeric | null",
+    "longitude": "numeric | null",
     "started_at": "timestamp"
   }
 }
@@ -102,7 +104,7 @@
 
 | Consuming service | Action |
 |------------------|--------|
-| Notifications | Creates an `alert_contact` for each `emergency_contact` of the user, for each applicable channel (`sms`\|`email`\|`call`\|`push`) |
+| Notifications | Creates an `alert_contact` for each `emergency_contact` of the user, for each applicable channel (`email` always, `push` if the contact has the app with an active session); the email carries the tracking link |
 | Evidence | May start receiving `evidence` associated with the `alert_id` |
 | Alert Management | Starts inserting `location_log` records with `alert_id` while the alert is `active` |
 
@@ -115,7 +117,7 @@
 | **Name** | `LocationRecorded` |
 | **Bounded Context** | Alert Management |
 | **Aggregate** | LocationLog |
-| **Trigger** | A record is inserted in `location_log` (with or without `alert_id`) while the alert is active (RF4.3) |
+| **Trigger** | A record is inserted in `location_log` (with or without `alert_id`) while the alert is active (RF-ALE-003) |
 | **Consumers** | Emergency contacts (real-time tracking) |
 
 ---
@@ -156,7 +158,7 @@
 | **Name** | `MiniAlertScheduled`, `MiniAlertSent` |
 | **Bounded Context** | Alert Management |
 | **Aggregate** | AlertReminder |
-| **Trigger** | An `alert_reminder` is created (`status = scheduled`) / changes to `sent` when there is no response from the user (RF4.5) |
+| **Trigger** | An `alert_reminder` is scheduled while the alert is active (for example the "Are you still in danger?" question at minute 25) / it is sent when the user does not answer (RF-ALE-005, RF-ALE-007) |
 | **Consumers** | Notifications |
 
 ---
@@ -168,7 +170,7 @@
 | **Name** | `AlertActivationMethodToggled` |
 | **Bounded Context** | Identity and Accounts |
 | **Aggregate** | AlertActivationSetting |
-| **Trigger** | `alert_activation_setting.is_enabled` changes value for a `device_id` + `activation_method` (RF5) |
+| **Trigger** | `alert_activation_setting.is_enabled` changes value for a `device_id` + `activation_method` (RF-ACT-010) |
 | **Consumers** | Alert Management (an alert can no longer be triggered by a disabled method) |
 | **Business rule tied to this event** | Before applying a toggle to `false`, the Service layer checks that at least one other method for the same `device_id` remains `is_enabled = true`; a database `CHECK` constraint cannot express this because it needs to compare across sibling rows |
 
@@ -181,8 +183,8 @@
 | **Name** | `EvidenceRegistered` |
 | **Bounded Context** | Evidence |
 | **Aggregate** | Evidence |
-| **Trigger** | A record is inserted in `evidence` with `media_type = photo \| video \| audio` (RF6.1, RF6.2) |
-| **Consumers** | Administration (lookup via RF13.7) |
+| **Trigger** | A record is inserted in `evidence` with `media_type = photo \| video \| audio` (RF-EVI-001, RF-EVI-002) |
+| **Consumers** | Administration (lookup via RF-ADM-007) |
 
 ---
 
@@ -193,7 +195,7 @@
 | **Name** | `NotificationCreated` |
 | **Bounded Context** | Notifications |
 | **Aggregate** | Notification |
-| **Trigger** | A record is inserted in `notification` with `priority = normal \| high \| critical` (RF8.1) |
+| **Trigger** | A record is inserted in `notification` with `priority = normal \| high \| critical` (RF-NOT-002) |
 | **Consumers** | The user herself (via app/web) |
 
 ---
@@ -205,8 +207,8 @@
 | **Name** | `ZoneRegistered` |
 | **Bounded Context** | Zones and Help Resources |
 | **Aggregate** | Zone |
-| **Trigger** | A `zone` is created with `zone_type = safe \| risk`, optionally linked to `created_by_admin_profile_id` (RF9.2) |
-| **Consumers** | Administration (to review/manage, RF13.3) |
+| **Trigger** | A `zone` is created with `zone_type = safe \| risk`, optionally linked to `created_by_admin_profile_id` (RF-UBI-002) |
+| **Consumers** | Administration (to review/manage, RF-ADM-003) |
 
 ---
 
@@ -219,7 +221,7 @@
 | **Aggregate** | ZoneReport |
 | **Trigger** | A `zone_report` is created (`status = pending`) |
 | **Consumers** | Administration (approves/rejects, via `reviewed_by_admin_profile_id`) |
-| **Relationship with the SRS** | RF9.2 only describes registering a zone by whoever creates it; this event covers reclassification by other users, a feature under evaluation by the team |
+| **Relationship with the SRS** | RF-UBI-002 only describes registering a zone by whoever creates it; this event covers reclassification by other users, a feature under evaluation by the team |
 
 ---
 
@@ -232,7 +234,7 @@
 | **Aggregate** | ResourceCall |
 | **Trigger** | A `resource_call` is created (`status = started`) / changes to `answered` \| `unanswered` \| `failed` \| `cancelled` |
 | **Consumers** | Administration |
-| **Relationship with the SRS** | RF1.2 (call permission) and RF7.1 (directory) do not require storing a call history; this event covers that record, a feature under evaluation by the team |
+| **Relationship with the SRS** | RF-REC-002 (call permission) and RF-REC-001 (directory) do not require storing a call history; this event covers that record, a feature under evaluation by the team |
 
 ---
 
@@ -243,7 +245,7 @@
 | **Name** | `UserReported` |
 | **Bounded Context** | Administration and Moderation |
 | **Aggregate** | UserReport |
-| **Trigger** | A `user_report` is created (`status = pending`) (RF13.10) |
+| **Trigger** | A `user_report` is created (`status = pending`) (RF-ADM-009) |
 | **Consumers** | Moderation |
 
 ---
@@ -255,7 +257,7 @@
 | **Name** | `ModerationActionRegistered` |
 | **Bounded Context** | Administration and Moderation |
 | **Aggregate** | ModerationAction |
-| **Trigger** | A `moderation_action` is created with `action_type = review \| warn \| block \| unblock \| reject \| close \| escalate`, authored by `admin_profile_id` (RF13.10) |
+| **Trigger** | A `moderation_action` is created with `action_type = review \| warn \| block \| unblock \| reject \| close \| escalate`, authored by `admin_profile_id` (RF-ADM-009) |
 | **Consumers** | Identity and Accounts (if `action_type = block/unblock`, it affects `account.status`) |
 
 ---
@@ -279,8 +281,30 @@
 | **Name** | `ActionAudited` |
 | **Bounded Context** | Administration and Moderation |
 | **Aggregate** | AuditLog |
-| **Trigger** | Any relevant administrative action is inserted into `audit_log` (`entity_type`, `entity_id`, `action`) (RF13.9) |
-| **Consumers** | Admin panel, for traceability and control of operations (RF13.9) |
+| **Trigger** | Any relevant administrative action is inserted into `audit_log` (`entity_type`, `entity_id`, `action`) (RF-AUD-001) |
+| **Consumers** | Admin panel, for traceability and control of operations (RF-AUD-001) |
+
+---
+
+## New events since the microservices split
+
+| Event | Origin | Source table | What happens |
+|-------|--------|--------------|--------------|
+| AlertNoticeResent | Alert Management | `alert_contact` | No contact opened the notice in 5 minutes: resent once with the latest location (RF-ALE-006) |
+| AlertSignalLost | Alert Management | `location_log` | No location for 5 minutes during an active alert: contacts warned with the last location (RF-ALE-009) |
+| AlertDangerQuestionAsked / AlertExtended | Alert Management | `alert`, `alert_reminder` | Minute 25: "Are you still in danger?"; yes → extended 30 minutes; no answer → saving mode and notice (RF-ALE-007) |
+| AlertExpired | Alert Management | `alert` | Absolute limit of 120 minutes reached |
+| AlertMessageSent | Alert Management | `alert_message` | Chat message from the user or a contact |
+| SafeTripStarted / SafeTripAlerted | Alert Management | `safe_trip` | Trip started; the server creates the alert if arrival is not confirmed or the heartbeat stops (RF-TRA-002) |
+| AutoProtectionStarted / AutoProtectionAlerted | Alert Management | `safe_trip` (`mode = auto`), `protection_device` | Watch started when leaving a frequent place; alert by lost signal, no answer, not confirmed or duress PIN (RF-TRA-003) |
+| DuressPinUsed | Alert Management | `alert`, `safe_trip` | The app looks cancelled while the contacts get a silent notice (RF-ACT-007) |
+| TrackingLinkCreated / TrackingViewed | Notifications | `tracking_link`, `tracking_view` | Link sent by email; visits recorded so the user knows she is being watched |
+| PasswordRecoveryRequested | Identity and Accounts | `recovery_request` | 6-digit code sent by email; forwarded between services through `/internal/events` |
+| NewDeviceSignedIn | Identity and Accounts | `device`, `device_session` | The user's other phones are notified (RF-NOT-006) |
+| AccountDeletionRequested / Approved | Administration and Moderation | `account_deletion_request` | Needs a second administrator; personal data anonymized |
+| EvidenceRetentionNotice | Evidence | `evidence` | Notice 5 days before deleting evidence older than 30 days |
+
+Implementation: Spring events published after the transaction commits; between services they are forwarded by HTTP to `/internal/events` with `X-Internal-Key`. There is no message broker and no outbox.
 
 ---
 
@@ -289,31 +313,34 @@
 ```
 User
   │
-  │  POST /alerts (activation_method: widget|sudden_movement|physical_button|
-  │                discreet_confirmation|panic_button|automatic)
-  ▼
-[alert] status = 'active', device_id = <required>
+  │  activation (SOS button | contact | shake | widget) → 5-second countdown
+  │  (cancelled in time or volume-down ×4 → nothing is registered)
   │
-  │  AlertActivated
+  │  POST /api/alerts (activationMethod: panic_button | contact | suspicious_movement)
+  ▼
+[alert.alert] status = 'active', device_id = <required>, lat/long if available
+  │
+  │  AlertActivated (after commit)
   ├──────────────────────────────────────────┐
   │                                            ▼
   │                                  [For each emergency_contact]
-  │                                  creates alert_contact (status=pending)
-  │                                  → attempts to send (sms/email/call/push)
-  │                                  → updates status to sent/delivered/failed
+  │                                  creates notification.tracking_link (hash only)
+  │                                  creates alert_contact (email; push if the contact has the app)
+  │                                  → Resend / FCM
+  │                                  → status sent | failed (attempts, error_message)
+  │                                  → nobody opened it in 5 min → resent once
   │
-  │  LocationRecorded (repeated)
-  │  ────────────────────────────▶ location_log (alert_id = alert.id)
+  │  LocationRecorded (every 15 s for 5 min, then 30 s / 60 s in saving mode)
+  │  ────────────────────────────▶ alert.location_log (alert_id = alert.id)
+  │  (no location for 5 min) ────▶ AlertSignalLost → notice to contacts
   │
-  │  (no response from the user within the configured time)
-  │  ────────────────────────────▶ alert_reminder (reminder_type=mini_alert)
+  │  Minute 25: "Are you still in danger?" ──▶ yes: +30 min | no answer: saving mode + notice
   │
-  │  (the user confirms it was a misunderstanding — UC3/UC4)
+  │  "I'm OK" (+ cancellation PIN)  ──▶ status = 'cancelled' → ALERTA_FINALIZADA (email + push)
+  │  Administrator                  ──▶ status = 'resolved'
+  │  120 minutes                    ──▶ status = 'expired'
   ▼
-alert.status = 'cancelled', cancelled_at = now()
-  │
-  ▼
-AlertCancelled
+Tracking link stops working 2 hours after the end
 ```
 
 ---
@@ -331,6 +358,10 @@ AlertCancelled
 | AlertContactNotified | Alert Management | `alert_contact` |
 | AlertResolved/Cancelled/Completed/Failed | Alert Management | `alert` |
 | MiniAlertScheduled / Sent | Alert Management | `alert_reminder` |
+| AlertNoticeResent, AlertSignalLost, AlertExpired | Alert Management | `alert_contact`, `location_log`, `alert` |
+| SafeTripStarted / SafeTripAlerted, AutoProtectionStarted / Alerted | Alert Management | `safe_trip`, `protection_device` |
+| TrackingLinkCreated / TrackingViewed | Notifications | `tracking_link`, `tracking_view` |
+| AccountDeletionRequested / Approved | Administration and Moderation | `account_deletion_request` |
 | AlertActivationMethodToggled | Identity and Accounts | `alert_activation_setting` |
 | EvidenceRegistered | Evidence | `evidence` |
 | NotificationCreated | Notifications | `notification` |
@@ -342,7 +373,7 @@ AlertCancelled
 | SystemConfigurationUpdated | Administration and Moderation | `system_configuration` |
 | ActionAudited | Administration and Moderation | `audit_log` |
 
-⚠️ = table/event under evaluation for removal by the team (no direct RF in the SRS).
+⚠️ = these tables were under evaluation; both are in use today (zone reports approved by the administration; manual call history in the web portal).
 
 ---
 
@@ -350,9 +381,11 @@ AlertCancelled
 
 | Trigger event | Policy | Result |
 |--------------|--------|----------|
-| AlertActivated | For each `emergency_contact` of the user, create an `alert_contact` per available channel | Multichannel delivery (RF4.2) |
-| AlertContactNotified (`status = failed`) | Retry the send | `attempts` is incremented, moves to `retrying` |
-| AlertReminder (`status = scheduled`, no response from the user) | Send mini alert | Updated to `sent` (RF4.5) |
+| AlertActivated | For each `emergency_contact` of the user, send email (and push if available) with the tracking link | Notice per contact and channel (RF-ALE-002) |
+| AlertContactNotified (nobody opened it in 5 min) | Resend once with the latest location | Second notice (RF-ALE-006) |
+| No location for 5 minutes | Warn the contacts with the last location | Lost-signal notice (RF-ALE-009) |
+| Minute 25 without answer | Saving mode and notice to the contacts | Alert keeps running until 120 minutes (RF-ALE-007) |
+| Trip not confirmed / heartbeat lost | Server creates the alert | Alert with the last location (RF-TRA-002) |
 | ModerationAction (`action_type = block`) | Block the associated account | `account.status = 'blocked'` |
 | AlertActivationMethodToggled (would disable the last enabled method) | Reject the toggle | The Service layer blocks the `UPDATE`, since a device must always keep at least one activation method enabled |
 
@@ -360,4 +393,4 @@ AlertCancelled
 
 ## Resilience patterns for events
 
-`alert_contact` models retries at the data level (`attempts`, `status = retrying`, `error_message`), just like `alert_reminder` and `recovery_request` — consistent with the SRS requirement for fault tolerance in sending critical notifications and alerts (section 2.3, RNF007). The maximum number of retries and the backoff time between each one still need to be defined, which the SRS does not set.
+`alert_contact` records each send with `attempts`, `status` (`pending`, `sent`, `failed`, `expired`) and `error_message`, so a provider failure is visible per contact and channel and does not stop the other notices (RNF-DIS-003). The notice is resent once if nobody opens it in 5 minutes. Events are published only after the transaction commits, so a rolled-back operation never sends an email; there is no outbox, so an event can be lost if the service stops right after the commit. Scheduled tasks (expiration, resend, signal check, trips, retention) only run while the service is awake on the free plan.

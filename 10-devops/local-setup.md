@@ -1,8 +1,7 @@
 # Local Project Setup
 
-> This document ensures that any developer can have a functional local environment
-> in less than 1 hour. If it takes longer, the document is incomplete.
-> **Rule:** If you have to guess something or look elsewhere, add what's missing here.
+> How to run Woman Alert on a developer machine: the three microservices with Docker, the Angular
+> web and the Android app. The step-by-step version with screenshots is the installation manual.
 
 ---
 
@@ -10,57 +9,46 @@
 
 ### Universal tools (all stacks)
 
-| Tool | Minimum version | Install from | Verify with |
-|------|----------------|--------------|-------------|
-| Docker | 24.0+ | docker.com | `docker --version` |
-| Docker Compose | 2.20+ | Included with Docker Desktop | `docker compose version` |
-| Git | 2.40+ | git-scm.com | `git --version` |
+| Tool | Version | For what |
+|------|---------|----------|
+| Git | Recent | Clone the three repositories |
+| Docker + Docker Compose | Recent | PostgreSQL, SeaweedFS (local S3) and the three services |
+| An IDE | IntelliJ IDEA, VS Code or similar | — |
 
 ### Project language tool
 
-> Add here the specific tool for the chosen stack and remove this instruction.
-> See your stack guide in `_stacks/` for recommended versions.
+| Tool | Version | For what |
+|------|---------|----------|
+| Java JDK / Maven | 17 / 3.9 | Microservices without Docker and tests |
+| Node.js + npm | 20 or higher | Web and mobile |
+| Android SDK + JDK 17 | — | Local APK (`eas build --local`) |
+| EAS CLI + Expo account | 24.12 or higher | APK in the cloud |
+| PostgreSQL 16 | Only without Docker | Database |
 
-| Tool | Minimum version | Install from | Verify with |
-|------|----------------|--------------|-------------|
-| [Language / Runtime] | [LTS version] | [Official URL] | `[command --version]` |
-| [Package manager] | [version] | [included / URL] | `[command --version]` |
-| [Additional tool] | [version] | [URL] | [command] |
-
-**Stack tool reference:**
-- Node.js + TypeScript → [`_stacks/node-typescript.md`](../_stacks/node-typescript.md)
-- Java + Spring Boot → [`_stacks/java-spring.md`](../_stacks/java-spring.md)
-- Python + FastAPI → [`_stacks/python-fastapi.md`](../_stacks/python-fastapi.md)
-- Go → [`_stacks/go.md`](../_stacks/go.md)
-
-**Recommended (not required):**
-- Team editor: [VS Code / IntelliJ IDEA / PyCharm / GoLand]
-- Postman or Insomnia for manually testing endpoints
+Ask the team for the Firebase service account file (Auth and Alert) and `google-services.json`
+(mobile). Never commit them with real data.
 
 ---
 
 ## Local ports in use
 
-Verify these ports are free before starting:
+| Port | Component |
+|------|-----------|
+| 5433 | PostgreSQL 16 (Docker, mapped from 5432) |
+| 8081 | Auth Service |
+| 8082 | Alert Service |
+| 8083 | Evidence Service |
+| 4200 | Angular web (`npm start`) |
+| 8081 (default) | Metro bundler of Expo — same as Auth; accept the alternative port Expo offers |
 
-| Port | Service | Description |
-|------|---------|-------------|
-| 8080 | api-gateway | Main entry point |
-| 3001 | auth-service | Authentication service |
-| 300X | [service-name] | [description] |
-| 5432 | PostgreSQL | Relational database |
-| 6379 | Redis | Cache and message queue |
-| 5672 | RabbitMQ | Message broker (AMQP) |
-| 15672 | RabbitMQ Management | RabbitMQ web interface |
-| 9092 | Kafka | Message broker (if applicable) |
+Check whether a port is busy:
 
-**Check free ports:**
 ```bash
 # Windows
-netstat -ano | findstr ":[PORT]"
+netstat -ano | findstr :8081
 
 # macOS / Linux
-lsof -i :[PORT]
+lsof -i :8081
 ```
 
 ---
@@ -70,92 +58,103 @@ lsof -i :[PORT]
 ### Step 1: Clone the repository
 
 ```bash
-git clone https://github.com/[org]/[repo].git
-cd [repo]
+git clone <backend-repository-url> Backend-ALERTA-MUJER
+git clone <web-repository-url> Frond-end-Web
+git clone <mobile-repository-url> AlertaMujer
 ```
+
+Create your branch from `develop`; changes enter by pull request to `develop`.
 
 ### Step 2: Environment variables
 
 ```bash
 # Copy the example environment variables
+cd Backend-ALERTA-MUJER
 cp .env.example .env
 
-# Edit .env if you need to change any value
-# (for local, the .env.example defaults should work)
+# Edit .env and fill in the values
+# (POSTGRES_PASSWORD, APP_DB_PASSWORD, JWT_SECRET and INTERNAL_API_KEY have no default value:
+#  Docker Compose stops with a message if one is missing)
 ```
 
-**Required variables to configure in .env:**
-
-| Variable | Description | Value for local |
-|----------|-------------|----------------|
-| `DATABASE_URL` | PostgreSQL connection | `postgresql://dev:dev@localhost:5432/dev` |
-| `REDIS_URL` | Redis connection | `redis://localhost:6379` |
-| `JWT_SECRET` | Key for signing JWT | `[generate with: openssl rand -base64 32]` |
-| `[VARIABLE]` | [description] | [example value] |
-
-> **NEVER** commit the `.env` file. It is in `.gitignore` for a reason.
+| Variable | Services | Description |
+|----------|----------|-------------|
+| `JWT_SECRET` | All | JWT signing key, the same in the three |
+| `INTERNAL_API_KEY` | All | Key of the internal API (`X-Internal-Key`), the same in the three |
+| `CORS_ORIGIN` | All | `http://localhost:4200` in local |
+| `DB_HOST`, `DB_PORT`, `DB_NAME` and credentials | All | PostgreSQL connection |
+| `SERVICES_AUTH_URL`, `SERVICES_ALERT_URL`, `SERVICES_EVIDENCE_URL` | All | URLs the services use to call each other |
+| Firebase file | Auth and Alert | Google login and push |
+| `EMAIL_PROVIDER`, `EMAIL_API_KEY`, `EMAIL_FROM` | Alert | Leave empty in development: emails are written to the log |
+| `notifications.web-base-url` | Alert | Web URL used to build the tracking link |
+| S3 endpoint, bucket and keys | Evidence | SeaweedFS in local |
 
 ### Step 3: Start the infrastructure
 
 ```bash
-# Start databases and brokers in Docker
-docker compose up -d
+# Start PostgreSQL, SeaweedFS and the three services
+docker compose up --build
 
 # Verify they are healthy
 docker compose ps
 ```
 
-The command should show all containers in `healthy` or `running` state.
-
 ### Step 4: Install dependencies
 
-> Commands depend on the project stack. See `_stacks/[your-stack].md → Project commands`.
+```bash
+# Web
+cd Frond-end-Web/alerta-mujer-web
+npm install
 
-| Stack | Command |
-|-------|---------|
-| Node.js + npm | `npm install` |
-| Java + Maven | `mvn install -DskipTests` |
-| Python + Poetry | `poetry install` |
-| Go | `go mod download` |
+# Mobile
+cd AlertaMujer/Frontend-movil
+npm install
+```
 
 ### Step 5: Run migrations
 
-> The migration tool varies by stack. See `_stacks/[your-stack].md`.
-
-| Stack / Tool | Command |
-|--------------|---------|
-| Node.js + knex/Prisma | `npm run db:migrate` |
-| Java + Flyway | `mvn flyway:migrate` (or automatic on startup) |
-| Python + Alembic | `alembic upgrade head` |
-| Go + golang-migrate | `make migrate-up` |
+There is nothing to run by hand: **Auth applies the Liquibase migrations when it starts**. It creates
+the schemas `identity`, `alert`, `resource`, `admin` and `notification`, the 35 tables, indexes, audit
+triggers and the limited application user. Test data is loaded only in the `dev` and `test` contexts.
 
 ```bash
-# Optionally: load initial test data (seed)
-# [see command in your stack guide]
+# Optionally: give a registered account the administrator role
+psql -h localhost -p 5433 -U <user> -d <database> \
+  -c "UPDATE identity.users SET role_id = 2 WHERE email = 'admin@example.com';"
+# Log out and in again so the token carries the new role
 ```
 
 ### Step 6: Start the services
 
-> Startup commands depend on the stack. See `_stacks/[your-stack].md → Project commands`.
+```bash
+# Web (http://localhost:4200) — URLs in src/environments/environment.ts
+cd Frond-end-Web/alerta-mujer-web
+npm start
 
-| Stack | Development command |
-|-------|---------------------|
-| Node.js | `npm run dev` |
-| Java | `mvn spring-boot:run` or `java -jar target/app.jar` |
-| Python | `uvicorn main:app --reload` |
-| Go | `go run ./cmd/server/...` or `make dev` |
+# Mobile — writes the computer IP into .env (10.0.2.2 for the emulator)
+cd AlertaMujer/Frontend-movil
+npm start
+```
+
+The app uses native modules (shake sensor, Notifee, Firebase, Google Sign-In), so it does not work in
+Expo Go: install a development build or a test APK. The phone and the computer must be on the same
+Wi-Fi network.
 
 ### Step 7: Verify it works
 
 ```bash
-# Health check of the API Gateway
-curl http://localhost:8080/health
+# Health check of each service
+curl http://localhost:8081/actuator/health
+curl http://localhost:8082/actuator/health
+curl http://localhost:8083/actuator/health
 
 # Expected response:
-# {"status": "ok", "timestamp": "2024-01-15T10:30:00Z"}
-```
+# {"status":"UP"}
 
-Open your browser at `http://localhost:15672` for the RabbitMQ interface (if using RabbitMQ).
+# Security checks
+curl -i http://localhost:8081/api/users/me                          # 403 without token
+curl -i -X POST http://localhost:8081/internal/rpc/IdentityApi/test # 403 without internal key
+```
 
 ---
 
@@ -163,118 +162,38 @@ Open your browser at `http://localhost:15672` for the RabbitMQ interface (if usi
 
 ```bash
 # At the start of the day
-git pull origin develop
-# Install dependencies if they changed (see stack):
-#   npm install / mvn install / poetry install / go mod download
-# Run migrations if there are new ones (see stack):
-#   npm run db:migrate / alembic upgrade head / make migrate-up
-# Start the service (see stack):
-#   npm run dev / mvn spring-boot:run / uvicorn main:app --reload / make dev
+git checkout develop && git pull
+git checkout -b feature/my-change
 
-# At the end
-git add [specific files]
-git commit -m "feat(scope): description"
+# Rebuild if dependencies or migrations changed
+docker compose up --build
+
+# Run the tests before opening the pull request
+cd microservicios && mvn clean test          # backend: 351 tests
+npx ng test --watch=false && npx ng build    # web: 39 tests + build
+npx tsc --noEmit && npx jest                 # mobile: types + 163 tests
+
+# Logs of an installed APK
+adb logcat -v time ReactNativeJS:V AndroidRuntime:E *:S
 ```
 
 ---
 
 ## Common issues
 
-### "Port already in use"
-
-```bash
-# Find which process is using the port
-lsof -i :5432    # macOS/Linux
-netstat -ano | findstr :5432  # Windows
-
-# Kill the process (replace PID)
-kill -9 [PID]    # macOS/Linux
-taskkill /PID [PID] /F  # Windows
-```
-
-### "Docker containers not starting"
-
-```bash
-# View logs of the failing container
-docker compose logs [service-name]
-
-# Restart from scratch (deletes volumes)
-docker compose down -v
-docker compose up -d
-```
-
-### "Database connection refused"
-
-```bash
-# Verify PostgreSQL is running
-docker compose ps | grep postgres
-
-# View PostgreSQL logs
-docker compose logs postgres
-```
-
-### "Migration failed"
-
-```bash
-# View migration status
-npm run db:migrate:status
-
-# Revert the last migration
-npm run db:migrate:revert
-
-# Run from a specific version
-npm run db:migrate -- --from V005
-```
-
-### "JWT_SECRET not set" or authentication errors
-
-```bash
-# Generate a valid JWT_SECRET
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-# Copy the result into .env
-```
-
----
-
-## Utility commands
-
-```bash
-# Tests
-npm test                    # All tests
-npm run test:unit           # Unit tests only
-npm run test:integration    # Integration tests only
-npm run test:coverage       # With coverage report
-
-# Database
-npm run db:migrate          # Apply pending migrations
-npm run db:seed             # Load test data
-npm run db:reset            # Revert everything and start over (DELETES DATA!)
-
-# Code quality
-npm run lint                # Check ESLint
-npm run lint:fix            # Auto-fix
-npm run format              # Apply Prettier
-
-# Build
-npm run build               # Compile TypeScript
-npm run build:docker        # Build local Docker image
-```
-
----
-
-## Useful local URLs
-
-| Service | URL | Credentials (local only) |
-|---------|-----|--------------------------|
-| API Gateway | http://localhost:8080 | |
-| RabbitMQ UI | http://localhost:15672 | guest / guest |
-| [Tool] | http://localhost:[port] | [user / pass] |
-| Swagger UI | http://localhost:3001/api-docs | |
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| A service does not start | `JWT_SECRET` empty or with the value that was once published | Set a new long random secret in `.env` |
+| Docker Compose stops at startup | A required variable is missing | Fill in `POSTGRES_PASSWORD`, `APP_DB_PASSWORD`, `JWT_SECRET`, `INTERNAL_API_KEY` |
+| The app cannot reach the backend | Phone on another network or wrong IP | Same Wi-Fi; restart `npm start` so `update-env.js` writes the IP again |
+| Metro and Auth fight for 8081 | Both use 8081 by default | Accept the other port Expo offers |
+| Emails do not arrive in local | No email provider configured | Expected: read them in the Alert logs |
+| The app closes in Expo Go | Native modules | Use a development build or an APK |
 
 ---
 
 ## Correlations
 
-- Environment variables per environment → `10-devops/environments.md`
-- CI/CD pipeline → `10-devops/README.md`
-- Production troubleshooting → `09-microservices/services/XX/runbook.md`
+- Environments and variables → `10-devops/environments.md`
+- Deployment → `05-architecture/deployment.md`
+- Technical onboarding → `14-training/technical-onboarding.md`

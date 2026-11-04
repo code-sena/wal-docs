@@ -1,56 +1,51 @@
-# Decisiones técnicas — API Gateway
+# Technical Decisions — API Gateway
 
-> Decisiones de diseño internas de este servicio que no están cubiertas por los ADRs
-> de arquitectura global. Cada decisión documenta el contexto, la elección y las consecuencias.
-
----
-
-## Decisión: Autenticación en gateway vs. en cada servicio
-
-**Fecha:** [fecha de la decisión]
-**Contexto:** Hay dos estrategias para verificar tokens JWT: (A) el gateway verifica el token
-y pasa el contexto del usuario como headers; (B) cada microservicio verifica su propio token.
-
-**Decisión:** Estrategia A — el gateway verifica el JWT (firma + expiración + blacklist)
-y adjunta `X-User-Id` y `X-User-Role` como headers internos. Los microservicios confían
-en estos headers sin re-verificar el token.
-
-**Consecuencias:**
-- Los microservicios son más simples (no necesitan librería JWT)
-- El gateway es el único punto que necesita acceso a la clave pública JWT
-- Si el gateway es comprometido, todos los servicios son vulnerables — mitigado con TLS interno
-- Los headers internos NO deben estar disponibles desde fuera del gateway (nginx/proxy stripea los headers X-User-* entrantes)
+> Decisions about the entry point of the system. The current state is: no gateway, routing in the
+> clients and authentication validated in each service.
 
 ---
 
-## Decisión: Rate limiting por IP vs. por usuario
+## Decision: Authentication in the gateway vs. in each service
 
-**Fecha:** [fecha de la decisión]
-**Contexto:** El rate limiting se puede aplicar a la IP de origen o al usuario autenticado.
+**Context:** with three services and no gateway, someone has to validate the JWT.
 
-**Decisión:** Rate limiting por IP para endpoints públicos (login, register), por user-id para
-endpoints autenticados.
+**Decision:** each service validates the JWT with the same key (`JWT_SECRET`), using the security
+configuration of the `shared-kernel`. No service calls Auth to validate a token.
 
-**Consecuencias:**
-- El rate limit por IP no penaliza a usuarios de la misma red (NAT corporativa)
-- El rate limit por user-id requiere que el token esté verificado antes de aplicar el límite
-- Implementación: bucket en Redis con key `rate:{ip}:{path}` o `rate:{userId}:{path}`
-
----
-
-## Decisión: Implementación del gateway
-
-**Fecha:** [fecha de la decisión]
-**Contexto:** Opciones: (A) Kong/NGINX Plus (solución gestionada), (B) Express/Fastify custom,
-(C) Envoy como sidecar.
-
-**Decisión:** [A / B / C] — [razón]
-
-**Consecuencias:** [trade-offs de la decisión]
+**Consequences:**
+- No extra network hop per request, which matters with the cold start of the free plan.
+- The secret must be the same in the three services; it was rotated on 28/10/2026 and the services
+  refuse to start with an empty value or with the value that was once published.
 
 ---
 
-## Correlaciones
+## Decision: Rate limiting by IP vs. by user
 
-- ADRs de arquitectura global → `05-architecture/decisions/records/`
-- Runbook del gateway → `runbook.md`
+**Decision:** by IP, only on the authentication endpoints of Auth (login, Google, registration and
+recovery), 5 attempts per minute, using the real client IP (`forward-headers-strategy`). Afterwards
+the answer is 429.
+
+**Why:** these endpoints are public and are the target of brute force. Authenticated endpoints rely on
+domain limits (one active alert per user, chat message limit, contact limit).
+
+---
+
+## Decision: Gateway implementation
+
+**Context:** the earlier design had a gateway in front of four services; the code had a `gateway/`
+folder and the clients actually pointed at the monolith.
+
+**Decision:** remove the gateway together with the monolith (25/10/2026) and let the clients route by
+path. Whether to add a gateway again is open (DIS-ARQ-04).
+
+**Trade-offs:**
+- Fewer processes on the free plan and one less cold start.
+- The routing is duplicated in the mobile app and the web.
+- No central place for correlation ids, access logs or global rate limits.
+
+---
+
+## Correlations
+
+- ADR-002 → `05-architecture/decisions/records/ADR-002-architectural-style.md`
+- Cross-cutting concerns → `05-architecture/cross-cutting.md`

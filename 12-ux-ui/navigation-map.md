@@ -38,8 +38,18 @@ AppNavigator (root)
     ├── HistoryMap
     ├── ActivationMethods
     ├── ClassifyZone
-    └── SavedLocations
+    ├── SavedLocations
+    ├── AlertChat              (chat of the active alert)
+    ├── ContactAlert           (tracking seen by a contact, alarm until silenced)
+    ├── ReceivedAlerts         (alerts of the people who have me as a contact)
+    ├── Trip                   ("Notify me if I don't arrive")
+    ├── Inbox                  (notifications bell)
+    ├── AlertSecurity          (PIN, duress PIN, automatic protection)
+    └── PermissionsProtection  (permissions and protection health)
 ```
+
+> Index is still registered in AuthNavigator but no route leads to it (demo mode pending removal).
+> The deep link `alertamujer://auto-protection/stop` opens the screen to stop automatic protection with the PIN.
 
 ### Web (Angular)
 
@@ -99,6 +109,9 @@ AppNavigator (root)
 │   └── /devices-management
 │       └── DeviceManagementComponent
 │
+├── /seguimiento/:code (PUBLIC — contacts, no account)
+│   └── Public tracking page: live map every 10 s, route, chat, recordings, call 123, open route in Google Maps
+│
 └── /** (wildcard → redirect /auth/login)
 ```
 
@@ -125,7 +138,7 @@ AppNavigator (root)
 | **Evidence** | — | `/dashboard/evidence` | — | Evidence | Web | USER | /evidence |
 | **Device Status** | — | `/dashboard/device-status` | — | DeviceStatusComponent | Web | USER | /devices |
 | **Location History** | — | `/dashboard/location-history` | — | LocationHistoryComponent | Web | USER | /location-history |
-| **SOS Activation** | Activation | — | ActivationScreen | — | Mobile | USER | /alerts/create |
+| **SOS Activation** | Activation | — | ActivationScreen | — | Mobile | USER | POST /api/alerts |
 | **Active Alert** | ActiveAlert | — | ActiveAlertScreen | — | Mobile | USER | /alerts/status |
 | **Add Contact** | AddContact | — | AddContactScreen | — | Mobile | USER | /contacts |
 | **Alert Detail** | AlertDetail | — | AlertDetailScreen | — | Mobile | USER | /alerts/{id} |
@@ -193,42 +206,42 @@ sequenceDiagram
     participant C as Contacts
     participant W as Web (Admin)
 
-    U->>M: Long press SOS button
+    U->>M: Press SOS (or shake / widget / alert a contact)
     M->>A: Navigate to ActivationScreen
     A->>A: Start countdown (5s)
     A->>U: Show countdown + vibration
-    A->>A: Prepare alert payload
 
-    alt User cancels
-        U->>A: Tap "Cancel"
-        A->>M: Return to Home
+    alt User cancels (button or volume-down x4)
+        U->>A: Cancel
+        A->>M: Return to Home (no alert registered)
     else User does not cancel
         A->>AA: Navigate to ActiveAlertScreen
-        AA->>API: POST /alerts/create
+        AA->>API: POST /api/alerts (Alert service)
         API-->>AA: Alert created with ID
 
-        AA->>AA: Start GPS tracking
-        AA->>API: PATCH /alerts/{id}/location
-        Note over AA,API: Every 5 seconds
+        API->>C: Email with tracking link (Resend) + push with alarm (FCM)
+        Note over API,C: Resent once if nobody opens it in 5 min
 
-        AA->>AA: Start evidence recording
-        AA->>API: POST /evidence/upload
+        AA->>AA: Start location (native service)
+        AA->>API: POST /api/location-logs
+        Note over AA,API: Every 15 s for 5 min, then 30 s (60 s in saving mode)
 
-        AA->>C: Notify contacts
-        C->>C: SMS with location
-        C->>C: Automatic call (optional)
+        AA->>AA: Record video, then audio
+        AA->>API: POST /api/evidences/upload (Evidence service)
 
-        AA->>W: WebSocket: active alert
-        W->>W: Show on admin dashboard
+        C->>API: GET /api/public/tracking/{code}
+        C-->>AA: Chat messages, "Received"
 
-        alt User taps "I'm safe"
-            U->>AA: Tap "I'm safe"
-            AA->>API: PATCH /alerts/{id}/status (cancelled)
+        alt User taps "I'm OK" (PIN if configured)
+            U->>AA: I'm OK
+            AA->>API: PUT /api/alerts/{id} (cancelled)
+            API->>C: End-of-alert email + push
             AA->>M: Return to Home
-        else Admin responds
-            W->>API: PATCH /alerts/{id}/status (attended)
+        else Admin marks it as attended
+            W->>API: Admin: status resolved
             API-->>AA: Status updated
-            AA->>U: Show "Help is on the way"
+        else Minute 25 without answer / 120 minutes
+            API->>C: Notice (saving mode) / alert expired
         end
     end
 ```
@@ -298,17 +311,17 @@ sequenceDiagram
 
     A->>WD: Access /admin/dashboard
     WD->>AS: getAll()
-    AS->>API: GET /alerts
+    AS->>API: GET /api/admin/alerts
     API-->>AS: Alert list
     AS-->>WD: Alerts received
 
     WD->>US: getAll()
-    US->>API: GET /users
+    US->>API: GET /api/admin/users
     API-->>US: User list
     US-->>WD: Users received
 
     WD->>ZS: getZones()
-    ZS->>API: GET /zones
+    ZS->>API: GET /api/zones
     API-->>ZS: Zone list
     ZS-->>WD: Zones received
 
@@ -316,28 +329,24 @@ sequenceDiagram
     WD->>WD: Show active alerts
     WD->>WD: Show critical zones
 
-    Note over WD,API: WebSocket: real-time alerts
-    M->>API: POST /alerts/create
-    API-->>WD: New alert received
-    WD->>WD: Update dashboard (30s polling)
+    M->>API: POST /api/alerts (Alert service)
+    Note over WD,API: No WebSocket: the dashboard refreshes by polling
+    WD->>API: GET /api/admin/alerts
+    API-->>WD: New alert listed
 
     A->>WD: Click on pending alert
     WD->>AS: getById(id)
-    AS->>API: GET /alerts/{id}
+    AS->>API: GET /api/admin/alerts (detail)
     API-->>AS: Alert details
     AS-->>WD: Show details
 
     A->>WD: Change status to "Attended"
     WD->>AS: updateStatus(id, 'Attended')
-    AS->>API: PATCH /alerts/{id}
+    AS->>API: status resolved (admin alerts endpoint)
     API-->>AS: Updated
     API-->>M: Notification to user
     WD->>WD: Update interface
 
-    A->>WD: Add response notes
-    WD->>AS: updateNotes(id, notes)
-    AS->>API: PATCH /alerts/{id}/notes
-    API-->>AS: Notes saved
 
     alt Multiple alerts in same zone
         WD->>WD: Highlight zone on map
@@ -405,6 +414,10 @@ sequenceDiagram
 | RiskZonesService | getZones, createZone, updateZone, deleteZone, getPoints | Map, ClassifyZone |
 | PhoneLocationService | getLocation, getHistory | Map, LocationHistory |
 | ContactsService | getAll, create, update, delete | Contacts, AddContact |
+| TripService | start, heartbeat, arrived, extend, cancel (`/api/safe-trips`) | Trip |
+| AutoProtection (Kotlin + service) | enable, disable, start, heartbeat, no-answer, unconfirmed, duress | AlertSecurity |
+| AlertChatService | `/api/alerts/{id}/messages` | AlertChat, ContactAlert |
+| serviceRoutes.ts | Chooses Auth, Alert or Evidence by path | All |
 
 ### Web
 

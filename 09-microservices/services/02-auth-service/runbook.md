@@ -1,154 +1,92 @@
 # Runbook — Auth Service
 
-> Procedimientos de operación para quien esté en guardia.
-> Este servicio es crítico — un P0 en auth-service impide que TODOS los usuarios accedan al sistema.
-
-**Servicio:** auth-service
-**Puerto local:** 8081
-**Versión:** 1.0
-**Última actualización:** [YYYY-MM-DD]
-
 ---
 
-## 1. Información rápida
+## 1. Quick information
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Puerto local | 8081 |
-| URL producción | `https://api.[dominio]/api/v1/auth` |
-| URL staging | `https://staging.api.[dominio]/api/v1/auth` |
-| Dashboard Grafana | [URL del panel de auth-service] |
-| Canal de alertas | [#alerts] |
-| Escalamiento | [Tech Lead — contacto — URGENTE si auth está caído] |
-| RTO objetivo | 5 min (autenticación bloqueada = sistema inoperable) |
-| RPO objetivo | 0 (PostgreSQL con réplica en tiempo real) |
+| URL | `https://alerta-mujer-auth.onrender.com` |
+| Hosting | Render, free plan, Docker, branch `main`, Root Directory `microservicios` |
+| Database | Render PostgreSQL 16 (migrated by this service at startup) |
+| Monitor | UptimeRobot on `/actuator/health` every 5 minutes |
+| Logs | **Logs** tab of the service in Render |
+| Owner | Backend team |
 
 ---
 
-## 2. Verificar salud
+## 2. Check health
 
 ```bash
 # Health check
-curl https://api.[dominio]/api/v1/auth/health
+curl https://alerta-mujer-auth.onrender.com/actuator/health
+# Expected response:
+# {"status":"UP"}
 
-# Respuesta esperada:
-# {"status": "ok", "db": "connected", "redis": "connected"}
-
-# Si hay problemas, verificar las dependencias:
-
-# Verificar PostgreSQL
-kubectl exec -n [ns] [postgres-pod] -- pg_isready -U [user]
-
-# Verificar Redis
-kubectl exec -n [ns] [redis-pod] -- redis-cli ping
-# Respuesta esperada: PONG
+# If there are problems, check the admin panel:
+# Configuration > System status (database connection, push, active alerts, last expiration review)
 ```
+
+The first request after 15 minutes without traffic can take up to about 90 seconds.
 
 ---
 
-## 3. Alertas frecuentes
+## 3. Frequent alerts
 
-### Alta tasa de errores 401 en login
+### High rate of 401 on login
 
-**Síntoma:** Muchos intentos de login fallidos en poco tiempo (posible ataque).
+1. Check the logs for repeated failed attempts from the same IP (the rate limit answers 429 after 5 per minute).
+2. If the users are blocked (`Account blocked`), review the admin panel: an administrator blocks accounts manually.
 
-```bash
-# Ver IPs con más intentos
-kubectl logs -n [ns] -l app=auth-service --tail=500 | \
-  grep '"eventType":"user.login_failed"' | jq '.payload.ipAddress' | \
-  sort | uniq -c | sort -rn | head -10
-```
+### Users with an active session cannot refresh
 
-**Acción:** Si una IP supera [N] intentos en 5 minutos, agregar a denylist del gateway.
+1. Check that `JWT_SECRET` did not change in one service only; it must be the same in the three.
+2. Check the `device_session` of the user: a `revoked` or `expired` session requires logging in again.
 
-### Tokens de actualización no funcionan (usuarios con sesión activa no pueden renovar)
+### The service does not start
 
-**Causa probable:** Redis caído o la clave JWT fue rotada sin actualizar todos los servicios.
-
-```bash
-# Verificar Redis
-kubectl exec -n [ns] [redis-pod] -- redis-cli ping
-
-# Verificar que la clave pública en el gateway coincide con la del auth-service
-kubectl exec -n [ns] [auth-pod] -- curl localhost:8081/api/v1/auth/jwks
-```
-
-### Accounts being locked out en masa
-
-**Síntoma:** Muchos usuarios reportan "cuenta bloqueada" simultáneamente.
-
-**Causa probable:** (A) ataque coordinado, (B) bug de contador que se incrementa incorrectamente.
-
-```bash
-# Ver cantidad de cuentas bloqueadas actualmente
-kubectl exec -n [ns] [redis-pod] -- redis-cli keys "locked:*" | wc -l
-
-# Desbloquear una cuenta específica (solo emergencias, aprobación Tech Lead)
-kubectl exec -n [ns] [redis-pod] -- redis-cli del "locked:usuario@example.com"
-```
+1. `JWT_SECRET` empty or with the value that was once published: `JwtKeyProvider` stops the startup.
+2. A Liquibase changeset failed: read the startup logs; never edit an applied changeset, create a new one.
+3. The database is unreachable: check `DB_HOST`, `DB_PORT`, `DB_NAME` and the free database expiration.
 
 ---
 
-## 4. Rotación de claves JWT
+## 4. JWT secret rotation
 
-> Solo ejecutar con aprobación del Tech Lead. Tiene impacto en todos los servicios.
+1. Generate a new long random secret.
+2. Update `JWT_SECRET` in the shared group of variables in Render (it applies to the three services).
+3. Redeploy the three services. Every existing session becomes invalid and users must log in again.
+4. Check the three health endpoints and log in from the web and the app.
 
-```bash
-# 1. Generar nuevo par de claves
-openssl genrsa -out new-private.pem 2048
-openssl rsa -in new-private.pem -pubout -out new-public.pem
-
-# 2. Actualizar el secreto en el vault del ambiente
-# (seguir el proceso del vault de tu infraestructura)
-
-# 3. El JWKS endpoint soporta múltiples claves — agregar la nueva sin remover la vieja
-# Esto permite que los tokens existentes (firmados con la clave vieja) sigan siendo válidos
-# hasta su expiración (máx 1 hora)
-
-# 4. Después de 1 hora: remover la clave vieja del JWKS
-
-# 5. Verificar que el gateway puede usar la nueva clave pública
-curl https://api.[dominio]/api/v1/auth/jwks
-```
+The last rotation was on 28/10/2026.
 
 ---
 
 ## 5. Rollback
 
-```bash
-kubectl rollout history deployment/auth-service -n [ns]
-kubectl rollout undo deployment/auth-service -n [ns]
-kubectl rollout status deployment/auth-service -n [ns]
-```
-
-**Si hay migraciones de BD en el deploy que se está revirtiendo:**
-Contactar al Tech Lead antes de hacer rollback — puede requerirse una migración de rollback.
+Redeploy the previous commit of `main` in Render, or revert the pull request and let Render publish
+again. A rollback does not undo applied migrations: if a changeset caused the problem, write a new
+changeset that corrects it (as changeset 25 did on 27/10/2026).
 
 ---
 
-## 6. Operaciones de mantenimiento
+## 6. Maintenance operations
 
-### Limpiar refresh tokens expirados
+### Wake the services before a presentation
 
-```bash
-# Si el job automático de limpieza falla:
-kubectl exec -n [ns] [postgres-pod] -- psql -U [user] -d [db] \
-  -c "DELETE FROM refresh_tokens WHERE expires_at < NOW() AND revoked_at IS NOT NULL;"
-```
+Call the three `/actuator/health` endpoints a few minutes before.
 
-### Revocar todas las sesiones de un usuario (emergencia)
+### Unblock an account
 
-```bash
-kubectl exec -n [ns] [postgres-pod] -- psql -U [user] -d [db] \
-  -c "UPDATE refresh_tokens SET revoked_at = NOW() WHERE user_id = '[user-uuid]';"
-```
+From the admin panel (Users), with the reason recorded in the audit log.
+
+### Delete an account
+
+Requested by one administrator and approved by a second one; the personal data is anonymized.
 
 ---
 
-## 7. Post-incidente
+## 7. Post-incident
 
-- [ ] Login y refresh funcionando normalmente
-- [ ] Zero 5xx en los últimos 5 minutos
-- [ ] Cuentas bloqueadas incorrectamente desbloqueadas (si aplica)
-- [ ] Incidente registrado en `13-operations/incident-management.md`
-- [ ] Si hubo breach de credenciales: escalar a protocolo de seguridad
+Record the cause, the affected users, the recovery time and the action taken in
+`13-operations/incident-management.md`.

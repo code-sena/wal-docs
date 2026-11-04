@@ -1,194 +1,156 @@
 # Product Roadmap — Woman Alert
 
-This roadmap defines the delivery plan over three horizons, from MVP to long-term evolution based on the SRS scope and discovery findings.
+This roadmap shows what was delivered and what comes next, over three horizons. Dates are the verifiable milestones recorded in the technical audit and the general project document; the team's Gantt chart (January to July, year not stated) is used only as a planning reference.
 
 ---
 
 ## Horizon 1 — MVP (Sprint 1-2)
 
-**Objective:** Deliver the core system described in the SRS with essential emergency response capabilities.
+**Objective:** Deliver the core system: activation from the app, notices to contacts, accompaniment during the alert, web portal and admin panel.
 
-**Timeline:** Sprint 1 (Sep 19 – Oct 2), Sprint 2 (Oct 3 – Oct 16)
+**Timeline:** built iteratively until the feature freeze of 24/10/2026; APK v1.0.0 and publication from `main` on 28/10/2026.
 
 ### Modules and features
 
 #### Identity and Access Management
-- User registration (phone/email with verification)
-- Login with JWT authentication
-- Profile configuration (name, photo, tutorial completion)
-- Emergency contacts management (add, edit, delete contacts)
-- Password recovery via email or SMS
+- [x] Registration with acceptance of terms, login with email or Google, JWT with refresh
+- [x] Recovery with a 6-digit code by email
+- [x] Profile, account deletion, new-phone notice
+- [x] Rate limit on authentication
 
 #### Alert Activation
-- Main panic button in app interface
-- Widget activation (home screen widget)
-- Sudden movement detection (accelerometer-based trigger)
-- Physical button activation (volume key long-press)
-- Discreet confirmation pattern (gesture-based)
+- [x] SOS button with a 5-second countdown, alert to a single contact, shake (native service), widget
+- [x] Cancellation PIN, duress PIN, cancel with volume-down ×4, discreet mode
+- [x] Enable or disable each method
+- [x] Lock screen and power button activation — **removed on 23/10/2026**
 
 #### Alert Delivery
-- Multi-channel notifications (SMS, email, push notifications via FCM)
-- Real-time location sharing with contacts
-- Alert contact tracking (delivery status, retry logic)
-- Chain of Responsibility pattern for channel failover
+- [x] Email with tracking link (Resend) and push with alarm (FCM)
+- [x] Result per contact and channel, resend after 5 minutes, lost-signal notice
+- [x] Public tracking page for contacts, chat
 
 #### Evidence Recording
-- Audio recording during active alert
-- Photo capture during active alert
-- Video recording during active alert
-- Cloud storage upload with encryption
-- Evidence history for user review
+- [x] Automatic video and then audio during the alert, upload queue
+- [x] Backblaze B2 with SHA-256, 30-day retention, keep up to 5 alerts
+- [x] Private copy on the device
 
 #### Location Tracking
-- Continuous GPS tracking during active alert
-- Location accuracy 10-20m (RNF7)
-- Frequent location logging (home, work, frequent places)
-- Safe/risk zone map visualization
+- [x] Periodic location during the alert, also with the app closed
+- [x] "Notify me if I don't arrive" trips
+- [x] Automatic protection when leaving a frequent place (added after the freeze, approved before it)
 
 #### Notifications
-- In-app notifications (reminders, warnings, updates)
-- Alert reminders when user doesn't respond
-- Persistent notifications for active alerts
+- [x] Inbox with a bell, alerts received from contacts
+- [x] Minimum version notice
 
 #### Web Platform
-- Public landing page (information about the service)
-- User portal (history, locations, evidence review)
-- Administrative panel (user management, alerts, reports)
+- [x] Landing with APK download, public tracking page, user portal, admin panel under `/admin`
+- [x] Translated to English, Portuguese and French on 25/10/2026
 
 #### Cross-cutting
-- Language support (Spanish primary, English toggle)
-- Theme customization (light/dark mode)
-- Device registration and management
-- Permission management (GPS, camera, microphone, contacts)
+- [x] Three microservices with hexagonal architecture and ArchUnit tests (25/10/2026)
+- [x] 553 automated tests and GitHub Actions on every pull request (28/10/2026)
+- [x] Render, Vercel and GitHub Releases publish from `main` (28/10/2026)
 
 ---
 
 ## Horizon 2 — Iteration (Sprint 3-4)
 
-**Objective:** Enhance the MVP based on user feedback and operational learnings.
-
-**Timeline:** Sprint 3 (Oct 17 – Oct 30), Sprint 4 (Oct 31 – Nov 13)
+**Objective:** Verify what was built and close the gaps found by the audit and the quality review.
 
 ### Enhancements
 
 #### Evidence Expansion
-- Evidence metadata tagging (timestamp, location, context)
-- Evidence sharing with authorities (with user consent)
-- Evidence compression for bandwidth optimization
-- Evidence retention policy implementation
+- Field test of recording with the app in the background
+- Encryption of evidence files with an own key, or correction of the tutorial text "Encrypted recording"
 
 #### Zone Management
-- User-reported zone classifications (safe/dangerous)
-- Zone geofencing notifications (entering/leaving risk zones)
-- Zone-based alert routing (contacts specific to zone)
-- Crowd-sourced zone safety ratings
+- Review of zones and help points with real data of Neiva and Huila
 
 #### Advanced Activation
-- Voice activation (keyword trigger)
-- Inactivity confirmation (user must confirm safety periodically)
-- Wearable device integration (smartwatch panic button)
-- Automatic distress pattern detection
+- Manual tests of shake, widget, trip and automatic protection with the release APK (PM-04 to PM-09) on several manufacturers
+- Local queue to create the alert without connection
 
 #### Reporting and Analytics
-- Alert statistics dashboard for administrators
-- Response time analytics (verify RNF5 compliance)
-- Geographic hotspots visualization
-- User engagement metrics
+- Measurement of alert dispatch time, battery and GPS accuracy (RNF-REN-001 to 003)
 
 #### Administrative Features
-- Audit log viewer
-- Bulk user operations
-- System configuration management
-- Moderation queue for reported content
+- Record previous and new values in the audit of configuration changes (RF-AUD-002)
+- Change the administrative password that appears in a commit message
 
 ---
 
 ## Horizon 3 — Long-term Evolution (Sprint 5+)
 
-**Objective:** Continuous improvement based on real-world usage and stakeholder feedback.
-
-**Timeline:** Ongoing from Sprint 5, based on user feedback and organizational priorities
+**Objective:** Improve with real use, if the project continues after the academic delivery.
 
 ### Future considerations
 
 #### UX and Usability
-- Accessibility improvements (screen reader support, high contrast)
-- Offline mode for areas with no connectivity
-- Reduced cognitive load interface design
-- User onboarding flow optimization
+- Validation with users from Huila, with a preserved instrument and results
+- Accessibility review with TalkBack, large text and keyboard
 
 #### Integration
-- Integration with Colombian emergency services (123 line)
-- Integration with women's support organizations
-- API for third-party developers (with approval)
-- Wearable-specific app versions
+- Decide whether to add a gateway (DIS-ARQ-04)
+- Production build (AAB) and distribution beyond GitHub Releases
 
 #### Privacy and Security
-- End-to-end encryption for all communications
-- Zero-knowledge architecture for sensitive data
-- GDPR-like data portability features
-- Blockchain-based evidence verification
+- Privacy policy, data treatment policy and terms and conditions (Law 1581 of 2012)
+- Switch to turn off the daily location; web token outside `localStorage`; encryption at rest
 
 #### AI and Automation
-- Predictive risk assessment based on location patterns
-- Automated alert escalation (contacts → authorities)
-- Pattern recognition for false positive reduction
-- Chatbot for resource directory queries
+- Not planned. Any automatic risk classification would need an explicit ethical and privacy review first.
 
 #### Community Features
-- Verified user communities (trusted networks)
-- Peer support connection features
-- Anonymous reporting channels
-- Community-driven safety resources
+- Not planned beyond the existing zone reports moderated by the administration.
 
 ---
 
 ## Dependencies between horizons
 
-| Horizon | Dependency on previous horizon | Reason |
-|---------|------------------------------|--------|
-| H2 | H1 core features stable | Cannot iterate on features that don't exist yet |
-| H3 | H2 operational data | Real-world usage data needed to inform H3 decisions |
-| H3 evidence sharing | H1 evidence recording | Need base evidence capture before sharing logic |
-| H3 integration with 123 | H1 multi-channel notifications | Established notification patterns needed for external integration |
+| Item | Depends on |
+|------|------------|
+| Declaring the alert path as verified | Manual tests PM-04 to PM-09 and archived evidence of the notices between two phones |
+| Opening the app to more users | Privacy policy and terms; closing the open security findings |
+| Removing the cold start | A hosting plan without sleep |
+| Web parity | Trips and personal data endpoints already exist in the backend; only the web screens are missing |
 
 ---
 
 ## Risk-based scope adjustments
 
-| Risk | Probability | Impact | Mitigation / Scope adjustment |
-|------|-------------|--------|-------------------------------|
-| GPS accuracy insufficient indoors | Medium | High | Accept lower accuracy in H1, improve in H2 with Wi-Fi positioning |
-| High false positive rate from sudden movement | Medium | High | Add machine learning in H2, start with sensitivity threshold in H1 |
-| Cloud storage costs exceed budget | Low | High | Implement retention policy in H1, optimize compression in H2 |
-| User adoption lower than expected | Medium | High | Focus on H1 usability, gather feedback in H2 before major features |
+| Risk | Scope decision |
+|------|----------------|
+| Academic deadline | Feature freeze on 24/10/2026; only automatic protection and bug fixes after it |
+| Google Maps billing | Migrated to MapLibre and Leaflet with OpenStreetMap tiles |
+| SMTP blocked by Render | Email through an HTTP API |
+| Lock screen activation unreliable | Removed and recorded as Retired |
+| SMS cost and complexity | Discarded; email with tracking link plus push |
 
 ---
 
 ## Success criteria per horizon
 
 ### Horizon 1 (MVP)
-- ✅ RNF5: ≥95% of alerts dispatched within ≤2 seconds
-- ✅ RNF6: Battery consumption ≤10% per hour of continuous GPS use
-- ✅ RNF7: Location accuracy 10-20m
-- ✅ End-to-end alert flow (activation → delivery → location sharing) working
-- ✅ Minimum 20 pilot users for testing
+- [x] All core features implemented in `main`
+- [x] 553 automated tests green in CI
+- [x] APK v1.0.0 published and downloadable from the landing page
+- [ ] Notices verified end to end between two phones with recorded evidence
 
 ### Horizon 2 (Iteration)
-- ✅ False positive rate < 5% (measured by cancelled alerts)
-- ✅ Evidence upload success rate > 98%
-- ✅ Average alert response time reduced by 20% vs. H1 baseline
-- ✅ User retention rate > 60% after 30 days
+- [ ] PM-04 to PM-09 recorded
+- [ ] Open security findings closed
+- [ ] Performance targets measured
 
 ### Horizon 3 (Long-term)
-- ✅ Integration with at least one external support organization
-- ✅ Community-reported zones with >80% approval rate
-- ✅ User-reported satisfaction score > 4.0/5.0
+- [ ] Design validated with users from Huila
+- [ ] Policies and terms published
+- [ ] Hosting without sleep
 
 ---
 
 ## Correlations
 
-* Product Vision → `03-product/vision.md`
-* User Stories implementing roadmap → `04-requirements/user-stories.md`
-* Technical backlog for deferred features → `15-project-control/technical-backlog.md` (to be created)
+* Product vision → `03-product/vision.md`
+* Product backlog → `03-product/product-backlog.md`
+* Risks → `15-project-control/risks.md`

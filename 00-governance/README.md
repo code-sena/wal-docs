@@ -44,7 +44,7 @@ Woman Alert is a gender violence prevention system with privacy-critical require
 - Accessibility considerations (stress-mode UI, discreet activation)
 
 ### Governance status
-- ✅ Sprint structure defined (2-week sprints starting Sep 19, 2026)
-- ✅ Ceremony schedule established (daily standups, planning, review, retro)
-- ✅ RBAC roles customized for Woman Alert context
-- ✅ Git conventions adapted for current workflow (main + feature branches)
+- ✅ Iterative and incremental work by feature; the verifiable evidence is the commits, feature branches and pull requests (formal Scrum records were not kept)
+- ✅ Feature freeze on 24/10/2026; after it, only automatic protection and bug fixes
+- ✅ RBAC roles customized for Woman Alert context (user and administrator)
+- ✅ Git flow `develop` → `qa` → `main` with GitHub Actions on every pull request (since 28/10/2026)

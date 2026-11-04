@@ -1,6 +1,6 @@
 # Microservices Catalog
 
-> **What to fill in here:** The complete inventory of system services.
+> The complete inventory of the system services in `main` (28/10/2026).
 > For the detail of each service, go to `09-microservices/services/NN-service-name/`.
 > This catalog is the executive view — one row per service.
 
@@ -9,38 +9,43 @@
 ## Services map
 
 ```
-                          ┌─────────────────┐
-  External clients        │   API Gateway   │
-  (Web, Mobile, API)  ──▶ │   :8080         │
-                          └────────┬────────┘
-                                   │ routes by path
-          ┌───────────────┬────────┴───────────┬──────────────────┐
-          ▼               ▼                    ▼                  ▼
-  ┌──────────────┐ ┌──────────────┐  ┌──────────────────┐ ┌──────────────┐
-  │ auth-service │ │[service-A]   │  │ [service-B]      │ │[service-N]   │
-  │    :3001     │ │    :3002     │  │    :3003         │ │    :300N     │
-  └──────────────┘ └──────┬───────┘  └────────┬─────────┘ └──────────────┘
-                           │                   │
-                           └──────────┬────────┘
-                                      ▼
-                            ┌─────────────────┐
-                            │  Message Broker  │
-                            │  (Kafka/RabbitMQ)│
-                            └─────────────────┘
+  External clients: Mobile app (Expo/React Native + Kotlin), Web (Angular), contacts' browsers
+                 │
+                 │ HTTPS + JWT — the client picks the service by path (no gateway)
+     ┌───────────┼──────────────────────────┬──────────────────────────┐
+     ▼           ▼                          ▼                          │
+┌──────────────────┐  ┌───────────────────────────┐  ┌──────────────────┐
+│   Auth Service   │  │       Alert Service       │  │ Evidence Service │
+│      :8081       │  │          :8082            │  │      :8083       │
+│ identity devices │  │ alerts notifications      │  │ evidence         │
+│ settings admin   │  │ zones resources           │  │                  │
+└────────┬─────────┘  └─────────────┬─────────────┘  └────────┬─────────┘
+         │   /internal/rpc · /internal/events (X-Internal-Key)  │
+         └──────────────────────────┼───────────────────────────┘
+                                    ▼
+                         ┌─────────────────────┐
+                         │   PostgreSQL 16     │
+                         │ identity · alert ·  │
+                         │ resource · admin ·  │
+                         │ notification        │
+                         └─────────────────────┘
+   External: Firebase (FCM, Google) · Resend · Backblaze B2
 ```
+
+There is no message broker: events inside a service are Spring events published after the
+transaction commits, and between services they are forwarded by HTTP to `/internal/events`.
 
 ---
 
 ## Service registry
 
-| # | Service | Main responsibility | Port | DB | DB type | Status |
-|---|---------|-------------------|------|-----|---------|--------|
-| 01 | `api-gateway` | Routing, authentication, rate limiting | 8080 | Redis | Cache | 🟢 Active |
-| 02 | `auth-service` | Registration, login, JWT tokens, RBAC | 3001 | PostgreSQL | Relational | 🟢 Active |
-| 03 | `[service-name]` | [responsibility] | 3002 | [DB] | [type] | 🟡 In development |
-| 04 | `[service-name]` | [responsibility] | 3003 | [DB] | [type] | 🔴 Planned |
-
-**Statuses:** 🟢 Active in prod | 🟡 In development | 🔴 Planned | ⏸ Deprecated
+| # | Service | Port (local) | Production URL | Owner | Status |
+|---|---------|--------------|----------------|-------|--------|
+| 01 | Client routing (no `api-gateway`) | — | — | Mobile and web teams | Gateway removed on 25/10/2026; routing in the clients |
+| 02 | `auth-service` | 8081 | `https://alerta-mujer-auth.onrender.com` | Backend | In production (`main`) — 51 endpoints |
+| 03 | `alert-service` | 8082 | `https://alerta-mujer-alert.onrender.com` | Backend | In production (`main`) — 93 endpoints |
+| 04 | `evidence-service` | 8083 | `https://alerta-mujer-evidence.onrender.com` | Backend | In production (`main`) — 14 endpoints |
+| — | `shared-kernel` | — | — | Backend | Library used by the three services |
 
 ---
 
@@ -50,110 +55,97 @@
 
 | Field | Value |
 |-------|-------|
-| **Folder** | `09-microservices/services/01-api-gateway/` |
-| **Responsibility** | Single entry point. Routes, authenticates, and applies rate limiting |
-| **Type** | Infrastructure service (not domain) |
-| **Port** | 8080 (HTTPS 8443) |
-| **Technology** | [Kong / NGINX + custom / Spring Cloud Gateway] |
-| **DB** | Redis (token cache, rate limiting) |
-| **Communicates with** | All internal services |
-| **Externally exposed** | Yes — it is the only entry point |
-
-**Key endpoints:**
-- `/*` — Proxy to internal services based on path
-
----
+| **Status** | Not deployed. The gateway and the old monolith were deleted from the repository on 25/10/2026 |
+| **What replaces it** | Each client chooses the service by the start of the path: `services/serviceRoutes.ts` (mobile) and `core/api/service-routes.ts` + interceptor (web) |
+| **Where JWT is validated** | In each service, with the same key, without calling Auth |
+| **Open decision** | DIS-ARQ-04: whether to add a gateway and the criteria to split or merge modules |
+| **Docs** | `services/01-api-gateway/` |
 
 ### 02 — `auth-service`
 
 | Field | Value |
 |-------|-------|
-| **Folder** | `09-microservices/services/02-auth-service/` |
-| **Responsibility** | Identity and access: registration, login, refresh token, RBAC |
-| **Type** | Supporting service |
-| **Port** | 3001 |
-| **Technology** | [Node.js + Express / Spring Boot / etc.] |
-| **DB** | PostgreSQL |
-| **Bounded Context** | `02-domain/domain-map.md` → IAM Context |
-| **Externally exposed** | Only through the API Gateway |
+| **Responsibility** | Registration, login with JWT and Google, refresh, password recovery, profile, phones and push tokens, system configuration, admin panel, moderation, reports, account deletion with two administrators, audit and admin session |
+| **Modules** | `identity`, `devices`, `settings`, `admin` |
+| **Contracts it exposes** | `IdentityApi`, `DevicesApi`, `SettingsApi` |
+| **Contracts it consumes** | `AlertsApi`, `ZonesApi` |
+| **Database** | Schemas `identity` (11 tables) and `admin` (6 tables); applies all the Liquibase migrations at startup |
+| **External** | Firebase (Google token verification, push for the new-phone notice), email provider (recovery code) |
+| **Tests** | 114 (JUnit 5, Mockito, ArchUnit) |
+| **Docs** | `services/02-auth-service/` |
 
-**Key endpoints:**
-- `POST /auth/register` — User registration
-- `POST /auth/login` — Authentication, returns JWT
-- `POST /auth/refresh` — Renew token
-- `DELETE /auth/logout` — Invalidate refresh token
-
-**Events published:**
-- `UserRegistered` → Topic: `iam.user.registered`
-- `SessionStarted` → Topic: `iam.session.started`
-
----
-
-### 03 — `[service-name]`
+### 03 — `alert-service`
 
 | Field | Value |
 |-------|-------|
-| **Folder** | `09-microservices/services/03-[name]/` |
-| **Responsibility** | [Describe in one sentence] |
-| **Type** | [Core / Supporting / Generic] |
-| **Port** | 300X |
-| **Technology** | [Stack] |
-| **DB** | [Engine and name] |
-| **Bounded Context** | [Reference in domain-map] |
-| **Externally exposed** | [Yes / Internal only] |
+| **Responsibility** | Alerts and their lifecycle, location, chat, contacts, email and push notices, resend after 5 minutes, lost-signal notice, public tracking, trips, automatic protection, zones, zone reports, help resources and calls |
+| **Modules** | `alerts`, `notifications`, `zones`, `resources` |
+| **Contracts it exposes** | `AlertsApi`, `ZonesApi` |
+| **Contracts it consumes** | `IdentityApi`, `DevicesApi`, `SettingsApi`, `EvidenceApi` (public tracking) |
+| **Database** | Schemas `alert` (except `evidence`), `resource` and `notification` |
+| **External** | Firebase Cloud Messaging, Resend (Brevo as alternative) |
+| **Scheduled tasks** | Alert expiration, resend and signal check, trips and automatic protection, location retention |
+| **Tests** | 196 |
+| **Docs** | Detailed in `05-architecture/overview.md`, `07-api/api-contract.md` and the technical manual (no own folder in this repository yet) |
 
-**Key endpoints:**
-- `[METHOD] /[path]` — [description]
+### 04 — `evidence-service`
 
-**Events published:**
-- `[EventName]` → Topic: `[topic.name]`
-
-**Events consumed:**
-- `[EventName]` from `[source service]`
+| Field | Value |
+|-------|-------|
+| **Responsibility** | Upload (multipart, max. 50 MB), SHA-256 hash, storage in Backblaze B2, download, admin review and 30-day retention with a notice 5 days before |
+| **Modules** | `evidence` |
+| **Contracts it exposes** | None (the module implements `EvidenceApi` for Alert) |
+| **Contracts it consumes** | `AlertsApi`, `IdentityApi` |
+| **Database** | Table `alert.evidence` |
+| **External** | Backblaze B2 (S3 API); SeaweedFS as local S3 in Docker |
+| **Tests** | 25 |
+| **Docs** | Detailed in `07-api/api-contract.md` §7 and the technical manual |
 
 ---
 
 ## Service communication matrix
 
-> Who calls whom and through which channel.
+| Caller ↓ / Called → | Auth | Alert | Evidence | Communication type |
+|---------------------|------|-------|----------|--------------------|
+| **Mobile / Web** | ✅ | ✅ | ✅ | HTTPS + JWT, routed by path |
+| **Auth** | — | ✅ (`AlertsApi`, `ZonesApi`) | ❌ | RPC `/internal/rpc`; events to `/internal/events` |
+| **Alert** | ✅ (`IdentityApi`, `DevicesApi`, `SettingsApi`) | — | ✅ (`EvidenceApi`) | RPC `/internal/rpc` |
+| **Evidence** | ✅ (`IdentityApi`) | ✅ (`AlertsApi`) | — | RPC `/internal/rpc` |
 
-| Source service | Destination service | Channel | Type | Description |
-|----------------|--------------------|---------|----- |-------------|
-| api-gateway | auth-service | HTTP/REST | Synchronous | Validate JWT on each request |
-| [svc-a] | [svc-b] | Event | Asynchronous | Notify of [event] |
-| [svc-b] | [svc-c] | HTTP/REST | Synchronous | Query [data] |
+All internal calls require `X-Internal-Key`, keep the error type (404, 403, 400, 409) and wait up to
+90 seconds because of the cold start of the free plan.
 
 ---
 
 ## Data ownership matrix
 
-Each business entity has a single owner service.
-Others access via API or events, never directly to the DB.
-
-| Entity / Data | Owner service (Source of Truth) | How other services access |
-|---------------|--------------------------------|--------------------------|
-| User / Identity | auth-service | REST API (`GET /users/:id`) |
-| [Entity A] | [service-A] | `[EntityACreated]` event |
-| [Entity B] | [service-B] | REST API (`GET /b/:id`) |
+| Data | Owner | Who else reads it (through a contract) |
+|------|-------|----------------------------------------|
+| Users, accounts, profiles, roles, recovery | Auth (`identity`) | Alert, Evidence (`IdentityApi`) |
+| Devices, push tokens, sessions, activation settings, preferences | Auth (`identity`) | Alert (`DevicesApi`) |
+| System configuration, audit, moderation, reports, account deletion | Auth (`admin`) | Alert (`SettingsApi`) |
+| Alerts, notices, chat, locations, contacts, places, routes, trips, protection devices, notifications | Alert (`alert`) | Auth, Evidence (`AlertsApi`) |
+| Zones, zone reports, help resources, calls | Alert (`resource`) | Auth (`ZonesApi`) |
+| Tracking links and visits | Alert (`notification`) | — |
+| Evidence files | Evidence (`alert.evidence`) | Alert (`EvidenceApi`) |
 
 ---
 
 ## How to add a new service
 
-1. Assign the next available number in this catalog
-2. Create the folder: `cp -r 09-microservices/_template/service 09-microservices/services/NN-new-service`
-3. Fill in the README, data-model, events, and decisions of the new service
-4. Create the OpenAPI contract in `07-api/contracts/openapi/NN-new-service.yaml`
-5. Add the service to this catalog
-6. Add the ADR for the decision to create the service in `05-architecture/decisions/`
-7. Update the diagram in `05-architecture/overview.md`
+1. Write an ADR that explains why the module needs its own deployment.
+2. Create the Maven module under `microservicios/` depending on `shared-kernel`.
+3. Keep the hexagonal structure and add `HexagonalArchitectureTest`.
+4. Expose what other services need through a `*Api` contract; callers get an RPC client.
+5. Add its `Dockerfile`, its entry in `docker-compose.yml` and `render.yaml`, and its URL variable.
+6. Update the routing by path in the mobile app and the web.
+7. Add it to this catalog and create its folder in `services/`.
 
 ---
 
 ## Correlations
 
-- Architecture and patterns → `05-architecture/`
-- API contracts per service → `07-api/contracts/openapi/`
-- System events → `02-domain/domain-events.md`
-- Template for creating services → `09-microservices/_template/service/`
-- Full detail per service → `09-microservices/services/NN-[name]/`
+- Architecture overview → `05-architecture/overview.md`
+- Architectural style → `05-architecture/decisions/records/ADR-002-architectural-style.md`
+- API contract → `07-api/api-contract.md`
+- Data models → `06-data/models.md`

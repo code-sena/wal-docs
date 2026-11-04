@@ -17,14 +17,15 @@ the services work in parallel with an agreed contract.
 
 ## What is here and how to fill it in
 
-### `contracts/openapi/api-gateway.yaml` ✅ REAL (partial)
-Planned single entry point: validates JWT, routes, applies rate limiting/CORS. Today clients point
-directly at the monolith; this contract is the gateway's promise.
+### `contracts/openapi/api-gateway.yaml` ✅ REAL (entry points)
+There is no gateway in production. This file documents the entry points that the clients use: the
+three service URLs (local and Render), the routing by path that mobile and web apply, and the public
+health check of each service.
 
 ### `contracts/openapi/auth-service.yaml` ✅ REAL (partial)
-The identity service contract (registration, login, session renewal). Divergence note: current
-code exposes these endpoints under `/api/auth/**` in the monolith and in `am-identity-service`
-(:3001), the only service with functional code.
+Contract of the Auth service for the endpoints the clients use: registration, login, Google login,
+refresh, password recovery, profile, devices and public configuration. The admin endpoints are listed
+in `api-contract.md` §13.
 
 ### `contracts/openapi/_shared.yaml`
 Reusable schemas and components across contracts (pagination, errors, security).
@@ -35,10 +36,9 @@ Template for adding a new service contract. Duplicate it as `service-name.yaml`.
 ### Missing (debt)
 | Service | Port | Bounded contexts | Status |
 |---|---|---|---|
-| identity-service | 3001 | Identity and Accounts | Partial code; missing own `identity-service.yaml` |
-| alert-service | 3002 | Alert Management, contacts, evidence, notifications | Skeleton → missing `alert-service.yaml` |
-| resource-service | 3003 | Zones and help resources | Skeleton → missing `resource-service.yaml` |
-| admin-service | 3004 | Administration and moderation | Skeleton → missing `admin-service.yaml` |
+| Auth | 8081 | Identity and Accounts, Administration and Moderation | `auth-service.yaml` covers the client endpoints; admin endpoints only in `api-contract.md` |
+| Alert | 8082 | Alerts, contacts, notifications, trips, zones and resources | Missing `alert-service.yaml`; documented in `api-contract.md` |
+| Evidence | 8083 | Evidence | Missing `evidence-service.yaml`; documented in `api-contract.md` |
 
 ### Minimum structure for each contract
 

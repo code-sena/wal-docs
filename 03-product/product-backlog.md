@@ -1,429 +1,429 @@
 # Product Backlog — Woman Alert
 
-Prioritized list of user stories and technical tasks to be implemented, ordered by user value and dependencies.
+Prioritized list of user stories and technical tasks, ordered by user value and dependencies. Updated on 28/10/2026 against SRS v2.6 and the code in `main`. New features were frozen on 24/10/2026, so P0 and P1 are built and the open work is verification and the items in P2, P3 and the technical debt.
 
 ---
 
 ## Backlog priorities
 
 ### Priority Legend
-- **P0** — Critical for MVP (Horizon 1, Sprint 1-2)
-- **P1** — Important for MVP (Horizon 1, Sprint 3-4)
-- **P2** — Enhancement (Horizon 2)
-- **P3** — Future consideration (Horizon 3)
+- **P0** — Critical: the alert path and the accounts (delivered in APK v1.0.0)
+- **P1** — Important: complements of the alert path (delivered)
+- **P2** — Next: gaps found by the audit and the quality review
+- **P3** — Future consideration
 
 ---
 
 ## P0 — Critical for MVP
 
-### HU-IDM-001: User Registration
+### HU-USU-001: Account and Login
 **As** a new user  
-**I want** to register with my phone number or email  
-**So that** I can access the Woman Alert system
+**I want** to register and log in with email or Google  
+**So that** I can use Woman Alert in the app and on the web
 
 **Acceptance Criteria:**
-- Given a valid phone number, when the user submits registration, then receive SMS verification code
-- Given a valid email, when the user submits registration, then receive email verification link
-- Given an invalid phone/email format, when the user submits, then show validation error
-- Given a verified phone/email, when user sets password, then account is created with status `active`
+- Registration validates the data and requires accepting the terms
+- Login with email/password or Google opens the private area
+- Five failed attempts per minute from the same IP return 429
 
-**Estimation:** 3 SP  
+**Requirements:** RF-USU-001, RF-USU-003, RF-USU-005, RF-USU-007  
 **Priority:** P0  
-**Dependencies:** None
+**Status:** Done
 
 ---
 
-### HU-IDM-002: User Login
-**As** a registered user  
-**I want** to log in with my credentials  
-**So that** I can access my account and use the app
+### HU-USU-002: Recover Access
+**As** an user  
+**I want** to recover my account with a code sent to my email  
+**So that** I do not lose access to my contacts and history
 
 **Acceptance Criteria:**
-- Given valid credentials, when user logs in, then receive JWT access token
-- Given invalid credentials, when user attempts login, then show error message
-- Given 5 failed login attempts, when user tries again, then temporarily block account (5 minutes)
-- Given successful login, when JWT expires, then refresh token automatically
+- A 6-digit code is sent, valid 15 minutes with 5 attempts
+- The answer is the same whether the account exists or not
 
-**Estimation:** 2 SP  
+**Requirements:** RF-USU-002  
 **Priority:** P0  
-**Dependencies:** HU-IDM-001
+**Status:** Done
 
 ---
 
-### HU-IDM-003: Emergency Contacts Management
-**As** a user  
-**I want** to add, edit, and delete emergency contacts  
-**So that** my alerts reach the right people
+### HU-CON-001: Trusted Contacts
+**As** an user  
+**I want** to add, edit and remove my trusted contacts  
+**So that** the notices reach the people I chose
 
 **Acceptance Criteria:**
-- Given a contact form, when user adds contact, then save with name, phone, email, relationship
-- Given an existing contact, when user edits details, then update record
-- Given a contact, when user deletes it, then remove from emergency contacts list
-- Given no contacts configured, when user triggers alert, then show error "Configure emergency contacts first"
+- Contacts from the phone book or manual, synchronized with the web
+- The server rejects contacts above the configured limit (default 5)
 
-**Estimation:** 3 SP  
+**Requirements:** RF-CON-001, RF-CON-002, RF-WEB-008  
 **Priority:** P0  
-**Dependencies:** HU-IDM-002
+**Status:** Done
 
 ---
 
-### HU-ALT-001: Main Panic Button
-**As** a user in danger  
-**I want** to activate a panic button from the app interface  
-**So that** I can quickly send an alert to my contacts
+### HU-ACT-001: Activate an Alert
+**As** an user  
+**I want** to activate an alert with the SOS button, a contact, a shake or the widget  
+**So that** I can ask for help in seconds
 
 **Acceptance Criteria:**
-- Given the main screen, when user taps panic button, then immediately trigger alert
-- Given an active alert, when user taps cancel, then prompt for confirmation
-- Given confirmation, when user confirms cancellation, then send "alert cancelled" notification to contacts
-- Given an alert with no active contacts, when user taps panic button, then show error
+- A 5-second countdown allows cancelling
+- The alert is registered with method, time and available location
+- Shake works with the app closed (native service)
 
-**Estimation:** 5 SP  
+**Requirements:** RF-ACT-001 to RF-ACT-006, RF-ALE-001  
 **Priority:** P0  
-**Dependencies:** HU-IDM-003
+**Status:** Done — manual test with the release APK pending
 
 ---
 
-### HU-ALT-002: Widget Activation
-**As** a user  
-**I want** to add a panic button widget to my home screen  
-**So that** I can activate alerts without opening the app
+### HU-ACT-002: Cancel Safely
+**As** an user  
+**I want** to cancel by mistake or under pressure without being discovered  
+**So that** an unwanted alert is avoided and a forced cancellation still warns my contacts
 
 **Acceptance Criteria:**
-- Given the widget configuration screen, when user adds widget, then widget appears on home screen
-- Given the widget, when user taps it, then trigger alert without opening app
-- Given an active alert, when user taps widget again, then show cancellation confirmation
-- Given device without widget support, when user tries to add widget, then show "not supported" message
+- Volume-down ×4 cancels during the countdown
+- The cancellation PIN is required to finish an issued alert
+- The duress PIN looks like a cancellation and sends a silent notice
 
-**Estimation:** 5 SP  
+**Requirements:** RF-ACT-006 to RF-ACT-009  
 **Priority:** P0  
-**Dependencies:** HU-ALT-001
+**Status:** Done
 
 ---
 
-### HU-ALT-003: Sudden Movement Detection
-**As** a user in danger  
-**I want** the app to detect sudden movements and trigger an alert  
-**So that** I can get help even if I cannot manually activate the alert
+### HU-ALE-001: Notify My Contacts
+**As** an user  
+**I want** my contacts to receive a notice with a tracking link  
+**So that** they know I need help and can follow me
 
 **Acceptance Criteria:**
-- Given movement detection enabled, when accelerometer detects pattern matching danger, then trigger alert
-- Given detection triggered, when user does not cancel within 10 seconds, then alert is sent
-- Given a false positive, when user cancels within grace period, then alert is not sent
-- Given movement detection settings, when user adjusts sensitivity, then detection threshold changes accordingly
+- Email (Resend) to every contact; push (FCM) if they have the app
+- Result recorded per contact and channel
+- Resent once if nobody opens it in 5 minutes
 
-**Estimation:** 8 SP  
+**Requirements:** RF-ALE-002, RF-ALE-006, RF-ALE-011  
 **Priority:** P0  
-**Dependencies:** HU-ALT-001
+**Status:** Done — end-to-end evidence pending
 
 ---
 
-### HU-ALT-004: Multi-channel Notifications
-**As** a user  
-**I want** my emergency contacts to receive alerts via SMS, email, and push notifications  
-**So that** at least one channel reaches them
+### HU-ALE-002: Location During the Alert
+**As** an user  
+**I want** my location to be shared while the alert is active  
+**So that** my contacts see where I am
 
 **Acceptance Criteria:**
-- Given an active alert, when notification is sent, then attempt SMS first
-- Given SMS failure, when retry is attempted, then try email
-- Given email failure, when retry is attempted, then try push notification
-- Given all channels fail, when retries exhausted, then log error and alert user
+- Every 15 s for 5 minutes, then every 30 s (60 s in saving mode)
+- Lost-signal notice after 5 minutes without location
 
-**Estimation:** 5 SP  
+**Requirements:** RF-ALE-003, RF-ALE-009  
 **Priority:** P0  
-**Dependencies:** HU-ALT-001
+**Status:** Done
 
 ---
 
-### HU-ALT-005: Real-time Location Sharing
-**As** a user  
-**I want** my contacts to see my real-time location during an active alert  
-**So that** they can find me quickly
+### HU-ALE-003: Alert Duration
+**As** an user  
+**I want** the app to ask me if I am still in danger  
+**So that** the alert does not end while I still need help
 
 **Acceptance Criteria:**
-- Given an active alert, when location is updated, then send coordinates to contacts every 30 seconds
-- Given GPS signal loss, when location cannot be obtained, then send last known location with "stale" flag
-- Given alert resolution, when alert ends, then stop location sharing
-- Given location accuracy < 10m, when coordinates are sent, then mark as "high accuracy"
+- Question at minute 25; yes extends 30 minutes
+- No answer: saving mode and notice to contacts
+- Absolute limit of 2 hours
 
-**Estimation:** 5 SP  
+**Requirements:** RF-ALE-005, RF-ALE-007  
 **Priority:** P0  
-**Dependencies:** HU-ALT-004
+**Status:** Done
 
 ---
 
-### HU-EVI-001: Audio Evidence Recording
-**As** a user  
-**I want** the app to record audio during an active alert  
-**So that** I have evidence of the situation
+### HU-EVI-001: Record Evidence
+**As** an user  
+**I want** video and audio to be recorded during the alert  
+**So that** a record of what happened is kept
 
 **Acceptance Criteria:**
-- Given an active alert, when microphone permission is granted, then start audio recording
-- Given recording in progress, when alert ends, then upload file to cloud storage
-- Given upload failure, when retry is attempted, then keep local copy and retry later
-- Given successful upload, when file is stored, then delete local copy to save space
+- Recording starts automatically if permissions were granted
+- Upload queue when there is no connection
+- Kept 30 days with a notice 5 days before deletion
 
-**Estimation:** 5 SP  
+**Requirements:** RF-EVI-001 to RF-EVI-004  
 **Priority:** P0  
-**Dependencies:** HU-ALT-001
+**Status:** Done — field test pending
 
 ---
 
-### HU-EVI-002: Photo Evidence Capture
-**As** a user  
-**I want** to take photos during an active alert  
-**So that** I can document the situation visually
+### HU-TRA-001: Notify Me If I Don't Arrive
+**As** an user  
+**I want** to start a trip with a destination and arrival time  
+**So that** the server alerts my contacts if I do not confirm my arrival
 
 **Acceptance Criteria:**
-- Given an active alert, when user taps camera button, then capture photo immediately
-- Given photo captured, when upload succeeds, then add to evidence history
-- Given camera permission denied, when user tries to capture, then show permission request
-- Given dark environment, when photo is taken, then use flash if available
+- Arrival time 5 to 240 minutes, heartbeat every 2 minutes
+- The server creates the alert with the last location
 
-**Estimation:** 3 SP  
+**Requirements:** RF-TRA-001, RF-TRA-002, RF-ACT-011  
 **Priority:** P0  
-**Dependencies:** HU-ALT-001
+**Status:** Done — device test pending
 
 ---
 
-### HU-EVI-003: Video Evidence Recording
-**As** a user  
-**I want** to record video during an active alert  
-**So that** I can capture the full context of the situation
+### HU-TRA-002: Automatic Protection
+**As** an user  
+**I want** protection to start by itself when I leave a frequent place  
+**So that** I am accompanied without starting a trip
 
 **Acceptance Criteria:**
-- Given an active alert, when user taps video button, then start video recording
-- Given recording in progress, when user taps stop, then end recording and upload
-- Given storage full, when recording is attempted, then show error and suggest deleting old files
-- Given video > 60 seconds, when recording continues, then compress automatically
+- Silent questions at 15 and 25 minutes, alert at 35
+- Alert if the signal is lost for 20 minutes
 
-**Estimation:** 5 SP  
+**Requirements:** RF-TRA-003  
 **Priority:** P0  
-**Dependencies:** HU-EVI-001
-
----
-
-### HU-LOC-001: Frequent Locations
-**As** a user  
-**I want** to save my frequent locations (home, work)  
-**So that** the system can identify my usual patterns
-
-**Acceptance Criteria:**
-- Given the locations screen, when user adds location, then save name, address, coordinates
-- Given a location, when user marks as "home" or "work", then set as primary location
-- Given user near a frequent location, when alert is triggered, then include location name in notification
-- Given a location, when user deletes it, then remove from frequent locations
-
-**Estimation:** 3 SP  
-**Priority:** P0  
-**Dependencies:** HU-ALT-005
+**Status:** Done — device test pending
 
 ---
 
 ### HU-WEB-001: User Portal
-**As** a user  
-**I want** to access a web portal to view my alert history  
-**So that** I can review past incidents
+**As** an user  
+**I want** to consult my alerts, locations, evidence, contacts and device from the web  
+**So that** I can review my information from a computer
 
 **Acceptance Criteria:**
-- Given a logged-in user, when user visits portal, then show list of past alerts
-- Given an alert in the list, when user clicks it, then show details (time, location, contacts notified)
-- Given evidence attached, when user views alert details, then show links to audio/photo/video files
-- Given no alerts, when user visits portal, then show "No alerts yet" message
+- Shows only my data
+- Never claims to locate a phone that is off
 
-**Estimation:** 5 SP  
+**Requirements:** RF-WEB-001 to RF-WEB-013  
 **Priority:** P0  
-**Dependencies:** HU-ALT-001
+**Status:** Done — no trips and no personal data editing on the web
 
 ---
 
-### HU-WEB-002: Administrative Panel
+### HU-ADM-001: Admin Panel
 **As** an administrator  
-**I want** to view all active alerts in the system  
-**So that** I can monitor emergency situations
+**I want** to manage users, alerts, zones, reports, evidence, moderation, devices and configuration  
+**So that** I can operate the system
 
 **Acceptance Criteria:**
-- Given an administrator, when accessing admin panel, then show list of active alerts
-- Given an active alert, when admin clicks it, then show user details, location, contacts
-- Given an alert, when admin adds a note, then save note with timestamp and admin ID
-- Given an alert, when admin manually resolves it, then change status to `resolved` and notify user
+- Only the admin role accesses `/api/admin/**`
+- Every change is audited
+- Contacts' personal data is never shown
 
-**Estimation:** 8 SP  
+**Requirements:** RF-ADM-001 to RF-ADM-012, RF-AUD, RF-SES  
 **Priority:** P0  
-**Dependencies:** HU-WEB-001
+**Status:** Done
 
 ---
 
 ## P1 — Important for MVP
 
-### HU-ALT-006: Physical Button Activation
-**As** a user  
-**I want** to activate alerts by long-pressing physical buttons  
-**So that** I can trigger alerts discreetly
+### HU-NOT-001: Contact Alarm and Inbox
+**As** an user  
+**I want** contacts with the app to hear an alarm and to have an inbox of notices  
+**So that** no notice goes unnoticed
 
-**Estimation:** 5 SP  
+**Acceptance Criteria:**
+- Alarm until silenced (max. 10 minutes)
+- Inbox with risk zone notices and end of a contact's alert
+
+**Requirements:** RF-NOT-002, RF-NOT-004, RF-NOT-007  
 **Priority:** P1  
-**Dependencies:** HU-ALT-001
+**Status:** Done — test pending
 
 ---
 
-### HU-ALT-007: Discreet Confirmation Pattern
-**As** a user  
-**I want** to confirm alerts with a discreet gesture pattern  
-**So that** attackers don't notice I'm activating the app
+### HU-UBI-001: Map, Places and Routes
+**As** an user  
+**I want** to see zones, save places and routes, and share a location  
+**So that** I can plan safer trips
 
-**Estimation:** 5 SP  
+**Acceptance Criteria:**
+- Places with safety level
+- Max. 4 routes, 2 starred
+
+**Requirements:** RF-UBI-001 to RF-UBI-008  
 **Priority:** P1  
-**Dependencies:** HU-ALT-001
+**Status:** Done
 
 ---
 
-### HU-NOT-001: In-app Notifications
-**As** a user  
-**I want** to receive notifications within the app  
-**So that** I stay informed about alerts and updates
+### HU-REC-001: Assistance Lines
+**As** an user  
+**I want** to open the dialer with 123, the purple line or the mental health line  
+**So that** I decide whether to call
 
-**Estimation:** 3 SP  
+**Acceptance Criteria:**
+- No automatic call
+
+**Requirements:** RF-REC-001, RF-REC-002  
 **Priority:** P1  
-**Dependencies:** HU-ALT-001
+**Status:** Done
 
 ---
 
-### HU-ZON-001: Safe/Risk Zone Map
-**As** a user  
-**I want** to view a map of safe and risk zones  
-**So that** I can plan safer routes
+### HU-CFG-001: Minimum Version
+**As** an user  
+**I want** to be told when my app is too old  
+**So that** I install the version that works
 
-**Estimation:** 5 SP  
+**Acceptance Criteria:**
+- Non-blocking notice with download link
+
+**Requirements:** RF-CFG-001  
 **Priority:** P1  
-**Dependencies:** HU-LOC-001
-
----
-
-### HU-RES-001: Emergency Resource Directory
-**As** a user  
-**I want** to browse a directory of support resources  
-**So that** I can find help near me
-
-**Estimation:** 3 SP  
-**Priority:** P1  
-**Dependencies:** HU-ZON-001
+**Status:** Done
 
 ---
 
 ## P2 — Enhancements (Horizon 2)
 
-### HU-EVI-004: Evidence Metadata Tagging
-**As** a user  
-**I want** evidence files to include metadata (timestamp, location)  
-**So that** context is preserved
+### HU-WEB-002: Web Parity
+**As** an user  
+**I want** to manage trips and edit my personal data from the web  
+**So that** I do not depend on the phone for those tasks
 
-**Estimation:** 3 SP  
+**Acceptance Criteria:**
+- Same rules as the app
+
+**Requirements:** RF-WEB-002  
 **Priority:** P2  
-**Dependencies:** HU-EVI-001
+**Status:** Pending
 
 ---
 
-### HU-ZON-002: User-reported Zone Classifications
-**As** a user  
-**I want** to report zones as safe or dangerous  
-**So that** other users benefit from my experience
+### HU-ALE-004: Alert Without Connection
+**As** an user  
+**I want** the alert to be queued and sent when the connection returns  
+**So that** an alert is not lost because of a short signal loss
 
-**Estimation:** 5 SP  
+**Acceptance Criteria:**
+- Single record, no duplicates
+
+**Requirements:** RF-ALE-001, RNF-DIS-002  
 **Priority:** P2  
-**Dependencies:** HU-ZON-001
+**Status:** Pending
 
 ---
 
-### HU-ALT-008: Voice Activation
-**As** a user  
-**I want** to activate alerts by saying a keyword  
-**So that** I can trigger alerts hands-free
+### HU-PRI-001: Daily Location Switch
+**As** an user  
+**I want** to turn off the daily location sharing  
+**So that** I control what is recorded about me
 
-**Estimation:** 8 SP  
+**Acceptance Criteria:**
+- Explicit consent
+
+**Requirements:** RNF-PRI-002  
 **Priority:** P2  
-**Dependencies:** HU-ALT-001
-
----
-
-### HU-REP-001: Alert Statistics Dashboard
-**As** an administrator  
-**I want** to view statistics about alerts in the system  
-**So that** I can identify patterns and improve response
-
-**Estimation:** 5 SP  
-**Priority:** P2  
-**Dependencies:** HU-WEB-002
+**Status:** Pending
 
 ---
 
 ## P3 — Future Considerations (Horizon 3)
 
-### HU-INT-001: Integration with 123 Emergency Line
-**As** a user  
-**I want** alerts to optionally reach the national emergency line  
-**So that** I can get official help
+### HU-ACC-001: Accessibility Review
+**As** an user who uses a screen reader  
+**I want** the app and the web to be usable with TalkBack and the keyboard  
+**So that** I can use Woman Alert without seeing the screen
 
-**Estimation:** 8 SP  
+**Acceptance Criteria:**
+- Labels on icon-only buttons, starting with the alert button
+
+**Requirements:** RNF-ACC-001  
 **Priority:** P3  
-**Dependencies:** HU-ALT-004
+**Status:** Pending
 
 ---
 
-### HU-COM-001: Community Support Features
-**As** a user  
-**I want** to connect with other verified users for support  
-**So that** I can build a safety network
+### HU-EVI-002: Evidence Encryption
+**As** an user  
+**I want** my evidence files to be encrypted with an own key  
+**So that** nobody with access to the storage can watch them
 
-**Estimation:** 8 SP  
+**Acceptance Criteria:**
+- Or remove the text "Encrypted recording" from the tutorial
+
+**Requirements:** RNF-SEG-006  
 **Priority:** P3  
-**Dependencies:** HU-IDM-003
+**Status:** Pending
 
 ---
 
-### HU-AI-001: Predictive Risk Assessment
-**As** a user  
-**I want** the app to warn me when entering high-risk areas  
-**So that** I can take precautions
+### HU-VAL-001: Validation with Users from Huila
+**As** a team  
+**I want** to test the activation methods with real users  
+**So that** we know the design works under stress
 
-**Estimation:** 13 SP  
+**Acceptance Criteria:**
+- Recorded instrument and results
+
+**Requirements:** RNF-USB-001  
 **Priority:** P3  
-**Dependencies:** HU-ZON-002
+**Status:** Pending
 
 ---
 
 ## Technical Debt Items
 
-### TECH-001: Implement Comprehensive Test Coverage
-**Description:** Add unit tests, integration tests, and E2E tests for all critical paths  
-**Priority:** P0  
-**Estimation:** 13 SP
+### TECH-001: Run and record manual tests with the release APK
+**Description:** PM-04 to PM-09: shake, widget, trip, automatic protection, background recording, notices between two phones  
+**Priority:** P0
 
 ---
 
-### TECH-002: Performance Optimization for GPS Tracking
-**Description:** Optimize GPS polling frequency to meet RNF6 (≤10% battery/hour)  
-**Priority:** P0  
-**Estimation:** 5 SP
+### TECH-002: Move the map views to ViewModels
+**Description:** `MapScreen.tsx` and other map views mix view and logic  
+**Priority:** P1
 
 ---
 
-### TECH-003: Implement Audit Logging
-**Description:** Add comprehensive audit logging for all administrative actions  
-**Priority:** P1  
-**Estimation:** 3 SP
+### TECH-003: Remove the demo mode of the mobile app
+**Description:** Index screen and temporary button in the contact tracking  
+**Priority:** P1
 
 ---
 
-### TECH-004: Add Rate Limiting to API Endpoints
-**Description:** Prevent abuse and protect against DDoS attacks  
-**Priority:** P1  
-**Estimation:** 3 SP
+### TECH-004: Global timeout in the web interceptor
+**Description:** Requests hang while a service is asleep  
+**Priority:** P1
+
+---
+
+### TECH-005: Unify duplicated zone and evidence services in the web
+**Description:** Three zone services and two evidence services  
+**Priority:** P2
+
+---
+
+### TECH-006: Save the smoke tests in the repository
+**Description:** `scripts/smoke/` to reuse them  
+**Priority:** P2
+
+---
+
+### TECH-007: Try a production build (AAB)
+**Description:** Never executed  
+**Priority:** P2
+
+---
+
+### TECH-008: Remove `console` calls outside `__DEV__`
+**Description:** 64 calls remain in the mobile app  
+**Priority:** P1
+
+---
+
+### TECH-009: Measure RNF-REN-001 to RNF-REN-003
+**Description:** Dispatch time, battery and GPS accuracy  
+**Priority:** P2
 
 ---
 
 ## Correlations
 
 * User Stories with acceptance criteria → `04-requirements/user-stories.md`
-* Technical backlog → `15-project-control/technical-backlog.md` (to be created)
-* Sprint planning based on this backlog → `00-governance/agile-conventions.md`
+* Requirements and traceability → `04-requirements/functional.md`, `04-requirements/traceability-matrix.md`
+* Risks → `15-project-control/risks.md`

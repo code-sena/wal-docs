@@ -1,78 +1,78 @@
 # Problem Framing — Woman Alert
 
-This document describes the problem that Woman Alert addresses, using real data taken from the project's SRS and from the team's own research (written survey and oral round). A few points remain undefined because they depend on a team decision rather than an existing source — these are marked as "pending" instead of being filled in with an invented number.
+This document describes the problem that Woman Alert addresses, using official figures cited in the general project document (v1.9). Each figure keeps its source, date and scope, because the sources measure different things (cases notified to the health system, forensic assessments and surveys) and must not be compared directly.
 
 ## 1. The problem in one sentence
 
-Women in Colombia who face situations of risk or gender-based violence struggle with the lack of timely and effective response mechanisms due to the absence of accessible and secure tools that allow them to quickly communicate with their support networks, resulting in victims remaining at risk without adequate support.
+How can a woman at risk ask for help quickly and share her location with the people she trusts, when lack of signal, fear of being discovered, not knowing the support routes and the time it takes to reach someone can delay or prevent the request?
 
 ## 2. Affected users
 
-| Segment                         | Description                                                                                                                                                            | Estimated size (according to sources cited in the SRS)                                                                                                                                                                                                                                                                  | Priority |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| User (mobile app)               | Woman experiencing a situation of risk or gender-based violence who uses the app to activate alerts, manage trusted contacts, consult safe areas and support resources | Initial scope: Neiva, Huila (the city where the team is based). The INS already identifies Huila among the departments with the highest concentration of gender-based violence cases nationwide. The system is designed to scale to other departments later, but the starting point and initial validation are in Neiva | High     |
-| User (authenticated web portal) | Same user, when she needs to review her history, location, evidence, or device status from a computer (the web complements the app; it does not replace it)            | Subset of mobile users                                                                                                                                                                                                                                                                                                  | Medium   |
-| Administrator (web platform)    | Personnel responsible for managing users, alerts, areas, evidence, reports, system configuration, and moderation from the administrative panel                         | Number to be defined by the team                                                                                                                                                                                                                                                                                        | Medium   |
+| Segment                         | Description | Estimated size |
+| ------------------------------- | ----------- | -------------- |
+| User (mobile app)               | Person, mainly women, who uses the app to prepare her contacts and activate alerts | Context: Colombia and Huila; no own estimate for smaller areas |
+| Trusted contact                 | Family member or friend who receives the notice and follows the alert without an account | Up to 5 per user by default (1 to 20 configurable) |
+| User (authenticated web portal) | Same user, when she reviews her information from a computer | Subset of mobile users |
+| Administrator (web platform)    | Staff who manage users, alerts, zones, reports, evidence, moderation and configuration | Defined by the operating organization |
 
 ## 3. Jobs to Be Done (JTBD)
 
-When a user is in a situation of risk or gender-based violence, she wants to activate an emergency alert that shares her real-time location and immediately notifies her trusted contacts through multiple channels (SMS, email, push notifications), so that she can receive help quickly, safely, and discreetly, even in high-stress situations.
+When a user is in a risk situation, she wants to notify her trusted contacts in seconds, with her location and without having to unlock the phone, search for a number or explain what is happening, so that someone she trusts knows she needs help and can follow what is happening. When someone is watching her phone, she wants to do it without being discovered.
 
 ## 4. Evidence of the problem
 
-| Type of evidence               | Source                                                                                                                                                          | Date                       | Key finding                                                                                                                                                                                                                                                                                  |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Institutional report           | Ombudsman's Office (Defensoría del Pueblo)                                                                                                                      | Jan–Apr 2025               | 123 official femicides, 79 attempted homicides potentially related to gender, 5,307 cases of domestic violence against women, and 3,804 sexual offenses (2,011 involving girls and adolescents)                                                                                              |
-| Observatory report             | Observatorio Feminicidios Colombia (via Noticias RCN)                                                                                                           | Through Jul 2025           | 501 femicides and 296 attempted femicides nationwide; Antioquia, Bogotá, Atlántico, Valle del Cauca, Magdalena, Santander, and Norte de Santander were the most affected; 72 femicides occurred in July alone, across 20 departments                                                         |
-| Press report                   | Infobae                                                                                                                                                         | Mar 2025                   | 23.6% increase in domestic violence in Bogotá compared with previous periods; 73% of victims were women                                                                                                                                                                                      |
-| Epidemiological bulletin       | National Institute of Health (INS)                                                                                                                              | As of Jun 2024             | 66,621 cases of gender-based violence in Colombia, 75.6% against women (50,374 cases), concentrated in Bogotá, Antioquia, Cundinamarca, Cali, Valle del Cauca, Santander, and Huila                                                                                                          |
-| Written survey (internal team) | Survey of 24 ADSO students from group 3145556 (21 male, 3 female)                                                                                               | Jun 9 – Jul 2, 2025        | 21/24 considered the app necessary or very necessary; the greatest perceived obstacle was not fear but not having a mobile phone with internet access (12/24); activation by "shaking the phone" received the most votes (12/24)                                                             |
-| Oral survey (internal team)    | Approximately 4 training environments (all on the second floor, including multimedia) and 5 instructors (including one from another group); no gender exclusion | Approximately Mar 27, 2026 | Repeated suggestions were made regarding activation methods (shaking, buttons); the risk that the user may not react in time and therefore prevent the alert from being activated was highlighted; colors were discussed; the inclusion of an assistance number within the app was suggested |
+| Type of evidence               | Source | Date | Key finding |
+| ------------------------------ | ------ | ---- | ----------- |
+| Health surveillance            | National Institute of Health (INS) | 2024, period XII (preliminary) | 154,312 suspected cases of gender-based and domestic violence; rate 292.2 per 100,000; 76.2 % women |
+| Health surveillance, Huila     | INS | 2024 | Rate of 509.5 per 100,000 in Huila, above the national rate |
+| Department report              | Gobernación del Huila | 2025 data, published 2026 | Rate of 534.0 suspected cases notified to Sivigila; greater impact on women and in urban areas; gaps and underreporting in rural areas |
+| Forensic assessments           | INMLCF | 2024 (preliminary) | 62,860 domestic violence assessments, 47,855 women; intimate partner violence: 35,063 of 40,778 were women |
+| Victimization survey           | DANE, ECSC | 2023 data | 69.7 % of women aged 15+ who were victims of a crime did not report it (80.6 % in rural areas) — it measures crimes in general, not gender violence |
+| Connectivity                   | DANE | 2024 | 65.6 % of households with Internet; 41.9 % in rural areas |
+| Policy framework               | CONPES 4080 of 2022; Laws 1257 of 2008, 1761 of 2015 and 1581 of 2012 | — | Barriers to access for rural women; protection of women; treatment of personal data |
+
+**Team consultation.** According to the team, some design decisions (colors, themes and activation methods such as shaking the phone) were taken with users through a questionnaire and a debate session. The team does not keep the instrument, the results or the list of participants, so this process is not presented as validation of the design. The five barriers (no signal, difficulty sharing the location, fear of being discovered, not knowing the routes, difficulty reaching contacts) are treated as design hypotheses, not as local findings.
 
 ## 5. Current user solution (and its problems)
 
-| Current solution                                                                                      | Limitations                                                                                                                                                                    | Cost/Friction                                                      |
-| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| Existing institutions and support programs (hotlines, police/family courts, health centers, shelters) | Barriers that make immediate access to help difficult persist; limited awareness of response routes and limited coordination between available channels (according to the SRS) | Victims remain without adequate support and continue to be at risk |
-| Manual communication with the support network (calls, messages)                                       | Does not share real-time location or record the interaction as evidence                                                                                                        | Depends on someone answering; no subsequent backup or record       |
+| Current solution | Limitations |
+| ---------------- | ----------- |
+| Line 123 (free) and line 155 (free, 24 hours, guidance for women) | Phone channels: they do not solve lack of coverage or the impossibility of speaking safely |
+| Calls or messages to family and friends | Time to search, unlock and explain; the contact may not see or understand the urgency; no shared location or record |
+| Official digital alert tools | No official Colombian app with SOS button, live location, evidence recording and "notify me if I don't arrive" was found in the sources consulted; none with verifiable name and validity in Huila |
 
 ## 6. Solution hypothesis
 
-We believe that designing and implementing a system composed of a mobile application (primary channel) and a supporting web platform — featuring a panic button, multi-channel notifications to trusted contacts, real-time tracking, evidence recording, and a directory of support resources — will reduce response times in situations of gender-based violence. We will know we have achieved this when the system meets the alert-processing times defined in the requirements (see RNF5 below) and users report having received help through the app.
+We believe that an Android app that lets the user activate an alert with few steps, notifies her trusted contacts by email and push with a public tracking link, shares her location, records evidence and offers discreet options, supported by a web platform for consultation and administration, will make it easier to ask for help in time. We will know it works when tests on real phones show that the notices arrive and when users from Huila confirm that the activation methods are usable under stress.
 
 ## 7. Success metrics (North Star)
 
-These metrics are already defined in the SRS as non-functional requirements (NFRs); they are not hypotheses to be validated but rather system objectives:
+| Metric | Baseline | Objective | How to measure it |
+| ------ | -------- | --------- | ----------------- |
+| Alert dispatch time (RNF-REN-001) | — | ≤ 2 s from activation to delivery to the provider (Resend or FCM) for ≥95 % of alerts | Backend timestamps per notice (not measured yet) |
+| Location accuracy (RNF-REN-003) | — | 10 to 20 m, subject to GPS signal | Comparison of reported coordinates (not measured yet) |
+| Battery consumption (RNF-REN-002) | — | ≤ 10 % per hour of foreground service | Measurement on physical phones (not measured yet) |
+| Notices opened | — | To be defined | `alert_contact.seen_at` and `tracking_view` |
 
-| Metric                     | Baseline | Objective defined in the SRS                                                                                                                                                | How to measure it                                                  |
-| -------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Alert dispatch time (RNF5) | —        | Maximum 2 seconds from activation until delivery to the channel provider (FCM, SMS, or email); at least 95% of alerts must meet this target under normal network conditions | Backend measurement from activation until delivery to the provider |
-| Location accuracy (RNF7)   | —        | Updates with an accuracy of 10 to 20 meters, subject to GPS signal quality                                                                                                  | Comparison of reported coordinates against a GPS reference         |
-| Battery consumption (RNF6) | —        | GPS/accelerometer usage in the foreground must not exceed 10% battery consumption per hour of continuous use                                                                | Measurement of battery consumption during field tests              |
-
-**North Star Metric:** To be defined by the team. The natural candidate, based on what is already available, is the percentage of alerts handled within the RNF5 target time.
+**North Star Metric:** percentage of alerts in which at least one contact opens the notice (`seen_at`) within 5 minutes.
 
 ## 8. Hypothesis risks
 
-| Risk                                                                                                                     | Probability     | Impact | Validation experiment                                                                                                    |
-| ------------------------------------------------------------------------------------------------------------------------ | --------------- | ------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Dependence on internet connectivity and third-party services (FCM, SMS provider, email server) for alert delivery (RNF4) | To be evaluated | High   | Failure-tolerance tests using the Chain of Responsibility pattern already defined (retry through an alternative channel) |
-| Users may not activate the app at the actual moment of risk                                                              | To be evaluated | High   | Validate quick activation methods with users (RNF12: widget, physical button, touch pattern)                             |
+| Risk | Probability | Impact | Validation experiment |
+| ---- | ----------- | ------ | --------------------- |
+| Delivery depends on connectivity, Resend, FCM and the contact (RNF-DIS-002) | Medium | High | Manual tests between two phones with the release APK (PM-04 to PM-09) and review of `alert_contact` failures |
+| Users may not activate the app at the real moment of risk | Medium | High | Validate the activation methods (SOS, contact, shake, widget) with users from Huila |
+| Someone watching the phone discovers the app | Medium | High | Test discreet mode, duress PIN and volume cancellation with users |
+| Android restrictions stop the background features | High | Medium | Tests on several manufacturers with the screen off |
 
 ## 9. Out of scope (not addressed in this cycle)
 
-* There is currently no dedicated RF for "anonymity" in the SRS; the possibility of sending an alert without identifying oneself should be incorporated as an acceptance criterion for RF4/RF12, rather than as a separate module (explicit note from the SRS itself).
-
-* The web platform does not replace the mobile app: it is a supporting tool (public site, user portal, and administrative panel), while the mobile app remains the primary channel for activating alerts.
+* Anonymous alerts: every alert belongs to an account; what is protected is the privacy of the contacts and the discretion of the user.
+* SMS, WhatsApp and automatic calls.
+* The web platform does not activate alerts: the app is the only channel for that.
 
 ## Correlations
 
 * Product vision → `03-product/vision.md`
-
-* User Stories that implement this solution → `04-requirements/user-stories.md`
-
-* Detailed KPIs → `13-operations/README.md`
-
-* Domain entities discovered through problem framing → `02-domain/entities-and-rules.md`
-
-* Non-functional requirements derived from evidence findings → `04-requirements/non-functional.md`
+* Discovery brief → `03-product/discovery-brief.md`
+* Requirements → `04-requirements/functional.md`

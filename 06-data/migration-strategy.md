@@ -14,15 +14,17 @@ This document defines the strategy for migrating data between schema versions, i
 
 ### Primary tool: Liquibase
 
-- **Tool:** Liquibase 4.x
-- **Format:** XML changelogs (YAML is alternative, but XML is project standard)
-- **Location:** `src/main/resources/db/changelog/` in each Spring Boot microservice
-- **Justification:** Native Spring Boot integration, database-agnostic, supports rollback operations, enterprise-grade features
+- **Tool:** Liquibase, through the Spring Boot integration
+- **Format:** YAML master changelog (`db/changelog/db.changelog-master.yaml`) that includes one file per change in `changesets/`
+- **Location:** `auth-service` only. Auth is the only service that applies migrations, when it starts; Alert and Evidence never run Liquibase
+- **Contexts:** test data is loaded only in the `dev` and `test` contexts; production gets roles and base configuration (v1.4.0)
+- **Current version:** v1.0.0 to v1.6.0, changeset 25 (28/10/2026): 35 tables in five schemas
+- **Justification:** native Spring Boot integration, history of applied changes in the database, contexts to separate test data from production
 
 ### Alternative considerations
 
-- **Flyway:** Considered but rejected due to less flexible rollback support
-- **Manual SQL scripts:** Rejected due to lack of version control and audit trail
+- **Flyway:** not chosen; the team already had the Liquibase changelogs from the start of the project
+- **Manual SQL scripts:** rejected for migrations. The structure-only script `alerta_mujer_schema.sql` is generated from a database with all migrations applied and is used only as documentation
 
 ---
 
@@ -30,56 +32,49 @@ This document defines the strategy for migrating data between schema versions, i
 
 ### Main changelog file
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-
-    <include file="changelog/001-create-user-table.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/002-create-account-table.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/003-create-alert-table.xml" relativeToChangelogFile="true"/>
-    <!-- ... -->
-
-</databaseChangeLog>
+```yaml
+# auth-service/src/main/resources/db/changelog/db.changelog-master.yaml
+databaseChangeLog:
+  - include: { file: changesets/000-create-schemas.yaml }        # identity, alert, resource, admin
+  - include: { file: changesets/v1.0.0-tables.yaml }              # tables + dev/test data
+  - include: { file: changesets/v1.1.0-constraints-audit.yaml }   # sequences, indexes, CHECK, updated_at, audit, app user
+  - include: { file: changesets/v1.2.0-saved-route.yaml }         # saved_route and its limits
+  - include: { file: changesets/v1.3.0-evidence-file.yaml }       # name, type, size, SHA-256
+  - include: { file: changesets/v1.4.0-production-base.yaml }     # roles and base configuration
+  # later changesets: contact notices, tracking (schema notification), chat,
+  # account deletion, sessions, retention, trips and automatic protection
+  - include: { file: changesets/025-fix-auto-protection.yaml }
 ```
+
+The file names above summarize the content of each version; the exact names are in the backend repository.
 
 ### Individual changelog file naming
 
-- **Format:** `NNN-description.xml`
-- **NNN:** Sequential number (001, 002, 003, ...)
-- **description:** kebab-case description of the change
-- **Examples:** `001-create-user-table.xml`, `002-add-email-unique-constraint.xml`
+- **Rule:** one file per change, added at the end of the master
+- **Never** edit a changeset that was already applied in any environment; create a new one
+- **Author:** the developer who writes the change
 
 ### Changelog file template
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
-
-    <changeSet id="001-create-user-table" author="team">
-        <comment>Create user table for storing personal data</comment>
-        <createTable tableName="user">
-            <column name="id" type="integer" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="first_name" type="varchar(100)">
-                <constraints nullable="false"/>
-            </column>
-            <!-- ... -->
-        </createTable>
-        <rollback>
-            <dropTable tableName="user"/>
-        </rollback>
-    </changeSet>
-
-</databaseChangeLog>
+```yaml
+databaseChangeLog:
+  - changeSet:
+      id: 026-add-example-column
+      author: team
+      comment: Add example column to alert.safe_trip
+      changes:
+        - addColumn:
+            schemaName: alert
+            tableName: safe_trip
+            columns:
+              - column:
+                  name: example_column
+                  type: varchar(50)
+      rollback:
+        - dropColumn:
+            schemaName: alert
+            tableName: safe_trip
+            columnName: example_column
 ```
 
 ---
@@ -88,26 +83,23 @@ This document defines the strategy for migrating data between schema versions, i
 
 ### Development environment
 
-1. **Create migration:** Write changelog file for schema change
-2. **Test locally:** Run `mvn liquibase:update` to apply migration
-3. **Test rollback:** Run `mvn liquibase:rollback` to verify rollback works
-4. **Commit:** Include changelog file in commit
-5. **Review:** Code review must include migration file review
+1. **Create migration:** add a new changeset file and include it at the end of the master
+2. **Apply locally:** `docker compose up --build` — Auth applies the pending changesets when it starts
+3. **Check:** the three services start and `mvn clean test` passes in `microservicios/`
+4. **Commit:** include the changeset in the same pull request as the code that needs it
+5. **Review:** the pull request to `develop` must include the migration review
 
 ### Staging environment
 
-1. **Apply migration:** Run `mvn liquibase:update` during deployment
-2. **Verify:** Check application starts correctly and data is intact
-3. **Smoke test:** Run basic smoke tests to confirm functionality
-4. **No rollback:** Rollbacks in staging require team approval
+There is no separate staging database. The integration branches (`develop` and `qa`) run the automated tests in GitHub Actions; the migrations are applied for real when they reach production.
 
 ### Production environment
 
-1. **Pre-flight check:** Verify staging deployment was successful
-2. **Backup:** Create database backup before migration (automated by DevOps)
-3. **Apply migration:** Run `mvn liquibase:update` during deployment
-4. **Monitor:** Watch for errors during migration and application startup
-5. **Post-deployment check:** Run automated smoke tests
+1. **Merge to `main`:** Render rebuilds the services
+2. **Apply migration:** Auth applies the pending changesets on startup against Render PostgreSQL 16
+3. **Monitor:** watch the Auth logs in Render during startup
+4. **Post-deployment check:** `/actuator/health` of the three services and a quick test of the affected feature
+5. **Example:** on 27/10/2026 changeset 25 corrected in production an error that prevented closing automatic protection and creating its alerts
 
 ---
 
@@ -269,11 +261,11 @@ This document defines the strategy for migrating data between schema versions, i
 
 Before committing a migration:
 
-- [ ] Changelog file follows naming convention (`NNN-description.xml`)
+- [ ] New changeset file added at the end of the master (never edit an applied one)
 - [ ] ChangeSet has descriptive comment
 - [ ] Rollback tag is included (except in production where rollback is prohibited)
 - [ ] Migration tested locally (apply + rollback)
-- [ ] Migration tested in staging
+- [ ] Migration applied locally with Docker Compose and tests passing in CI
 - [ ] Database backup created before production migration
 - [ ] Data model documentation updated (`06-data/models.md`)
 - [ ] Data dictionary updated if new/modified fields (`06-data/data-dictionary.md`)

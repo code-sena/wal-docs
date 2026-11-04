@@ -1,85 +1,81 @@
 openapi: 3.0.3
 info:
-  title: API Gateway
+  title: Woman Alert — Entry Points
   version: 1.0.0
   description: |
-    Punto único de entrada al sistema. El gateway enruta las peticiones a los
-    microservicios correspondientes según el path.
+    Woman Alert has **no API Gateway in production**. The earlier gateway and the old monolith were
+    removed from the repository on 25/10/2026. Each client (mobile and web) chooses the service by
+    the start of the path and sends the request directly to it:
 
-    ## Autenticación
-    La mayoría de los endpoints requieren un JWT válido:
-    ```
-    Authorization: Bearer <access_token>
-    ```
-    El token se obtiene en `POST /api/v1/auth/login` (ver `auth-service.yaml`).
+    | Paths | Service |
+    |-------|---------|
+    | `/api/evidences` | Evidence |
+    | `/api/alerts`, `/api/contacts`, `/api/location-logs`, `/api/zones`, `/api/resources`, `/api/saved-routes`, `/api/frequent-locations`, `/api/received-alerts`, `/api/zone-reports`, `/api/resource-calls`, `/api/safe-trips`, `/api/auto-protection`, `/api/public/**` | Alert |
+    | Everything else (`/api/auth`, `/api/users`, `/api/devices`, `/api/admin`, `/api/settings`) | Auth |
 
-    ## Headers internos (solo entre servicios)
-    El gateway agrega estos headers antes de reenviar la petición al upstream:
-    - `X-User-Id`: UUID del usuario autenticado
-    - `X-User-Role`: Rol del usuario (ADMIN, USER, VIEWER)
-    - `X-Correlation-Id`: ID de traza para correlacionar logs
+    The routing lives in `services/serviceRoutes.ts` (mobile) and `core/api/service-routes.ts` plus
+    an interceptor (web). Whether to add a gateway is an open decision (DIS-ARQ-04).
+
+    ## Authentication
+    Most endpoints require a valid JWT issued by the Auth service:
+    ```
+    Authorization: Bearer <token>
+    ```
+    Every service validates the token with the same key, without calling Auth.
+
+    ## Internal headers (only between services)
+    - `X-Internal-Key`: required by `/internal/rpc/{Contract}/{method}` and `/internal/events`.
+    - `X-Protection-Key`: device key used by `/api/public/auto-protection/**`.
 
 servers:
-  - url: http://localhost:8080
-    description: Local development
-  - url: https://api.dev.{domain}
-    description: Development
-    variables:
-      domain:
-        default: example.com
-  - url: https://api.{domain}
-    description: Production
-    variables:
-      domain:
-        default: example.com
+  - url: http://localhost:8081
+    description: Auth — local (Docker Compose)
+  - url: http://localhost:8082
+    description: Alert — local
+  - url: http://localhost:8083
+    description: Evidence — local
+  - url: https://alerta-mujer-auth.onrender.com
+    description: Auth — production
+  - url: https://alerta-mujer-alert.onrender.com
+    description: Alert — production
+  - url: https://alerta-mujer-evidence.onrender.com
+    description: Evidence — production
 
 tags:
   - name: Health
-    description: Estado del gateway y sus upstreams
+    description: Status of each service
 
 paths:
-  /health:
+  /actuator/health:
     get:
-      summary: Health check del gateway
+      summary: Health check of a service
       description: |
-        Verifica que el gateway esté funcionando y que todos los servicios upstream
-        estén respondiendo. No requiere autenticación.
+        Public in each of the three services. Render uses it, and UptimeRobot calls the three
+        endpoints every 5 minutes to keep the free-plan services awake. A sleeping service can take
+        up to about 90 seconds to answer the first request.
       tags:
         - Health
       security: []
       responses:
         '200':
-          description: Gateway y upstreams saludables
+          description: Service is up
           content:
             application/json:
               schema:
                 type: object
-                required: [status, timestamp]
+                required: [status]
                 properties:
                   status:
                     type: string
-                    enum: [ok, degraded]
-                  timestamp:
-                    type: string
-                    format: date-time
-                  upstreams:
-                    type: object
-                    description: Estado de cada microservicio
-                    additionalProperties:
-                      type: string
-                      enum: [ok, degraded, down]
+                    enum: [UP, DOWN]
               example:
-                status: ok
-                timestamp: '2024-01-15T10:30:00Z'
-                upstreams:
-                  auth-service: ok
-                  nombre-servicio: ok
+                status: UP
         '503':
-          description: El gateway está iniciando o un upstream crítico está caído
+          description: The service is starting or a dependency is down
           content:
             application/json:
               schema:
-                $ref: './auth-service.yaml#/components/schemas/ErrorResponse'
+                $ref: './auth-service.yaml#/components/schemas/Error'
 
 components:
   securitySchemes:

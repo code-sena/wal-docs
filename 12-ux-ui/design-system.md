@@ -654,8 +654,8 @@ tabBarStyle: {
 
 ## ♿ Accessibility and UX Rules
 
-> These accessibility rules directly implement **RNF11** (accessible interface, large elements,
-> contrasting colors for use under stress) and **RNF12** (rapid activation methods outside the
+> These accessibility rules directly implement **RNF-USB-001** (accessible interface, large elements,
+> contrasting colors for use under stress) and **RNF-USB-002** (rapid activation methods outside the
 > main interface). See `04-requirements/non-functional.md` for the full definitions.
 
 ### Color Contrast (WCAG AA)
@@ -828,7 +828,8 @@ Vibration.vibrate(50);
 ### Runtime Permissions
 **Mobile:**
 - GPS: Required for core functionality
-- SMS: Required for alerts
+- Background location ("Allow all the time"): only when enabling automatic protection
+- Special accesses: overlay, full-screen notifications, exact alarms, unrestricted battery, brightness during recording
 - Camera: Optional for evidence
 - Microphone: Optional for evidence
 - Contacts: Required for notifications

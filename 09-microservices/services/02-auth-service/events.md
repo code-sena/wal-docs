@@ -1,113 +1,68 @@
-# Eventos — Auth Service
+# Events — Auth Service
 
-> El Auth Service publica eventos de dominio cuando ocurren cambios significativos
-> en la identidad del usuario. Los eventos son la forma en que otros servicios
-> reaccionan sin consultar directamente a auth-service.
-
----
-
-## Eventos publicados
-
-### `user.registered`
-
-**Cuándo se emite:** Al completarse el registro exitoso de un nuevo usuario.
-**Tópico / Exchange:** `auth.events` (o `user.registered` según el broker del proyecto)
-**Consumidores típicos:** notification-service (enviar email de bienvenida), analytics-service
-
-```json
-{
-  "eventId": "550e8400-e29b-41d4-a716-446655440001",
-  "eventType": "user.registered",
-  "aggregateId": "550e8400-e29b-41d4-a716-446655440000",
-  "occurredAt": "2024-01-15T10:30:00.000Z",
-  "version": 1,
-  "payload": {
-    "userId": "550e8400-e29b-41d4-a716-446655440000",
-    "email": "usuario@example.com",
-    "roles": ["USER"]
-  },
-  "metadata": {
-    "correlationId": "req-abc-123",
-    "causationId": "cmd-register-456"
-  }
-}
-```
+> Auth uses Spring events published after the transaction commits. When the listener lives in another
+> service, the event is forwarded by HTTP to `POST /internal/events` with `X-Internal-Key`. There is no
+> message broker.
 
 ---
 
-### `user.login_failed`
+## Published events
 
-**Cuándo se emite:** Cuando un intento de login falla por credenciales inválidas.
-**Tópico / Exchange:** `auth.events`
-**Consumidores típicos:** security-monitoring-service (detección de ataques de fuerza bruta)
+### Password recovery requested
 
-```json
-{
-  "eventId": "...",
-  "eventType": "user.login_failed",
-  "aggregateId": "email-hash-del-usuario",
-  "occurredAt": "2024-01-15T10:31:00.000Z",
-  "version": 1,
-  "payload": {
-    "email": "usuario@example.com",
-    "failedAttempts": 3,
-    "ipAddress": "192.168.1.100",
-    "userAgent": "Mozilla/5.0 ..."
-  }
-}
-```
+| Field | Value |
+|-------|-------|
+| Trigger | `POST /api/auth/forgot-password` with an existing account |
+| Payload | Account, email and the 6-digit code (the code is never stored, only its hash) |
+| Listener | Email adapter: sends the recovery code |
+| Delivery | After commit; if no email provider is configured, the email is written to the log |
 
-**Nota de privacidad:** El email se incluye para correlacionar intentos, pero el servicio
-consumidor no debe loguearlo en texto plano. Considerar hashear con HMAC antes de publicar.
+### New phone signed in
 
----
+| Field | Value |
+|-------|-------|
+| Trigger | Login from a device that was not registered for the account |
+| Payload | User and new device data |
+| Listener | Notification to the user's other phones (RF-NOT-006) |
+| Delivery | Forwarded between services through `/internal/events` |
 
-### `user.password_changed`
+### Admin session events
 
-**Cuándo se emite:** Al cambiarse exitosamente la contraseña.
-**Tópico / Exchange:** `auth.events`
-**Consumidores típicos:** notification-service (alertar al usuario del cambio)
+| Field | Value |
+|-------|-------|
+| Trigger | Successful login, failed attempt, password change, logout (voluntary or by inactivity) of an admin account |
+| Payload | Account, role, IP, origin (web, mobile or scheduled task), date and time |
+| Listener | Audit adapter: writes to `admin.audit_log` |
+| Delivery | After commit |
 
-```json
-{
-  "eventType": "user.password_changed",
-  "aggregateId": "[userId]",
-  "payload": {
-    "userId": "[userId]",
-    "changedAt": "2024-01-15T10:35:00.000Z"
-  }
-}
-```
+### Configuration changed
+
+| Field | Value |
+|-------|-------|
+| Trigger | Update of `admin.system_configuration` from the panel (with confirmation) |
+| Payload | Changed columns |
+| Listener | Database trigger `trg_audit_system_configuration` |
+| Delivery | Same transaction |
 
 ---
 
-### `user.account_locked`
+## Consumed events
 
-**Cuándo se emite:** Al bloquearse una cuenta por demasiados intentos fallidos.
-**Tópico / Exchange:** `auth.events`
-**Consumidores típicos:** notification-service (alertar al usuario), security-monitoring
-
----
-
-## Eventos consumidos
-
-**Ninguno actualmente.** El Auth Service no reacciona a eventos de otros servicios.
-
-Si en el futuro necesita datos de negocio (ej: suspender cuenta por impago), deberá
-suscribirse al evento correspondiente — registrar esa decisión en `decisions.md`.
+Auth does not listen to events of other services. When it needs alert or zone data (dashboard, admin
+views) it calls `AlertsApi` and `ZonesApi` by RPC.
 
 ---
 
-## Garantías de entrega
+## Delivery guarantees
 
-**At-least-once:** Los eventos se publican después de que la transacción de BD confirma (Outbox Pattern recomendado — ver `05-architecture/pattern-guide.md`).
-
-**Idempotencia:** Los consumidores deben ser idempotentes — pueden recibir el mismo evento más de una vez. El `eventId` es la clave de idempotencia.
+- Events are published only after the transaction commits, so a rolled-back operation does not send
+  an email.
+- There is no outbox: if the service stops right after the commit, the event can be lost.
+- Internal HTTP forwarding waits up to 90 seconds for a sleeping service.
 
 ---
 
-## Correlaciones
+## Correlations
 
-- Patrón Outbox → `05-architecture/pattern-guide.md#outbox-pattern`
-- Formato estándar de eventos → `02-domain/domain-events.md`
-- Datos del usuario (modelo) → `data-model.md`
+- Domain events catalog → `02-domain/domain-events.md`
+- Internal API → `07-api/api-contract.md` §13.1

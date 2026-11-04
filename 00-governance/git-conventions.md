@@ -5,18 +5,19 @@
 ## Branch strategy
 
 ```
-main        ← Production. Merge from release only. Always stable.
-  └── dev   ← Continuous integration. Merge from features.
-        └── feat/[description]    ← One branch per feature/user story
-        └── fix/[description]     ← One branch per bugfix
-        └── chore/[description]   ← Infrastructure, docs, dependency changes
-        └── hotfix/[description]  ← Urgent fixes directly to main
+main          ← Production (Render and Vercel publish from it). Merge from qa only.
+  └── qa      ← Promotion before production. Merge from develop.
+        └── develop   ← Integration. Every pull request targets this branch.
+              └── feature/[description]   ← One branch per feature
+              └── fix/[description]       ← One branch per bugfix
+              └── refactor/[description]  ← Refactoring without behavior change
+              └── docs/[description]      ← Documentation (wal-docs)
 ```
 
-**Woman Alert team note:** Currently all work is in `main` with feature branches. Transition to `dev` branch will happen once CI/CD pipeline is established.
+**Woman Alert team note:** since 28/10/2026 the three code repositories keep only `develop`, `qa` and `main`. Changes enter by pull request to `develop`, are promoted to `qa` and then to `main`. GitHub Actions runs the tests on every push and pull request, and a pull request is merged only with the pipeline in green. In `wal-docs` the work branches follow the `docs/[section]` pattern (for example `docs/architecture`, `docs/data`).
 
 **Rules:**
-- Nobody commits directly to `main` or `dev`
+- Nobody commits directly to `main`, `qa` or `develop`
 - Every task = one branch + one Pull Request
 - One branch = one task (do not mix different features)
 - Branches are deleted after merge
@@ -29,10 +30,10 @@ main        ← Production. Merge from release only. Always stable.
 [type]/[description-in-kebab-case]
 
 Examples:
-feat/oauth2-login
-fix/schedule-overlap-calculation
-chore/update-spring-dependencies
-hotfix/null-token-expiration
+feature/auto-protection-shorter-times
+fix/alert-contact-method
+refactor/map-screen-viewmodel
+docs/final-delivery
 ```
 
 ---
@@ -61,14 +62,13 @@ hotfix/null-token-expiration
 
 **Examples:**
 ```
-feat(iam): implement JWT login
+feat(alertas): agregar reintento al crear la alerta
 
-fix(scheduling): correct schedule overlap validation
-Closes #42
+fix(alerts): register alerts started from a contact as `contact`
 
-docs(api): update actor service OpenAPI contract
+docs(api): update auth-service OpenAPI contract
 
-chore(deps): upgrade Spring Boot to 3.2.0
+test(trip): cover the heartbeat of the safe trip
 ```
 
 ---

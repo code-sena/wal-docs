@@ -1,6 +1,6 @@
 # Entities, Value Objects, and Business Rules
 
-> Catalog of entities, attributes, and business rules for Woman Alert, organized by bounded context according to the SRS Functional Requirements (RF1–RF13) and use cases 1–4.
+> Catalog of entities, attributes, and business rules for Woman Alert, organized by bounded context according to the SRS Functional Requirements (SRS v2.6) and the 32 use cases of Software Analysis v3.4.
 > **Updated to match the final 27-table database schema.**
 
 ---
@@ -74,7 +74,7 @@
 | id | integer | PK | Yes | — |
 | user_id | integer | FK → `user.id` | Yes | Unique (1:1 with `user`) |
 | profile_photo_url | varchar(500) | Profile photo | No | — |
-| tutorial_completed | boolean | Whether the tutorial was viewed (RF3.1) | Yes | Default `false` |
+| tutorial_completed | boolean | Whether the tutorial was viewed (RF-INI-001) | Yes | Default `false` |
 | tutorial_seen_at | timestamp | When it was viewed | No | — |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 | updated_at | timestamp | Last update | No | — |
@@ -144,12 +144,12 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 | id | integer | PK | Yes | — |
 | account_id | integer | FK → `account.id` | Yes | — |
 | device_uuid | varchar(255) | Unique device identifier | Yes | Unique |
-| brand | varchar(50) | Brand | No | RF13.6 |
-| model | varchar(100) | Model | No | RF13.6 |
+| brand | varchar(50) | Brand | No | RF-ADM-006 |
+| model | varchar(100) | Model | No | RF-ADM-006 |
 | os_name | varchar(30) | `Android` | Yes | — |
 | os_version | varchar(30) | OS version | No | — |
 | app_version | varchar(30) | App version | No | — |
-| gps_status | varchar(20) | `active` \| `inactive` \| `unknown` | Yes | Default `unknown` — RF13.6 |
+| gps_status | varchar(20) | `active` \| `inactive` \| `unknown` | Yes | Default `unknown` — RF-ADM-006 |
 | status | varchar(20) | `active` \| `blocked` \| `revoked` \| `inactive` | Yes | Default `active` |
 | last_access | timestamp | Last access | No | — |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
@@ -165,7 +165,7 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | device_id | integer | FK → `device.id` | Yes | — |
-| permission_type | varchar(30) | `contacts` \| `calls` \| `location` \| `notifications` \| `microphone` \| `camera` (RF1.1–RF1.6) | Yes | — |
+| permission_type | varchar(30) | `contacts` \| `calls` \| `location` \| `notifications` \| `microphone` \| `camera` (RF-PER-001–RF-PER-005) | Yes | — |
 | status | varchar(20) | `granted` \| `denied` \| `restricted` \| `not_requested` | Yes | — |
 | updated_at | timestamp | Last update | Yes | Default `CURRENT_TIMESTAMP` |
 
@@ -202,7 +202,7 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | device_id | integer | FK → `device.id` | Yes | — |
-| activation_method | varchar(30) | `widget` \| `sudden_movement` \| `physical_button` \| `discreet_confirmation` (RF5.1–RF5.4) | Yes | — |
+| activation_method | varchar(30) | `panic_button` \| `contact` \| `suspicious_movement` \| `widget` \| trip (RF-ACT-010) | Yes | — |
 | is_enabled | boolean | Whether the user has this method turned on/off | Yes | Default `true` — all methods start enabled |
 | updated_at | timestamp | Last update | Yes | Default `CURRENT_TIMESTAMP` |
 
@@ -222,8 +222,8 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | user_profile_id | integer | FK → `user_profile.id` | Yes | Unique (1:1) |
-| language | varchar(10) | Language (RF10.1) | Yes | Default `es` |
-| theme | varchar(20) | `light` \| `dark` \| `system` (RF11.1) | Yes | Default `light` |
+| language | varchar(10) | Language (RF-IDI-001) | Yes | Default `es` |
+| theme | varchar(20) | `light` \| `dark` \| `system` (RF-TEM-001) | Yes | Default `light` |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 | updated_at | timestamp | Last update | No | — |
 
@@ -241,15 +241,15 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 | id | integer | PK | Yes | — |
 | user_profile_id | integer | FK → `user_profile.id` | Yes | — |
 | contact_name | varchar(100) | Contact's name | Yes | — |
-| telephone | varchar(20) | Phone number | **Yes** | RF2.2 explicitly requires a phone number for every contact |
+| telephone | varchar(20) | Phone number | **Yes** | RF-CON-001 explicitly requires a phone number for every contact |
 | email | varchar(150) | Email | No | — |
 | relationship | varchar(30) | Relationship to the user | No | — |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 | updated_at | timestamp | Last update | No | — |
 
 **Business rules (invariants):**
-- [ ] A contact belongs to a single `user_profile` (RF2.2).
-- [ ] `telephone` is mandatory at the database level (`NOT NULL`); `email` remains optional, since RF2.2 only requires a phone number.
+- [ ] A contact belongs to a single `user_profile` (RF-CON-001).
+- [ ] `telephone` is mandatory at the database level (`NOT NULL`); `email` remains optional, since RF-CON-001 only requires a phone number.
 
 ---
 
@@ -264,11 +264,12 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | user_profile_id | integer | FK → `user_profile.id` | Yes | — |
-| device_id | integer | FK → `device.id` | **Yes** | Every alert must originate from a registered device, so RF13.6 (device oversight) can always trace an alert back to its device |
-| alert_type | varchar(20) | `main` \| `mini` \| `reminder` | Yes | Default `main` |
-| activation_method | varchar(30) | `panic_button` \| `widget` \| `sudden_movement` \| `physical_button` \| `discreet_confirmation` \| `automatic` (RF5) | Yes | — |
-| status | varchar(20) | `active` \| `resolved` \| `cancelled` \| `completed` \| `failed` | Yes | Default `active` |
-| message | varchar(500) | Associated message | No | — |
+| device_id | integer | FK → `device.id` | **Yes** | Every alert must originate from a registered device, so RF-ADM-006 (device oversight) can always trace an alert back to its device |
+| alert_type | varchar(20) | `main` \| `medical` \| `police` \| `fire` \| `custom` | Yes | Default `main`; the apps only create `main` |
+| activation_method | varchar(30) | In use: `panic_button`, `contact`, `suspicious_movement`, `widget`, `signal_lost`, `auto` (RF-ACT, RF-TRA) | Yes | Label only; it does not change the priority |
+| status | varchar(20) | `active` \| `resolved` \| `cancelled` \| `expired` | Yes | Default `active` |
+| message | varchar(500) | Message generated when the alert is created | No | — |
+| latitude / longitude | numeric(9,6) | Location available at activation | No | Range checks; only stored if it was obtained (RN-13) |
 | started_at | timestamp | Start | Yes | Default `CURRENT_TIMESTAMP` |
 | ended_at | timestamp | End | No | — |
 | cancelled_at | timestamp | Cancellation | No | — |
@@ -277,24 +278,35 @@ PENDING ──(token verified)──▶ VERIFIED ──(password changed)──�
 **Lifecycle / States:**
 
 ```
-ACTIVE ──(the user confirms it was a misunderstanding, UC3/UC4)──▶ CANCELLED
-ACTIVE ──(handled and closed successfully)──▶ RESOLVED / COMPLETED
-ACTIVE ──(could not be notified/handled)──▶ FAILED
+(activation requested) ──(cancelled within 5 s)──▶ no alert is registered (RN-08)
+(activation requested) ──(5 s pass)──▶ ACTIVE
+ACTIVE ──("I'm OK", with cancellation PIN if configured)──▶ CANCELLED
+ACTIVE ──(duress PIN)──▶ looks CANCELLED to the user, contacts get a silent notice
+ACTIVE ──(administrator marks it as attended)──▶ RESOLVED
+ACTIVE ──(minute 25: "Are you still in danger?" → yes)──▶ ACTIVE, extended 30 minutes
+ACTIVE ──(no answer)──▶ ACTIVE in saving mode, contacts notified
+ACTIVE ──(absolute limit of 120 minutes)──▶ EXPIRED
 ```
 
 **Business rules (invariants):**
 ```
-INV-001: When moving to the ACTIVE state, a notification attempt must be generated to each
-  emergency_contact of the user via alert_contact (RF4.2).
-INV-002: While alert.status = 'active', records must keep being generated in
-  location_log associated with the alert (RF4.3).
-INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
-  "the user manually turns off the alarm" to shut it off).
+INV-001: A user can have only one ACTIVE alert at a time (409 otherwise).
+INV-002: When the alert becomes ACTIVE, a notice is sent to each emergency_contact by email and,
+  if the contact has the app with an active session, by push; each send is recorded in
+  alert_contact (RF-ALE-002). With method `contact`, only that contact may be notified.
+INV-003: While the alert is ACTIVE, the app sends location every 15 s for 5 minutes and then every
+  30 s, or 60 s in saving mode (RN-09); the points are stored in location_log with alert_id.
+INV-004: If no contact opens the notice in 5 minutes, it is resent once (alerts up to 60 min).
+INV-005: If no location arrives for 5 minutes, the contacts are warned with the last location.
+INV-006: Only the owner can cancel her alert (with the cancellation PIN if configured); only an
+  administrator can mark it as RESOLVED.
+INV-007: The alert is closed as EXPIRED at the absolute limit of 120 minutes (RN-03).
+INV-008: The owner is always taken from the JWT, never from the request body.
 ```
 
 **Behaviors (domain methods):**
 - `activate(activation_method)`: creates the alert in the `active` state.
-- `resolve() / complete() / cancel() / markFailed()`: state transition.
+- `resolve() / cancel() / expire() / extend()`: state transitions checked in the domain model.
 
 ---
 
@@ -308,13 +320,14 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | id | integer | PK | Yes | — |
 | alert_id | integer | FK → `alert.id` | Yes | — |
 | emergency_contact_id | integer | FK → `emergency_contact.id` | Yes | — |
-| channel | varchar(20) | `sms` \| `email` \| `call` \| `push` | Yes | — |
+| channel | varchar(20) | `email` \| `push` | Yes | SMS, WhatsApp and calls are not notice channels |
 | destination | varchar(150) | Send destination | Yes | — |
-| status | varchar(20) | `pending` \| `sent` \| `delivered` \| `failed` \| `retrying` | Yes | Default `pending` |
+| status | varchar(20) | `pending` \| `sent` \| `failed` \| `expired` | Yes | Default `pending`; a pending record is not a delivery confirmation (RN-05) |
 | sent_at | timestamp | Sent | No | — |
 | delivered_at | timestamp | Delivered | No | — |
 | attempts | integer | Attempts | Yes | Default 0 |
 | error_message | varchar(500) | Error, if any | No | — |
+| seen_at | timestamp | When the contact opened the notice | No | Shown to the user as "seen" |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 
 **Business rules (invariants):**
@@ -331,10 +344,10 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | user_profile_id | integer | FK → `user_profile.id` | Yes | — |
-| alert_id | integer | FK → `alert.id` | No | A location can be logged without an active alert (e.g., RF3.2) |
+| alert_id | integer | FK → `alert.id` | No | A location can be logged without an active alert (e.g., RF-UBI-001) |
 | latitude | decimal(9,6) | Latitude | Yes | Precision ≈ 11 cm |
 | longitude | decimal(9,6) | Longitude | Yes | Precision ≈ 11 cm |
-| accuracy | decimal(6,2) | GPS accuracy | No | RNF010 |
+| accuracy | decimal(6,2) | GPS accuracy | No | RNF-COM-002 |
 | recorded_at | timestamp | Time of recording | Yes | Default `CURRENT_TIMESTAMP` |
 
 **Business rules (invariants):**
@@ -351,7 +364,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | alert_id | integer | FK → `alert.id` | Yes | — |
-| reminder_type | varchar(20) | `mini_alert` \| `reminder` (RF4.5) | Yes | — |
+| reminder_type | varchar(20) | `mini_alert` \| `reminder` (RF-ALE-005) | Yes | — |
 | sequence_number | integer | Reminder order | Yes | — |
 | scheduled_at | timestamp | Scheduled for | Yes | — |
 | sent_at | timestamp | Sent at | No | — |
@@ -370,7 +383,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | user_profile_id | integer | FK → `user_profile.id` | Yes | — |
-| name | varchar(100) | Name/label (e.g., "Home", "Work") | Yes | RF3.2 |
+| name | varchar(100) | Name/label (e.g., "Home", "Work") | Yes | RF-UBI-001 |
 | address | varchar(255) | Address | No | — |
 | city | varchar(100) | City | No | — |
 | latitude | decimal(9,6) | Latitude | Yes | — |
@@ -379,6 +392,52 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | is_active | boolean | Active/logically deleted | Yes | Default `true` |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 | updated_at | timestamp | Last update | No | — |
+
+---
+
+### Entity: SafeTrip
+
+**Belongs to:** Alert Management
+**Identifier:** `id`
+
+"Notify me if I don't arrive" trip, and also the automatic protection watch (`mode = auto`).
+
+| Attribute | Type | Description | Required | Rules |
+|-----------|------|-------------|---------|-------|
+| user_profile_id | bigint | Owner | Yes | Only one active trip per user |
+| destination, arrival time | — | Destination and minutes to arrive | Yes | 5 to 240 minutes; reminder 5 minutes before |
+| status | varchar | `active` \| `arrived` \| `cancelled` \| `alerted` \| `ended` | Yes | — |
+| alert_reason | varchar | `not_confirmed` \| `signal_lost` \| `no_answer` \| `unconfirmed` \| `duress` | No | Set when the server creates the alert |
+| last heartbeat | timestamp | Last signal with location (every 2 minutes) | No | Signal lost after 20 minutes in automatic protection |
+
+**Business rules:** the server creates the alert with the last recorded location, without depending on the phone's signal, when arrival is not confirmed or the heartbeat stops (RF-TRA-002). In automatic protection: silent "Did you arrive OK?" at 15 and 25 minutes and alert at 35; "Is everything OK?" in a risk zone and alert at 5 minutes (RF-TRA-003).
+
+---
+
+### Entity: ProtectionDevice
+
+**Belongs to:** Alert Management
+**Identifier:** `id`
+
+Phone with automatic protection enabled. Stores `key_hash` (varchar(64)), the hash of the device key returned once when protection is enabled; the phone sends it in `X-Protection-Key` so protection keeps working when the session expires.
+
+---
+
+### Entity: AlertMessage
+
+**Belongs to:** Alert Management
+**Identifier:** `id`
+
+Chat message of an alert. `sender_type`: `owner` or `contact`. Contacts have a message limit. No audit trigger, because the content is sensitive.
+
+---
+
+### Entity: SavedRoute
+
+**Belongs to:** Alert Management
+**Identifier:** `id`
+
+Route saved by the user: `points` in JSONB (2 to 5000 points), `is_starred`, `is_manual`. **Engine rule:** maximum 4 routes and 2 starred per user (trigger `trg_saved_route_limits`).
 
 ---
 
@@ -393,13 +452,13 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | alert_id | integer | FK → `alert.id` | Yes | — |
-| media_type | varchar(20) | `photo` \| `video` \| `audio` (RF6.1, RF6.2) | Yes | `photo` under evaluation — not explicitly described in RF6, kept as a scope extension |
+| media_type | varchar(20) | `photo` \| `video` \| `audio` \| `document` (RF-EVI-001, RF-EVI-002) | Yes | The app records video and then audio |
 | file_url | varchar(255) | File URL (external storage) | Yes | The file itself is never stored in the relational database |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 
 **Business rules (invariants):**
 - [ ] A piece of evidence always belongs to an alert.
-- [ ] The table does not indicate whether `file_url` has already been backed up to the cloud (RF6.3) — to confirm with the team whether that field is missing.
+- [ ] The table does not indicate whether `file_url` has already been backed up to the cloud (RF-EVI-003) — to confirm with the team whether that field is missing.
 
 ---
 
@@ -416,13 +475,21 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | user_profile_id | integer | FK → `user_profile.id` | Yes | — |
 | alert_id | integer | FK → `alert.id` | No | Not every notification originates from an alert (e.g., a permission reminder) |
 | type | varchar(30) | `reminder` \| `warning` \| `update` \| `emergency` | Yes | — |
-| priority | varchar(20) | `normal` \| `high` \| `critical` (RF8.1) | Yes | Default `normal` |
+| priority | varchar(20) | `normal` \| `high` \| `critical` (RF-NOT-002) | Yes | Default `normal` |
 | title | varchar(100) | Title | Yes | — |
 | message | varchar(500) | Message | Yes | — |
 | is_read | boolean | Read | Yes | Default `false` |
-| is_persistent | boolean | Persistent while the alert is active (RF8.2) | Yes | Default `false` |
+| is_persistent | boolean | Persistent while the alert is active (RF-NOT-003) | Yes | Default `false` |
 | expires_at | timestamp | Expiration | No | — |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
+
+---
+
+### Entity: TrackingLink / TrackingView
+
+**Belongs to:** Notifications (schema `notification`)
+
+`tracking_link` stores only the SHA-256 hash (`token_hash`, char(64)) of the 256-bit code sent by email to each contact; it stops working 2 hours after the alert ends. `alert_id` has no foreign key on purpose, so the schema does not depend on another module. `tracking_view` records who opened the tracking (contact's browser or app, with an anonymous id), so the user knows she is being watched.
 
 ---
 
@@ -437,7 +504,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
 | created_by_admin_profile_id | integer | FK → `admin_profile.id` | No | Renamed from `created_by_account_id`: only an administrator's profile can appear here, structurally |
-| name | varchar(150) | Name (RF9.2) | Yes | — |
+| name | varchar(150) | Name (RF-UBI-002) | Yes | — |
 | zone_type | varchar(20) | `safe` \| `risk` | Yes | — |
 | risk_level | varchar(20) | `low` \| `medium` \| `high` \| `critical` | Yes | Default `medium` |
 | description | varchar(500) | Description | No | — |
@@ -471,7 +538,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 
 **Business rules (invariants):**
 - [ ] A user can report/classify the same zone more than once over time — the `zone_id` + `user_profile_id` unique index protects against a duplicate row, so the application performs an `UPDATE` on the existing report instead of an `INSERT` when one already exists for that pair.
-- ⚠️ RF9.2 describes registering a zone by whoever creates it, with its name, risk level, and location — not a later reclassification by other users, which is what this table covers. It is under evaluation by the team.
+- ⚠️ RF-UBI-002 describes registering a zone by whoever creates it, with its name, risk level, and location — not a later reclassification by other users, which is what this table covers. It is under evaluation by the team.
 
 ---
 
@@ -483,15 +550,15 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | Attribute | Type | Description | Required | Rules |
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
-| name | varchar(150) | Name (RF7.1) | Yes | — |
+| name | varchar(150) | Name (RF-REC-001) | Yes | — |
 | resource_type | varchar(40) | `emergency_line` \| `hospital` \| `health_center` \| `police_station` \| `police_post` \| `shelter` \| `support_organization` | Yes | Matches SRS section 2.4 |
 | telephone | varchar(30) | Primary phone number | No | — |
 | secondary_telephone | varchar(30) | Secondary phone number | No | — |
 | email | varchar(150) | Email | No | — |
 | address | varchar(255) | Address | No | — |
 | city | varchar(100) | City | Yes | — |
-| latitude | decimal(9,6) | Latitude (RF9.3) | No | — |
-| longitude | decimal(9,6) | Longitude (RF9.3) | No | — |
+| latitude | decimal(9,6) | Latitude (RF-UBI-003) | No | — |
+| longitude | decimal(9,6) | Longitude (RF-UBI-003) | No | — |
 | description | varchar(500) | Description | No | — |
 | is_active | boolean | Active | Yes | Default `true` |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
@@ -518,7 +585,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | duration_seconds | integer | Duration | No | — |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 
-⚠️ RF1.2 covers the permission to make emergency calls and RF7.1 covers the directory of help centers, but neither requires storing a history of calls made — that is what this table adds. It is under evaluation by the team.
+⚠️ RF-REC-002 covers the permission to make emergency calls and RF-REC-001 covers the directory of help centers, but neither requires storing a history of calls made — that is what this table adds. It is under evaluation by the team.
 
 ---
 
@@ -532,7 +599,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | Attribute | Type | Description | Required | Rules |
 |-----------|------|-------------|---------|-------|
 | id | integer | PK | Yes | — |
-| account_id | integer | FK → `account.id` | Yes | RF13.9 — Audit |
+| account_id | integer | FK → `account.id` | Yes | RF-AUD-001 — Audit |
 | action | varchar(100) | Action executed | Yes | — |
 | entity_type | varchar(50) | Type of affected entity | Yes | — |
 | entity_id | integer | Id of the affected entity | No | — |
@@ -552,7 +619,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | id | integer | PK | Yes | — |
 | reported_user_id | integer | FK → `user.id` (reported user) | Yes | — |
 | reporter_user_id | integer | FK → `user.id` (who is reporting) | No | — |
-| reason | varchar(100) | Reason | Yes | RF13.10 — Moderation |
+| reason | varchar(100) | Reason | Yes | RF-ADM-009 — Moderation |
 | description | varchar(1000) | Description | Yes | — |
 | status | varchar(20) | `pending` \| `under_review` \| `resolved` \| `rejected` \| `closed` | Yes | Default `pending` |
 | reviewed_by_admin_profile_id | integer | FK → `admin_profile.id` | No | Renamed from `reviewed_by_account_id` |
@@ -573,7 +640,7 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | id | integer | PK | Yes | — |
 | user_report_id | integer | FK → `user_report.id` | Yes | — |
 | admin_profile_id | integer | FK → `admin_profile.id` (acting administrator) | Yes | Renamed from `account_id`, structurally guaranteed to be an administrator |
-| action_type | varchar(30) | `review` \| `warn` \| `block` \| `unblock` \| `reject` \| `close` \| `escalate` | Yes | RF13.10 |
+| action_type | varchar(30) | `review` \| `warn` \| `block` \| `unblock` \| `reject` \| `close` \| `escalate` | Yes | RF-ADM-009 |
 | notes | varchar(1000) | Notes | No | — |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 
@@ -597,6 +664,22 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | updated_by_admin_profile_id | integer | FK → `admin_profile.id` | No | Renamed from `updated_by_account_id` |
 | created_at | timestamp | Creation | Yes | Default `CURRENT_TIMESTAMP` |
 | updated_at | timestamp | Last update | No | — |
+
+---
+
+### Entity: AccountDeletionRequest
+
+**Belongs to:** Administration and Moderation
+
+Request to delete an account. Status `pending`, `approved` or `rejected`. **Rule:** it must be approved by a second administrator (`decided_by` different from `requested_by`); on approval the personal data is anonymized.
+
+---
+
+### Entity: AlertReport
+
+**Belongs to:** Administration and Moderation
+
+Alert report built by the administration with filters (date, type, status, city) and exported to PDF or CSV. Status `pending`, `attended` or `closed`; `export_count >= 0`.
 
 ---
 
@@ -634,4 +717,4 @@ INV-003: Only the user herself can move the alert to 'cancelled' (UC3/UC4:
 | `EmergencyResource` / `ResourceCall` | `emergency_resource` / `resource_call` | `resource_call` under evaluation for removal |
 | `SystemConfiguration` | `system_configuration` | Single row, enforced via `singleton_key UNIQUE` |
 
-> Pending decision with the team: whether to remove `zone_report` and/or `resource_call`, and whether a cloud backup field (`backed_up_at`) is missing on `evidence` (RF6.3) and a notification tone field (RF8.3) is missing on `emergency_contact` or `user_preference`.
+> `zone_report` and `resource_call` are in use. Evidence is stored in Backblaze B2 with `storage_key` and `sha256` (RF-EVI-003). Six tables created by the migrations are not used in the code and are pending review.

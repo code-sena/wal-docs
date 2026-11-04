@@ -1,7 +1,8 @@
 # API Gateway
 
-> **Single entry point** to the system. Receives all frontend requests and routes them
-> to the corresponding microservice. It is the authoritative owner of the routing rules.
+> **Not deployed.** Woman Alert has no API Gateway in production. The gateway and the old
+> monolith were deleted from the repository on 25/10/2026. This folder keeps the number 01 of the
+> catalog to document how requests reach the three services today: **each client routes by path**.
 
 ---
 
@@ -10,43 +11,47 @@
 | Field | Value |
 |-------|-------|
 | Number in catalog | 01 |
-| Local port | 8080 |
-| Repository | [Service repo URL] |
-| DB engine | — (stateless, no own DB) |
-| Communicates with | auth-service, [other services] |
-| Consumed by | Web frontend, mobile app, third-party tools |
+| Local port | — (no process) |
+| Repository | Routing lives in `AlertaMujer/Frontend-movil` and `Frond-end-Web/alerta-mujer-web` |
+| DB engine | — |
+| Communicates with | auth-service (:8081), alert-service (:8082), evidence-service (:8083) |
+| Consumed by | Web frontend, mobile app |
 
 ---
 
 ## Responsibilities (what this service DOES)
 
-- Route HTTP requests to the correct microservice based on the path (`/api/v1/auth/*`, `/api/v1/[resource]/*`)
-- Verify that the JWT token is valid before forwarding the request (delegating to auth-service)
-- Attach user context (`X-User-Id`, `X-User-Role`) as internal headers
-- Global rate limiting: maximum [100] requests per IP per minute
-- Unified access logs with correlationId
+What a gateway would do is distributed today as follows:
+
+- **Routing by path:** `services/serviceRoutes.ts` (mobile) and `core/api/service-routes.ts` plus an interceptor (web) send each request to Auth, Alert or Evidence.
+- **JWT validation:** each service validates the token with the same key, without calling Auth.
+- **Rate limiting:** `RateLimitFilter` in Auth, 5 attempts per minute per IP on authentication endpoints.
+- **CORS:** each service restricts browser requests to the web domain (`CORS_ORIGIN`).
+- **Health:** `GET /actuator/health` in each service.
 
 ## Out of scope (what it does NOT do)
 
-- **Does not handle business logic** — only routes
-- **Does not verify resource permissions** — only verifies the JWT is valid (authorization is done by each service)
-- **Does not store data** — stateless
+- **No business logic** — it does not exist as a process.
+- **No correlation id** — there is no distributed tracing between services.
+- **No aggregation** of responses from several services.
 
 ---
 
 ## How to run it locally
 
 ```bash
-# From the project root (starts all services)
-docker compose up -d api-gateway
+# There is no gateway to start. Start the three services:
+docker compose up --build
 
-# Verify it is working
-curl http://localhost:8080/health
+# Verify each service
+curl http://localhost:8081/actuator/health
+curl http://localhost:8082/actuator/health
+curl http://localhost:8083/actuator/health
 ```
 
 **Expected response:**
 ```json
-{ "status": "ok", "timestamp": "2024-01-15T10:30:00Z" }
+{ "status": "UP" }
 ```
 
 ---
@@ -55,9 +60,9 @@ curl http://localhost:8080/health
 
 - [data-model.md](./data-model.md) — Not applicable (no own DB)
 - [events.md](./events.md) — Not applicable (does not emit domain events)
-- [decisions.md](./decisions.md) — Gateway design decisions
-- [runbook.md](./runbook.md) — Operation in production
-- [API Contract](../../../07-api/contracts/openapi/api-gateway.yaml)
+- [decisions.md](./decisions.md) — Why there is no gateway today
+- [runbook.md](./runbook.md) — How to check the entry points in production
+- [Entry points contract](../../../07-api/contracts/openapi/api-gateway.yaml)
 
 ---
 
@@ -66,16 +71,22 @@ curl http://localhost:8080/health
 See: `09-microservices/services/01-api-gateway/decisions.md`
 
 Relevant decisions include:
-- **ADR-002** — Why [Kong / Nginx / custom Express] was chosen as the gateway base
-- **ADR-003** — Authentication strategy at the gateway vs. in each service
+- **ADR-002** — Three microservices with hexagonal architecture, without a gateway
+- **DIS-ARQ-04** (open) — Whether to add a gateway and the criteria to split or merge modules
 
 ---
 
 ## Routing pattern
 
 ```
-Client → :8080/api/v1/auth/*        → auth-service :8081
-Client → :8080/api/v1/[resource]/*  → [name]-service :808N
+Client → /api/evidences/**                                   → evidence-service :8083
+Client → /api/alerts/**, /api/contacts/**, /api/location-logs/**,
+         /api/zones/**, /api/resources/**, /api/saved-routes/**,
+         /api/frequent-locations/**, /api/received-alerts/**,
+         /api/zone-reports/**, /api/resource-calls/**,
+         /api/safe-trips/**, /api/auto-protection/**, /api/public/** → alert-service :8082
+Client → everything else (/api/auth, /api/users, /api/devices,
+         /api/admin, /api/settings)                          → auth-service :8081
 ```
 
-Routing configuration: `[path to gateway configuration file]`
+Routing configuration: `services/serviceRoutes.ts` (mobile) and `src/app/core/api/service-routes.ts` (web).

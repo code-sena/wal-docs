@@ -3,52 +3,54 @@ info:
   title: Auth Service API
   version: 1.0.0
   description: |
-    Servicio de autenticación: registro, login, renovación de tokens y gestión de sesiones.
+    Auth service of Woman Alert: registration, login (email and Google), token refresh,
+    password recovery, profile, devices and public configuration.
 
-    ## Flujo de autenticación
-    1. `POST /auth/register` — crear cuenta
-    2. `POST /auth/login` — obtener access_token + refresh_token
-    3. Usar `access_token` en el header `Authorization: Bearer` para todos los demás endpoints
-    4. Cuando el access_token expire (1h): `POST /auth/refresh` con el refresh_token
-    5. Para cerrar sesión: `POST /auth/logout`
+    ## Authentication flow
+    1. `POST /api/auth/register` — create the account (returns an access token)
+    2. `POST /api/auth/login` or `POST /api/auth/google` — get `token` + `refreshToken`
+    3. Send `Authorization: Bearer <token>` on every other endpoint of the three services
+    4. When the access token expires (24 h): `POST /api/auth/refresh` with the refresh token (15 days)
 
     ## Tokens
-    - **access_token**: JWT RS256, expira en 1 hora. Incluye userId, email, roles, permissions.
-    - **refresh_token**: Opaque token (UUID), expira en 7 días. Solo válido una vez (rotación).
+    - **token**: JWT signed with `JWT_SECRET`, valid 24 hours. Payload `{ sub, role, iat, exp }`.
+    - **refreshToken**: JWT valid 15 days; its hash is stored per device in `identity.device_session`.
+
+    ## Limits
+    Login, Google, registration and recovery accept 5 attempts per minute per IP (429 afterwards).
+
+    The admin endpoints (`/api/admin/**`) are documented in `07-api/api-contract.md` §13.
 
 servers:
   - url: http://localhost:8081
-    description: Local development
-  - url: https://api.dev.{domain}/api/v1/auth
-    description: Development
-    variables:
-      domain:
-        default: example.com
-  - url: https://api.{domain}/api/v1/auth
-    description: Production
-    variables:
-      domain:
-        default: example.com
+    description: Local development (Docker Compose)
+  - url: https://alerta-mujer-auth.onrender.com
+    description: Production (Render, free plan)
 
-security: []  # La mayoría de estos endpoints son públicos
+security:
+  - bearerAuth: []
 
 tags:
   - name: Auth
-    description: Registro, login y gestión de sesiones
-  - name: Keys
-    description: Claves públicas para verificación de tokens
+    description: Registration, login and session
+  - name: Users
+    description: Profile of the authenticated user
+  - name: Devices
+    description: Phones, push token and permissions
+  - name: Settings
+    description: Public configuration for the apps
   - name: Health
-    description: Estado del servicio
+    description: Service status
 
 paths:
-  /health:
+  /actuator/health:
     get:
       summary: Health check
       tags: [Health]
       security: []
       responses:
         '200':
-          description: Servicio saludable
+          description: Service is up
           content:
             application/json:
               schema:
@@ -56,23 +58,16 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum: [ok]
-                  db:
-                    type: string
-                    enum: [connected, disconnected]
-                  redis:
-                    type: string
-                    enum: [connected, disconnected]
+                    enum: [UP, DOWN]
               example:
-                status: ok
-                db: connected
-                redis: connected
+                status: UP
 
-  /register:
+  /api/auth/register:
     post:
-      summary: Registrar un nuevo usuario
+      summary: Register a new user
       operationId: register
       tags: [Auth]
+      security: []
       requestBody:
         required: true
         content:
@@ -80,70 +75,100 @@ paths:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
             example:
-              email: usuario@example.com
-              password: "SecurePass123!"
-              name: "María García"
+              nombre: Maria Garcia
+              email: maria.garcia@example.com
+              password: '********'
+              telefono: '3001234567'
       responses:
-        '201':
-          description: Usuario registrado exitosamente
+        '200':
+          description: Account created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/ValidationError'
         '409':
-          description: El email ya está registrado
+          description: Email already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: EMAIL_ALREADY_EXISTS
-                message: El email ya está registrado
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
 
-  /login:
+  /api/auth/login:
     post:
-      summary: Autenticar un usuario
+      summary: Log in with email and password
       operationId: login
       tags: [Auth]
+      security: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
-            example:
-              email: usuario@example.com
-              password: "SecurePass123!"
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
       responses:
         '200':
-          description: Login exitoso
+          description: Logged in
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
-          description: Credenciales inválidas
+          description: Invalid credentials or account blocked
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: INVALID_CREDENTIALS
-                message: Email o contraseña incorrectos
-        '423':
-          description: Cuenta bloqueada temporalmente por intentos fallidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
 
-  /refresh:
+  /api/auth/google:
     post:
-      summary: Renovar el access token
-      operationId: refreshToken
+      summary: Log in with Google
+      description: |
+        Accepts the Firebase token (web) or the Google ID token (mobile). The token is verified
+        with its signature on the server. If the email does not exist, the account is created.
+      operationId: loginWithGoogle
       tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idToken]
+              properties:
+                idToken:
+                  type: string
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid token
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/auth/refresh:
+    post:
+      summary: Get a new access token
+      operationId: refresh
+      tags: [Auth]
+      security: []
       requestBody:
         required: true
         content:
@@ -154,156 +179,339 @@ paths:
               properties:
                 refreshToken:
                   type: string
-                  description: Refresh token obtenido en login o en el último refresh
       responses:
         '200':
-          description: Tokens renovados (el refresh token anterior ya no es válido)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          description: Refresh token inválido, expirado o ya usado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /logout:
-    post:
-      summary: Cerrar sesión
-      operationId: logout
-      tags: [Auth]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                refreshToken:
-                  type: string
-                  description: Si se provee, también revoca el refresh token
-                allDevices:
-                  type: boolean
-                  description: Si es true, revoca todos los refresh tokens del usuario
-                  default: false
-      responses:
-        '204':
-          description: Sesión cerrada exitosamente
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /jwks:
-    get:
-      summary: Claves públicas para verificación de tokens (JWKS)
-      description: Endpoint estándar JWKS para que los servicios verifiquen tokens sin llamar al auth-service.
-      operationId: getJwks
-      tags: [Keys]
-      security: []
-      responses:
-        '200':
-          description: JSON Web Key Set
+          description: New access token
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  keys:
-                    type: array
-                    items:
-                      type: object
-                      description: JWK (RFC 7517)
+                  token:
+                    type: string
+        '401':
+          description: Refresh token expired or invalid
+
+  /api/auth/forgot-password:
+    post:
+      summary: Send a 6-digit recovery code by email
+      description: |
+        The code is valid 15 minutes and accepts 5 attempts; only its hash is stored.
+        The response is the same whether the account exists or not.
+      operationId: forgotPassword
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Request accepted
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/auth/reset-password:
+    post:
+      summary: Save a new password with a valid code
+      operationId: resetPassword
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, code, newPassword]
+              properties:
+                email:
+                  type: string
+                  format: email
+                code:
+                  type: string
+                  pattern: '^[0-9]{6}$'
+                newPassword:
+                  type: string
+                  minLength: 8
+                  maxLength: 100
+      responses:
+        '200':
+          description: Password changed
+        '400':
+          description: Invalid or expired code
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/users/me:
+    get:
+      summary: Data of the authenticated user
+      operationId: getMe
+      tags: [Users]
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Missing or invalid token
+    put:
+      summary: Update the profile of the authenticated user
+      operationId: updateMe
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                telephone:
+                  type: string
+                documentNumber:
+                  type: string
+                documentType:
+                  type: string
+                birthdate:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/devices/user:
+    get:
+      summary: Devices of the authenticated user
+      operationId: listMyDevices
+      tags: [Devices]
+      responses:
+        '200':
+          description: Device list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+  /api/devices:
+    post:
+      summary: Register a device
+      operationId: registerDevice
+      tags: [Devices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+  /api/devices/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    put:
+      summary: Update a device (push token and permissions)
+      operationId: updateDevice
+      tags: [Devices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device updated
+    delete:
+      summary: Delete a device
+      operationId: deleteDevice
+      tags: [Devices]
+      responses:
+        '200':
+          description: Device deleted
+
+  /api/settings:
+    get:
+      summary: Public configuration for the apps
+      description: Minimum app version and other public parameters. Never returns secrets.
+      operationId: getPublicSettings
+      tags: [Settings]
+      security: []
+      responses:
+        '200':
+          description: Public configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  minAppVersion:
+                    type: string
+                    example: 1.0.0
+                  emergencyNumber:
+                    type: string
+                    example: '123'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    ValidationError:
+      description: One or more fields are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: More than 5 attempts per minute from the same IP
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
   schemas:
     RegisterRequest:
       type: object
-      required: [email, password, name]
+      required: [nombre, email, password]
       properties:
+        nombre:
+          type: string
+          minLength: 2
+          maxLength: 100
         email:
           type: string
           format: email
-          maxLength: 255
         password:
           type: string
           minLength: 8
           maxLength: 100
-          description: Mínimo 8 caracteres, una mayúscula, un número
-        name:
+        telefono:
           type: string
-          minLength: 1
-          maxLength: 100
-
-    LoginRequest:
-      type: object
-      required: [email, password]
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
+          maxLength: 20
 
     AuthResponse:
       type: object
-      required: [accessToken, refreshToken, expiresIn, user]
       properties:
-        accessToken:
+        token:
           type: string
-          description: JWT RS256. Incluir en Authorization Bearer para requests autenticados.
         refreshToken:
           type: string
-          description: Opaque token. Usar en POST /refresh cuando el access token expire.
-        expiresIn:
-          type: integer
-          description: Segundos hasta la expiración del access token
-          example: 3600
+          nullable: true
         user:
-          $ref: '#/components/schemas/UserSummary'
+          $ref: '#/components/schemas/User'
 
-    UserSummary:
+    User:
       type: object
-      required: [id, email, roles]
       properties:
         id:
-          $ref: './_shared.yaml#/components/schemas/UUID'
+          type: integer
+          format: int64
+        firstName:
+          type: string
+        lastName:
+          type: string
         email:
           type: string
           format: email
-        name:
+        telephone:
           type: string
-        roles:
-          type: array
-          items:
+          nullable: true
+        roleId:
+          type: integer
+        roleName:
+          type: string
+          enum: [user, administrator]
+        documentNumber:
+          type: string
+          nullable: true
+        documentType:
+          type: string
+          nullable: true
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        deviceUuid:
+          type: string
+        fcmToken:
+          type: string
+          nullable: true
+        brand:
+          type: string
+        model:
+          type: string
+        osName:
+          type: string
+        osVersion:
+          type: string
+        appVersion:
+          type: string
+        gpsStatus:
+          type: string
+          enum: [active, inactive, unknown, denied]
+        status:
+          type: string
+          enum: [active, inactive, blocked, lost]
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        fieldErrors:
+          type: object
+          additionalProperties:
             type: string
-            enum: [ADMIN, USER, VIEWER]
-        permissions:
-          type: array
-          items:
-            type: string
-            description: Formato "[recurso]:[accion]"
-          example: ["appointment:read", "appointment:write"]
-
-    ErrorResponse:
-      $ref: './_shared.yaml#/components/schemas/ErrorResponse'
-
-  responses:
-    BadRequest:
-      description: Error de validación
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Unauthorized:
-      description: Token inválido o expirado
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-
-  securitySchemes:
-    bearerAuth:
-      $ref: './_shared.yaml#/components/securitySchemes/bearerAuth'
+      example:
+        status: 409
+        error: Conflict
+        message: Email already exists

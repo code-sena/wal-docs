@@ -21,7 +21,7 @@ This document analyzes the normalization level of the database schema and justif
 
 ### Module: Identity and Accounts
 
-#### Table: `user`
+#### Table: `users`
 
 **Normalization level:** 3NF ✅
 
@@ -44,7 +44,7 @@ This document analyzes the normalization level of the database schema and justif
 - Foreign key: `user_id` (unique, 1:1 relationship)
 - Non-key attributes: `password_hash`, `status`, `last_access`
 - Dependencies: All attributes depend on `id` (the account's unique identifier)
-- Separation from `user` table is correct: Credentials are account-specific, not user-specific
+- Separation from `users` table is correct: Credentials are account-specific, not user-specific
 
 **Justification:** Correctly normalized. Separation of user identity (personal data) from account credentials (access data) follows security best practices.
 
@@ -59,7 +59,7 @@ This document analyzes the normalization level of the database schema and justif
 - Foreign key: `user_id` (unique, 1:1 relationship)
 - Non-key attributes: `profile_photo_url`, `tutorial_completed`, `tutorial_seen_at`, `created_at`, `updated_at`
 - Dependencies: All attributes depend on `id`
-- Separation from `user` table is correct: Profile data is behavioral state, not identity
+- Separation from `users` table is correct: Profile data is behavioral state, not identity
 
 **Justification:** Correctly normalized. Behavioral state (tutorial completion) is separate from core identity.
 
@@ -316,7 +316,7 @@ device_permission (
 
 | Table | Normalization level | Performance impact | Justification |
 |-------|-------------------|-------------------|---------------|
-| `user` | 3NF | Neutral | Standard user entity |
+| `users` | 3NF | Neutral | Standard user entity |
 | `account` | 3NF | Neutral | Security separation |
 | `user_profile` | 3NF | Neutral | Behavioral state separation |
 | `device` | 3NF | Neutral | Device metadata |

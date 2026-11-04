@@ -1,8 +1,8 @@
 # Testing Strategy
 
-> Defines what, how much, and with which tools to test at each layer.
+> Defines what, how much, and with which tools Woman Alert is tested at each layer.
 > Complements the TDD guide (`tdd-guide.md`) that explains the process.
-> This document is the project's quality contract.
+> This document is the project's quality contract. Figures as of 27–28/10/2026 (Test Plan v7.1).
 
 ---
 
@@ -12,22 +12,22 @@
                  /\
                 /  \
                /    \
-              /  E2E  \     ← Few, slow, expensive but high-value
-             /  [5%]   \
+              /  E2E  \     ← None automated; manual tests on Android phones (PM-04 to PM-09 pending)
+             /         \
             /────────────\
-           /  Integration  \
-          /    [25%]        \  ← Test real integration (DB, broker, external APIs)
+           /  Integration  \  ← Adapters (JWT, email, PDF/CSV exporter, RPC client) and smoke tests
+          /                 \     in Docker (201 steps, 20/10/2026)
          /──────────────────\
-        /   Contract Tests    \
-       /      [20%]            \  ← Verify the OpenAPI contract is fulfilled
+        /   Contract Tests    \  ← JSON compared before and after each hexagonal migration
+       /                       \
       /────────────────────────\
-     /       Unit Tests         \
-    /          [50%]             \  ← Many, fast, test business logic
+     /       Unit Tests         \  ← 553 automated tests: backend 351, web 39, mobile 163
+    /                            \
    /────────────────────────────\
 ```
 
-**Rule:** More tests at the bottom = more maintainable system at lower cost.
-Inverting the pyramid (more E2E than unit tests) makes CI slow and fragile.
+**Rule:** More tests at the bottom = more maintainable system at lower cost. The weak point today is
+the top of the pyramid: the complete SOS flow on the phone is only tested by hand.
 
 ---
 
@@ -37,278 +37,122 @@ Inverting the pyramid (more E2E than unit tests) makes CI slow and fragile.
 
 | Aspect | Value |
 |--------|-------|
-| **What they test** | Aggregates, Value Objects, Domain Services, use cases |
-| **Isolation** | Complete — no real calls to DB or external services |
-| **Speed** | < 5ms per test |
-| **Target coverage** | ≥ 80% of lines (≥ 90% in `src/domain/`) |
-| **Tools** | Jest, Vitest, JUnit 5, pytest |
-| **Doubles** | Fakes, Stubs, Spies (see `tdd-guide.md`) |
-| **When they run** | On every `git commit` (pre-commit hook) and in CI |
-
-**Folder structure:**
-
-```
-tests/
-└── unit/
-    ├── domain/
-    │   ├── [Aggregate].spec.ts
-    │   └── value-objects/
-    │       └── [VO].spec.ts
-    └── application/
-        └── [UseCase].spec.ts
-```
-
-**Unit test example (see complete guide in `tdd-guide.md`):**
-
-```typescript
-// tests/unit/domain/Order.spec.ts
-it('total should be the sum of items × quantity', () => {
-  const items = [
-    new OrderItem(prod1Id, 2, new Money(100, 'USD')),
-    new OrderItem(prod2Id, 1, new Money(50, 'USD')),
-  ];
-  const order = Order.create(customerId, items);
-  expect(order.total).toEqual(new Money(250, 'USD'));
-});
-```
+| **Backend** | JUnit 5 + Mockito: domain models without Spring or database, use cases with mocked ports. 351 tests (shared-kernel 16, Auth 114, Alert 196, Evidence 25) |
+| **Architecture** | `HexagonalArchitectureTest` (ArchUnit) in each service: fails if the domain depends on the application, adapters, Spring, JPA or Lombok, or a use case depends on an adapter |
+| **Web** | Vitest 4 + jsdom: components, continuous evidence player and some services. 39 tests |
+| **Mobile** | Jest 29, jest-expo 54, React Native Testing Library 13: shake detection and manufacturer gestures, protection service, resuming an alert, password recovery, recording upload queue, permissions and protection health, SOS alarm and its silencing, stopping automatic protection with PIN, trip, chat, HTTP client (401 and refresh), devices, geocoding, location queue, routes, routing to microservices and token storage. 163 tests + `tsc --noEmit` with 0 errors |
+| **Speed** | The three suites run in a few minutes in GitHub Actions |
 
 ---
 
 ## Tier 2: Integration Tests
 
-**Objective:** Verify that the adapters work correctly with real systems.
+**Objective:** Test the adapters against real or simulated infrastructure.
 
 | Aspect | Value |
 |--------|-------|
-| **What they test** | Repositories vs real DB, publishers vs real broker |
-| **Isolation** | Low — use real DB and broker in Docker |
-| **Speed** | 50ms – 2s per test |
-| **Target coverage** | Happy path + 2-3 error cases per adapter |
-| **Tools** | Jest + Testcontainers, Spring Boot Test |
-| **Setup** | `docker compose up -d test-db test-broker` |
-| **When they run** | In CI, NOT in pre-commit (too slow) |
-
-**Setup with Testcontainers:**
-
-```typescript
-// tests/integration/setup.ts
-import { PostgreSqlContainer } from '@testcontainers/postgresql';
-
-let pgContainer: StartedPostgreSqlContainer;
-
-beforeAll(async () => {
-  pgContainer = await new PostgreSqlContainer('postgres:15')
-    .withDatabase('test_db')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DATABASE_URL = pgContainer.getConnectionUri();
-
-  // Apply migrations
-  await runMigrations(process.env.DATABASE_URL);
-}, 60_000); // 60s timeout for image pull
-
-afterAll(async () => {
-  await pgContainer.stop();
-});
-```
+| **Adapters covered** | JWT, email, PDF/CSV exporter, RPC client, trips and automatic protection |
+| **Smoke tests in Docker (20/10/2026)** | Auth 33 steps, devices and configuration 35, admin panel 54, Alert 30, notifications 15, zones and resources 34 — all identical before and after the migration |
+| **Emails** | Alert, end and recovery emails compared byte by byte before and after: identical |
+| **Not covered** | Web guards and interceptors; controllers with role security |
+| **Pending** | Save the smoke tests in the repository (`scripts/smoke/`) to reuse them |
 
 ---
 
 ## Tier 3: Contract Tests (Consumer-Driven Contract Testing)
 
-**Objective:** Verify that the OpenAPI contract (what the service documents) matches what the service actually implements.
+There is no consumer-driven contract tool (Pact or similar). The contract protection used so far:
 
-| Aspect | Value |
-|--------|-------|
-| **What they test** | HTTP API vs OpenAPI contract |
-| **Tools** | Pact, Dredd, supertest + openapi-validator |
-| **When they run** | In CI before pushing to staging |
-
-**Validation with openapi-validator:**
-
-```typescript
-// tests/contract/api-contract.spec.ts
-import { createOpenAPIValidatorMiddleware } from 'express-openapi-validator';
-
-const app = buildApp();
-app.use(createOpenAPIValidatorMiddleware({
-  apiSpec: './07-api/contracts/openapi/[service].yaml',
-  validateRequests: true,
-  validateResponses: true,
-}));
-
-it('POST /orders returns 201 with the correct schema', async () => {
-  const response = await request(app)
-    .post('/orders')
-    .set('Authorization', `Bearer ${testJWT}`)
-    .send(validOrderPayload);
-
-  expect(response.status).toBe(201);
-  // Response schema validation is done by the OpenAPI middleware
-});
-```
+- Each module migration compared HTTP codes, keys and order of the JSON between the old and the new
+  version, so web and mobile did not need changes.
+- `*Api` contracts are Java interfaces in the `shared-kernel`: a breaking change fails the build of
+  the caller.
+- The mobile tests cover the routing of each path to the right microservice.
 
 ---
 
 ## Tier 4: End-to-End Tests (E2E)
 
-**Objective:** Verify complete user flows as the end user would experience them.
+No automated E2E tests. The manual plan (Test Plan v7.1) has 47 cases:
 
-| Aspect | Value |
+| Result | Cases |
 |--------|-------|
-| **What they test** | Critical business flows end-to-end |
-| **Isolation** | None — real environment (staging or dedicated E2E environment) |
-| **Speed** | 5s – 60s per test |
-| **Tools** | Playwright (UI), K6 (API E2E), Cypress |
-| **When they run** | In CI only in the staging pipeline, not on every PR |
-| **Scope** | Critical flows only — register + create order + confirm payment |
+| Approved (local, API or build only) | 12 — e.g. CP-ADM-001 to CP-ADM-006, CP-ADM-008, CP-WEB-001, CP-WEB-002, CP-SEG-002 |
+| Partial | 2 — CP-ADM-007, CP-ADM-009 |
+| Observed by the audit, not executed | 9 — e.g. CP-SOS-004, CP-ALE-001, CP-ACT-001, CP-EVI-001 |
+| Failed in the old monolith, to revalidate | 1 — CP-SEG-003 |
+| Pending | 23 — including the 8 new cases of v7.1 (widget, PIN and volume cancellation, trip, automatic protection, contact alarm, inbox, minimum version) |
 
-**Priority E2E flows:**
-
-| # | Flow | Services involved |
-|---|------|------------------|
-| 1 | User registration and login | auth-service |
-| 2 | [Main business flow] | [services] |
-| 3 | [Critical error flow] | [services] |
+Manual tests on devices: Samsung SM-A125M (Android 12) and Infinix X678B. The notices between two
+phones were tested by hand in production on 23/10/2026 but the evidence is not archived yet. The
+manual tests of the native features with the release APK v1.0.0 (PM-04 to PM-09) are pending.
 
 ---
 
 ## Performance Tests
 
-**Objective:** Verify that NFR performance requirements are met under load.
+Not executed. Targets defined in the SRS and still to be measured:
 
-| Aspect | Value |
-|--------|-------|
-| **Tool** | k6 |
-| **When they run** | In the staging pipeline (not on every PR) |
-| **Failure criterion** | If P95 > 300ms or error rate > 1% |
-
-```javascript
-// tests/performance/load-test.js (k6)
-import http from 'k6/http';
-import { check } from 'k6';
-
-export const options = {
-  stages: [
-    { duration: '30s', target: 100 },  // Ramp up to 100 users
-    { duration: '60s', target: 100 },  // Hold 100 users
-    { duration: '30s', target: 0 },    // Ramp down
-  ],
-  thresholds: {
-    'http_req_duration': ['p(95)<300'],  // P95 < 300ms
-    'http_req_failed': ['rate<0.01'],    // < 1% errors
-  },
-};
-
-export default function () {
-  const res = http.get('http://localhost:8080/[critical-endpoint]', {
-    headers: { 'Authorization': `Bearer ${__ENV.TEST_TOKEN}` },
-  });
-  check(res, { 'status is 200': (r) => r.status === 200 });
-}
-```
+| Target | Requirement | Status |
+|--------|-------------|--------|
+| Alert dispatch to the providers in ≤ 2 s | RNF-REN-001 | Not measured |
+| Battery use ≤ 10 % per hour of foreground service | RNF-REN-002 | Not measured |
+| GPS accuracy 10 to 20 m | RNF-REN-003 | Not measured |
+| Cold start of the backend | CP-REN-001 | Known: up to about 90 s on the free plan; no systematic measurement |
 
 ---
 
 ## CI configuration per pipeline
 
 ```yaml
-# .github/workflows/ci.yml (simplified)
+# .github/workflows/ci.yml (simplified, one per repository)
+on: [push, pull_request]
 jobs:
-  unit-tests:
+  test:
+    runs-on: ubuntu-latest
     steps:
-      - run: npm run test:unit -- --coverage
-      - run: npm run lint
-
-  integration-tests:
-    services:
-      postgres:
-        image: postgres:15
-      redis:
-        image: redis:7
-    steps:
-      - run: npm run test:integration
-
-  contract-tests:
-    steps:
-      - run: npm run test:contract
-
-  # Only on push to main/develop:
-  performance-tests:
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - run: k6 run tests/performance/load-test.js
+      - uses: actions/checkout@v4
+      # Backend
+      - run: mvn -B -ntp test
+        working-directory: microservicios
+      # Web
+      # - run: npm ci && npx ng test --watch=false && npx ng build --configuration production
+      # Mobile
+      # - run: npm ci && npx tsc --noEmit && npx jest
 ```
+
+Green in the three repositories since 28/10/2026. A pull request is merged only with the pipeline in
+green.
 
 ---
 
 ## Code coverage — Thresholds per layer
 
-```json
-// jest.config.json
-{
-  "coverageThreshold": {
-    "global": {
-      "lines": 80,
-      "branches": 75,
-      "functions": 80,
-      "statements": 80
-    },
-    "./src/domain/": {
-      "lines": 90,
-      "branches": 85
-    }
-  }
-}
-```
+Coverage is not measured yet. Proposed thresholds for when it is enabled:
 
-**Coverage rule:** If a PR lowers the global coverage, CI fails.
-Coverage cannot go down — if there is uncovered code, tests must be added in the same PR.
+| Layer | Proposed threshold | Reason |
+|-------|--------------------|--------|
+| Backend domain | 80 % | Business rules of the alert path |
+| Backend use cases | 70 % | Ports are mocked |
+| Adapters | 50 % | Covered partly by smoke tests |
+| Mobile ViewModels and services | 60 % | Most logic of the app |
+| Web services | 50 % | Few tests today |
 
 ---
 
 ## Fixture and test data files
 
-```
-tests/
-├── fixtures/
-│   ├── order.fixture.ts       # Test object builders
-│   ├── user.fixture.ts
-│   └── db-seeds/
-│       └── test-data.sql       # Base data for integration tests
-├── helpers/
-│   ├── auth.helper.ts          # Generate test JWT
-│   └── database.helper.ts      # Reset DB between tests
-```
-
-**Fixture Builder pattern:**
-
-```typescript
-// tests/fixtures/order.fixture.ts
-export class OrderFixture {
-  static createValid(overrides: Partial<OrderData> = {}): Order {
-    return Order.create(
-      overrides.customerId ?? new CustomerId('customer-test-uuid'),
-      overrides.items ?? [OrderItemFixture.oneItem()],
-    );
-  }
-
-  static inConfirmedState(): Order {
-    const order = OrderFixture.createValid();
-    order.confirm();
-    return order;
-  }
-}
-```
+- Liquibase loads test data only in the `dev` and `test` contexts; production only gets roles and the
+  base configuration.
+- Backend tests build domain objects in memory; no shared database is needed.
+- No real personal data is used in tests, screenshots or shared databases (test plan rule).
+- Example data in the documentation uses invented names and `example.com` emails.
 
 ---
 
 ## Correlations
 
-- Complete TDD guide → `11-quality/tdd-guide.md`
-- Definition of Done (required coverage) → `00-governance/definition-of-done.md`
-- OpenAPI contracts to validate → `07-api/contracts/openapi/`
-- Hexagonal Architecture (facilitates testing) → `05-architecture/hexagonal-architecture.md`
-- CI/CD pipeline → `10-devops/README.md`
+- TDD process → `11-quality/tdd-guide.md`
+- Traceability with requirements → `04-requirements/traceability-matrix.md`
+- Non-functional requirements → `04-requirements/non-functional.md`
+- CI pipeline → `10-devops/environments.md`

@@ -1,18 +1,18 @@
 # Data Dictionary — Woman Alert
 
-This document defines the exact meaning of each important field in the system, with special attention to fields that may be ambiguous or have business rules. Critical for privacy and compliance given the sensitive nature of evidence (audio, video, location data).
+This document defines the exact meaning of the most important fields in the system, with special attention to fields that may be ambiguous or carry business rules. It is critical for privacy because the system stores location, contacts and evidence of people who may be at risk. Values are taken from the CHECK constraints of the schema generated on 28/10/2026 (Liquibase v1.0.0 to v1.6.0) and from the technical manual.
 
 **See also:**
 - Data models with table structures → `06-data/models.md`
 - Modeling conventions → `06-data/modeling-conventions.md`
 - Security policy for data handling → `00-governance/security-policy.md`
-- Non-functional requirements for data → `04-requirements/non-functional.md` (RNF1, RNF8, RNF16)
+- Non-functional requirements for data → `04-requirements/non-functional.md` (RNF-SEG-006, RNF-PRI-001, RNF-PRI-002)
 
 ---
 
 ## Core principles
 
-> **Evidence and location data are protected by privacy regulations.** Every field that stores personally identifiable information (PII) or sensitive evidence must be clearly documented with retention policies and access controls.
+> **Location, contacts and evidence are personal data, and in some cases sensitive data, under Law 1581 of 2012.** Every field that stores personally identifiable information or evidence must state its retention and who can see it. The administration never sees the personal data of trusted contacts, and only sees the route of active or attended alerts.
 
 ---
 
@@ -22,27 +22,31 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| identity-service | account | ENUM | Current access status of the account. Controls whether the user can authenticate and use the system. | `active` — Account is fully functional<br>`blocked` — Account is temporarily blocked due to security concerns (e.g., suspicious activity)<br>`inactive` — Account is deactivated by user or administrator | Medium — Status itself is not PII, but blocking may indicate security incident |
+| Auth | identity.account | varchar(20) | Access status of the account. Controls whether the user can log in. Login with a blocked account answers 401 "Account blocked" | `active` — normal use<br>`inactive` — not in use<br>`blocked` — blocked by an administrator (with reason and capture)<br>`pending` — not completed | Internal |
 
-### `user.telephone`
-
-| Service | Table | Type | Detailed description | Possible values | Privacy |
-|---------|-------|------|---------------------|-----------------|---------|
-| identity-service | user | VARCHAR(20) | Primary phone number used for SMS notifications and authentication. Must be unique across the system. | E.164 format (e.g., +573001234567) | **High** — Direct contact identifier, protected by encryption at rest |
-
-### `user.email`
+### `users.telephone`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| identity-service | user | VARCHAR(150) | Email address used for password recovery and secondary notifications. Must be unique. | Valid email format | **High** — Direct contact identifier, protected by encryption at rest |
+| Auth | identity.users | varchar(20), unique, nullable | User's phone number | Regex `^\+?[0-9][0-9 -]{5,18}[0-9]$` | PII — not shown to other users |
 
-### `user_profile.profile_photo_url`
+### `users.email`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| identity-service | user_profile | VARCHAR(500) | URL pointing to the user's profile photo in cloud storage. Photos are not publicly accessible; access requires authentication. | Cloud storage URL with signed token | **High** — Biometric-adjacent data; access requires user consent |
+| Auth | identity.users | varchar(150), unique, required | Login identifier and address for the recovery code. Registering an existing email answers 409 | Valid email format (CHECK with regex) | PII |
 
-**Important:** Per RNF1, profile photos are never publicly accessible. The URL includes a time-limited signed token.
+### `users.terms_accepted_at`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Auth | identity.users | timestamp | Date and time the user accepted the terms and conditions and the privacy policy at registration (RF-USU-007) | Timestamp or null for older accounts | Internal |
+
+### `user_profile.id` vs `users.id`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Auth | identity.user_profile | bigint | `users.id` is the value in the JWT (`sub`). Alerts, contacts, locations, routes and trips store `user_profile.id`. Mixing them is the most common source of errors | Positive integer | Internal |
 
 ---
 
@@ -52,25 +56,37 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | alert | ENUM | Current state of the alert in its lifecycle. | `active` — Alert is currently in progress, location sharing enabled<br>`resolved` — Alert ended normally (user confirmed safety)<br>`cancelled` — Alert was cancelled by user during grace period<br>`completed` — All contacts confirmed receipt, alert lifecycle complete<br>`failed` — Alert failed to deliver to any channel | Medium — Status indicates emergency situation but does not reveal details |
+| Alert | alert.alert | varchar(20) | Lifecycle of the alert. Only one active alert per user. Changing to `cancelled` triggers the end-of-alert notice | `active` — in progress<br>`resolved` — attended<br>`cancelled` — cancelled by the user (with PIN if configured)<br>`expired` — closed at the 120-minute limit | Sensitive |
 
 ### `alert.alert_type`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | alert | ENUM | Type of alert triggered. | `main` — Full emergency alert with all channels and features<br>`mini` — Lightweight alert for non-critical situations<br>`reminder` — Follow-up alert to check on user's status | Low — Categorization only |
+| Alert | alert.alert | varchar(20), default `main` | Kind of alert. The apps only create `main` | `main`, `medical`, `police`, `fire`, `custom` | Internal |
 
 ### `alert.activation_method`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | alert | ENUM | How the alert was triggered. Used for analytics and improving UX. | `panic_button` — Manual tap on main panic button<br>`widget` — Tap on home screen widget<br>`sudden_movement` — Automatic trigger from accelerometer<br>`physical_button` — Long-press on device physical button<br>`discreet_confirmation` — Gesture pattern activation<br>`automatic` — System-initiated (e.g., inactivity timeout) | Low — UX analytics only |
+| Alert | alert.alert | varchar(30) | How the alert started. It is only a label for the history: it does not change the priority | In use: `panic_button`, `contact`, `suspicious_movement` (shake), `widget`, `signal_lost`, `auto`. Allowed by the CHECK but not used: `gesture`, `voice`, `timer`, `manual`, `power_button` (retired) | Internal |
 
 ### `alert_contact.status`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | alert_contact | ENUM | Delivery status of the notification to a specific contact via a specific channel. | `pending` — Queued for delivery<br>`sent` — Successfully sent to channel provider<br>`delivered` — Confirmed delivered to recipient (push notification only)<br>`failed` — Delivery failed after all retries<br>`retrying` — Retry in progress via alternative channel | Medium — Indicates whether emergency communication succeeded |
+| Alert | alert.alert_contact | varchar(20) | Result of each notice sent to a contact through a channel (`email` or `push`), with `attempts` and `error_message`. A pending record is not a confirmation of delivery (RN-05). `seen_at` stores when the contact opened it | `pending`, `sent`, `failed`, `expired` | Sensitive (destination address) |
+
+### `alert_message.sender_type`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Alert | alert.alert_message | varchar | Who wrote the chat message. Contacts have a message limit. The table has no audit trigger because the content is sensitive | `owner`, `contact` | Sensitive |
+
+### `safe_trip.status` / `safe_trip.alert_reason`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Alert | alert.safe_trip | varchar | Trip or automatic protection watch (`mode = auto`). Arrival time 5 to 240 minutes, heartbeat every 2 minutes; the server alerts if the signal is lost for 20 minutes in automatic protection | Status: `active`, `arrived`, `cancelled`, `alerted`, `ended`<br>Reason: `not_confirmed`, `signal_lost`, `no_answer`, `unconfirmed`, `duress` | Sensitive (destination) |
 
 ---
 
@@ -80,19 +96,15 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| resource-service | evidence | ENUM | Type of media file captured as evidence. | `photo` — Still image<br>`video` — Video recording<br>`audio` — Audio recording | **High** — Evidence type determines retention policy |
+| Evidence | alert.evidence | varchar(20) | Kind of file. During an alert the app records video and then audio | `photo`, `video`, `audio`, `document` | Sensitive |
 
-### `evidence.file_url`
+### `evidence.file_url` / `storage_key` / `sha256`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| resource-service | evidence | VARCHAR(255) | URL pointing to the evidence file in cloud storage. URL includes time-limited signed token for security. | Cloud storage URL with signed token | **Critical** — Contains sensitive evidence of gender-based violence; access requires user consent and role-based authorization |
+| Evidence | alert.evidence | varchar(255) / varchar(100) unique / char(64) | Location of the file in Backblaze B2, its storage key and the SHA-256 hash calculated on upload. Maximum size 50 MB (`413` above that). `review_status`: `pending`, `verified`, `rejected` | Object key in the bucket; hexadecimal hash | Sensitive — files travel over HTTPS but are not encrypted with an own key |
 
-**Retention Policy:**
-- Audio: 90 days, then permanently deleted (unless user opts to extend)
-- Photo: 180 days, then permanently deleted
-- Video: 365 days, then permanently deleted
-- All evidence encrypted at rest (AES-256) and in transit (HTTPS/TLS)
+**Retention:** 30 days, with a notice to the user 5 days before deletion, except the evidence of the alerts she decides to keep (up to 5). The app also keeps a private copy outside the gallery.
 
 ---
 
@@ -102,15 +114,15 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | location_log | DECIMAL(9,6) | GPS coordinates of the user at the time of recording. Accuracy depends on GPS signal quality (RNF7: 10-20m target). | Decimal degrees (WGS84) | **Critical** — Direct location data; highly sensitive. Access requires user consent and role-based authorization |
-
-**Important:** Location data is stored as raw coordinates. Geocoding (converting to address) is done on-demand for display, not stored, to minimize PII exposure.
+| Alert | alert.location_log | numeric(9,6) | Point recorded by the phone. With `alert_id` it belongs to an alert (every 15 s for 5 min, then 30 s, or 60 s in saving mode); without it, it is the daily location of the main phone (every 50 m or 5 min) | Latitude −90 to 90; longitude −180 to 180 | Highly sensitive |
 
 ### `location_log.accuracy`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | location_log | DECIMAL(6,2) | GPS accuracy in meters. Lower values indicate higher precision. | 0.00–999.99 meters | Low — Metadata only |
+| Alert | alert.location_log | numeric(6,2) | Accuracy reported by the device in meters. The target is 10 to 20 m (RNF-REN-003, not measured) | `>= 0` or null | Internal |
+
+**Retention:** daily location 7 days; alert locations 30 days. The last recorded location is always shown with its date and time and is never presented as the current one (RN-13).
 
 ---
 
@@ -120,19 +132,25 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| admin-service | zone | ENUM | Classification of the zone's safety level. | `safe` — Area with lower reported incidents<br>`risk` — Area with higher reported incidents | Low — Community-sourced classification |
+| Alert | resource.zone | varchar(20) | Kind of zone managed by the administration and shown as a circle on the map (`radius_meters > 0`) | `risk`, `safe`, `help`, `policia`, `asistencia` | Public |
 
 ### `zone.risk_level`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| admin-service | zone | ENUM | Detailed risk assessment for the zone. | `low` — Minimal risk<br>`medium` — Moderate risk<br>`high` — Elevated risk<br>`critical` — Severe risk | Low — Administrative classification |
+| Alert | resource.zone | varchar(20), default `medium` | Risk classification of the zone | `low`, `medium`, `high` | Public |
+
+### `frequent_location.risk_level`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Alert | alert.frequent_location | varchar | Safety level the user gives to her own place. Frequent places are also the geofences (150 m) of automatic protection | `muy_segura`, `moderada`, `muy_insegura` | Sensitive (home, work) |
 
 ### `zone_report.status`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| admin-service | zone_report | ENUM | Moderation status of a user-submitted zone classification. | `pending` — Awaiting admin review<br>`approved` — Classification accepted and published<br>`rejected` — Classification rejected (does not affect zone) | Low — Moderation status only |
+| Alert | resource.zone_report | varchar | Report of a user about a zone; only an administrator approves or rejects it | `pending`, `approved`, `rejected` | Internal |
 
 ---
 
@@ -142,13 +160,19 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | notification | ENUM | Category of in-app notification. | `reminder` — Reminder to check in or confirm safety<br>`warning` — Warning about system status or potential issue<br>`update` — Informational update about alert or account<br>`emergency` — Critical emergency notification | Low — Categorization only |
+| Alert | alert.notification | varchar(30) | Kind of notice shown in the app inbox. Push data uses `ALERTA_SOS` (opens the tracking with the code) and `ALERTA_FINALIZADA` | Risk zone notice, end of a contact's alert, new phone signed in, evidence about to be deleted | Internal |
 
 ### `notification.priority`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | notification | ENUM | Display priority for the notification. | `normal` — Standard display<br>`high` — Prominent display<br>`critical` — Full-screen or persistent display | Low — UX priority only |
+| Alert | alert.notification | varchar | Priority of the notification | `low`, `normal`, `high`, `urgent` | Internal |
+
+### `tracking_link.token_hash`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Alert | notification.tracking_link | char(64) | SHA-256 hash of the 256-bit random code sent by email; the code itself is never stored. The link stops working 2 hours after the alert ends. `tracking_view` records the visits with an anonymous id | Hexadecimal hash | Sensitive |
 
 ---
 
@@ -158,23 +182,35 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| identity-service | device | ENUM | Current status of GPS capability on the device. | `active` — GPS is functional and providing location<br>`inactive` — GPS is disabled or not providing location<br>`unknown` — Status cannot be determined | Low — Technical status only |
+| Auth | identity.device | varchar(20), default `unknown` | Last known state of the location service on the phone | `active`, `inactive`, `unknown`, `denied` | Internal |
 
-### `device_permission.status`
+### `device.status` / `device.fcm_token`
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| identity-service | device_permission | ENUM | Permission grant status for a specific capability. | `granted` — User has granted permission<br>`denied` — User has denied permission<br>`restricted` — Permission is partially available (e.g., only when app is foreground)<br>`not_requested` — Permission has not been requested yet | Low — Permission status only |
+| Auth | identity.device | varchar(20) / varchar(255) | Device status managed by the administration, and the push token linked when the user logs in | `active`, `inactive`, `blocked`, `lost` | Internal — the token is a credential for push |
+
+### `device_session.status`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Auth | identity.device_session | varchar | Session per device; only the hash of the refresh token (15 days) is stored | `active`, `expired`, `revoked` | Internal |
+
+### `protection_device.key_hash`
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Alert | alert.protection_device | varchar(64) | Hash of the device key returned once when automatic protection is enabled. The phone sends it in `X-Protection-Key` so protection works even if the session expired | Hash | Credential |
 
 ---
 
 ## Recovery Module
 
-### `recovery_request.status`
+### `recovery_request` (code and attempts)
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| identity-service | recovery_request | ENUM | Status of the password or account recovery request. | `pending` — Token sent, awaiting verification<br>`verified` — Token verified, password change allowed<br>`used` — Recovery completed, token consumed<br>`expired` — Token expired without use<br>`cancelled` — Recovery cancelled by user or system | Medium — Indicates account recovery attempt |
+| Auth | identity.recovery_request | `token_hash` varchar(255), `attempts`, `expires_at`, `status` | 6-digit code sent by email; only its hash (`token_hash`) is stored, with the requesting IP. Valid 15 minutes and 5 attempts. The API answers the same whether the account exists or not | Hash, expiration, attempt counter, status | Credential |
 
 ---
 
@@ -184,28 +220,36 @@ This document defines the exact meaning of each important field in the system, w
 
 | Service | Table | Type | Detailed description | Possible values | Privacy |
 |---------|-------|------|---------------------|-----------------|---------|
-| alert-service | alert | VARCHAR(500) | Optional free-text message the user can attach to an alert. Used to provide context to contacts. | Free text, max 500 characters | **High** — May contain sensitive information about the emergency situation |
+| Alert | alert.alert | varchar(500) | Text generated by the app when creating the alert (for example "SOS alert activated from the app"). It is not the chat: chat messages live in `alert_message` | Free text up to 500 characters | Sensitive |
 
-**Business rule:** If the message contains personally identifiable information of third parties, it must be logged separately for GDPR-like compliance requirements.
+### `system_configuration` (single row)
+
+| Service | Table | Type | Detailed description | Possible values | Privacy |
+|---------|-------|------|---------------------|-----------------|---------|
+| Auth | admin.system_configuration | single row | Alert duration (30 to 1440 min, default 30), emergency number, administrative email, contact limit and minimum app version. Changes require confirmation, are persisted on the server and are audited (RN-06) | `max_emergency_contacts` 1 to 20 (default 5); `min_app_version` like `1.0.0` | Internal |
 
 ---
 
 ## Data retention summary
 
-| Data type | Retention period | Deletion method | Legal basis |
-|-----------|------------------|-----------------|-------------|
-| User account (inactive) | 2 years after last activity | Soft delete → hard delete after 2 years | Account management |
-| Alert records | 5 years | Hard delete after 5 years | Incident documentation |
-| Evidence (audio) | 90 days | Hard delete after 90 days (user can extend) | Evidence preservation |
-| Evidence (photo) | 180 days | Hard delete after 180 days (user can extend) | Evidence preservation |
-| Evidence (video) | 365 days | Hard delete after 365 days (user can extend) | Evidence preservation |
-| Location logs | 1 year | Hard delete after 1 year | Location history |
-| Audit logs | 7 years | Hard delete after 7 years | Legal compliance |
+| Data | Retention | Mechanism |
+|------|-----------|-----------|
+| Evidence | 30 days, notice 5 days before; kept alerts (up to 5) are not deleted | Scheduled task in Evidence |
+| Daily location | 7 days | Scheduled task in Alert |
+| Alert locations | 30 days | Scheduled task in Alert |
+| Tracking link | Until 2 hours after the alert ends | Domain rule in notifications |
+| Recovery code | 15 minutes | Domain rule in identity |
+| Refresh token | 15 days | JWT expiration and `device_session` |
+| Audit log | Not deleted; cannot be modified | Triggers |
+| Deleted account | Personal data anonymized after approval of two administrators | Admin module |
+
+Scheduled tasks only run while the service is awake (free Render plan).
 
 ---
 
 ## Correlations
 
-* Data models → `06-data/models.md`
-* Security rules for data handling → `00-governance/security-rules.md`
-* Non-functional requirements for data → `04-requirements/non-functional.md` (RNF1, RNF8, RNF16)
+- Data models → `06-data/models.md`
+- Business rules → `02-domain/entities-and-rules.md`
+- Security threat model → `05-architecture/security-threat-model.md`
+- Security policy → `00-governance/security-policy.md`

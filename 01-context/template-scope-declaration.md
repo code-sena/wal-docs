@@ -8,9 +8,9 @@
 
 ## 1. General description and objective of the project
 
-* **Project name:** Woman Alert
-* **Release/Target Phase:** MVP Academic Delivery - SENA File 3145556
-* **Project Purpose:** Provide a mobile and web security ecosystem that allows women in vulnerable situations to activate emergency alerts and share real-time location with trusted contacts.
+* **Project name:** Woman Alert (ALERTA MUJER)
+* **Release/Target Phase:** Final academic delivery - SENA, ADSO program, group 3145556. APK v1.0.0 (28/10/2026)
+* **Project Purpose:** Provide an integrated solution, made up of an Android app from which emergency alerts are activated and a complementary web platform for consultation and administration, so that women can ask for help quickly, share their location with their trusted contacts and access information related to risk situations.
 
 ---
 
@@ -19,26 +19,31 @@
 List the functions, modules, and explicit user flows included in this scope. Group them logically by platform or domain.
 
 ### 2.1 Mobile application (React Native / Expo)
-* [ ] **User authentication and profile:** User registration, login, JWT session management, account recovery flow and profile configuration.
-* [ ] **Emergency activation:** Panic button activation, widget activation, physical button assignment and discrete confirmation mechanisms.
-* [ ] **Real-time location sharing:** GPS tracking during active alerts (`location_log`), streaming coordinates in real-time via WebSockets, and viewing location history.
-* [ ] **Emergency Contact Management:** Add, edit and delete trusted contacts (`emergency_contact`) with required phone numbers.
-* [ ] **Evidence Collection:** Capturing photographs, audio and video recordings associated with an active emergency alert ("evidence").
-* [ ] **Smart map and safe zones:** Interactive map showing safe/risk zones (`zone`) and nearby emergency assistance centers (`emergency_resource`).
-* [ ] **Internationalization and customization:** Localized user interface (`es`, `en`, `fr`, `pt`) and theme customization (`user_preference`).
+* [x] **User authentication and profile:** registration with acceptance of terms, login with email or Google, JWT session (access 24 h, refresh 15 days) stored in `expo-secure-store`, recovery with a 6-digit email code, profile editing and account deletion.
+* [x] **Emergency activation:** SOS button with a 5-second countdown, alert to a single contact, shake detection (4.5 g threshold, native foreground service), home screen widget, cancellation PIN, duress PIN, cancel with volume-down ×4 and discreet mode.
+* [x] **Location during the alert:** periodic location sent to the server (every 15 s for the first 5 min, then 30 s, or 60 s in saving mode), also with the app closed. Last recorded location shown with its date and time.
+* [x] **Emergency Contact Management:** add from the phone book or manually, edit and delete trusted contacts (`emergency_contact`); default limit 5, validated on the server.
+* [x] **Evidence Collection:** automatic video and then audio recording during the alert, chunked uploads with a retry queue, private copy outside the gallery (`evidence`).
+* [x] **Trips and automatic protection:** "Notify me if I don't arrive" (`safe_trip`) and automatic protection when leaving a frequent place (`protection_device`, geofences).
+* [x] **Map, places and zones:** MapLibre map with safe and risk zones (`zone`), saved places with safety level (`frequent_location`), saved routes (`saved_route`) and assistance lines.
+* [x] **Notifications:** contact alarm until silenced, inbox with a bell, alerts received from contacts.
+* [x] **Internationalization and customization:** `es`, `en`, `fr`, `pt` and six themes (light, dark and four colors) (`user_preference`).
 
 ### 2.2 Web Administration Panel (Angular)
-* [ ] **Executive Dashboard:** High-level metrics, active alert counters, and system-wide user statistics.
-* [ ] **User and Device Management:** View and manage user accounts, inspect device permissions, and manage user status.
-* [ ] **Alert and Test Inspection:** Real-time alert monitoring, location history tracking, and test review for administrators.
-* [ ] **Zone and Resource Management:** CRUD operations for risk/safe geographic zones and emergency directory resources.
-* [ ] **Moderation and auditing:** Review reported users, perform administrative actions, and maintain audit logs (`audit_log`).
-* [ ] **System Configuration:** Manage global platform parameters through single-instance configuration settings (`system_configuration`).
+* [x] **Executive Dashboard:** number of users, attended and cancelled alerts, alerts by time of day, zones with more incidents and comparisons.
+* [x] **User and Device Management:** paginated user list, editing and blocking with reason; devices and their status.
+* [x] **Alert Inspection:** list of alerts, status change (active, attended, cancelled, expired) and route of active or attended alerts only.
+* [x] **Zone and Resource Management:** CRUD of zones and help points; approval or rejection of zone reports.
+* [x] **Reports:** creation, editing and deletion of alert reports with PDF and CSV export.
+* [x] **Moderation and auditing:** user reports, moderation actions, account deletion approved by two administrators and read-only audit log with filters and export (`audit_log`).
+* [x] **System Configuration:** alert duration (30 to 1440 min), emergency number, contact limit and minimum app version (`system_configuration`), with confirmation before saving and a system status page.
+* [x] **User portal and public pages:** landing with APK download, public tracking page for contacts and authenticated user portal.
 
 ### 2.3 Backend and infrastructure (Java/Spring Boot/PostgreSQL)
-* [ ] **RESTful API and WebSockets:** Business logic endpoints and real-time streaming connections.
-* [ ] **Shared PostgreSQL Database:** Relational data persistence supporting 27 core domain tables across 4 logical microservices.
-* [ ] **Notification resilience and delivery:** Asynchronous notification sending strategy (Push, SMS, Email) with exponential retry rollback policies (`alert_contact`).
+* [x] **REST API:** three microservices (Auth 51 endpoints, Alert 93, Evidence 14 in `main`) with hexagonal architecture and a shared kernel; internal calls through `/internal/rpc` and `/internal/events` protected with `X-Internal-Key`.
+* [x] **Shared PostgreSQL Database:** PostgreSQL 16 with 35 tables in five schemas (`identity`, `alert`, `resource`, `admin`, `notification`), 42 relationships, versioned with Liquibase.
+* [x] **Notification delivery:** email (Resend) and push (FCM) per contact, result recorded per contact and channel in `alert_contact` (`sent`, `failed`, `expired`), one resend after 5 minutes and lost-signal notice.
+* [x] **Scheduled tasks:** alert expiration, resend, trips and automatic protection, evidence retention (30 days) and location retention (7 and 30 days).
 
 ---
 
@@ -46,13 +51,15 @@ List the functions, modules, and explicit user flows included in this scope. Gro
 
 The following features and technical capabilities are **explicitly excluded** from the current version of the project to maintain project focus, avoid scope changes, and comply with architectural guidelines:
 
-* [ ] **Biometric/Fingerprint Emergency Activation:** Biometric or fingerprint gestures will not be used to activate panic alerts; Activation is based on UI buttons, widgets, or physical button shortcuts designated in the app.
-* [ ] **Completely Offline Emergency Mode / Native SMS Backup:** The app requires an active Wi-Fi or mobile data connection to transmit live GPS coordinates via WebSockets and communicate with the backend. Pure offline SMS emergency activation is out of reach.
-* [ ] **User-driven zone reclassification:** End users cannot automatically create or reclassify risk level zones. Management of geographic risks and safe zones ("zone") is strictly restricted to administrative users via the Web Dashboard.
-* [ ] **Customized contact ringtones and direct calls to operator:** Customized emergency audio tones per contact and automated direct phone calls over telecom operator networks are excluded.
-* [ ] **Physical separation of databases by microservice:** Although the backend follows a logical architecture of 4 microservices (`identity`, `alert`, `resource`, `admin`), implementing physical database engines separated by service is out of scope. The platform uses a single shared PostgreSQL database instance.
-* [ ] **Native Mobile Web Client:** The mobile UI is delivered exclusively as a native Android/iOS app built with React Native/Expo, not as a mobile browser web app.
-* [ ] **Native Hardware Local Audio/Video Encryption:** Evidence uploaded to the system relies on standard HTTPS/TLS encryption in transit rather than the integration of a custom cryptographic chip into the device.
+* [ ] **Lock screen and power button activation:** removed from the app on 23/10/2026 and recorded as "Retired" in the SRS.
+* [ ] **Offline alert creation / SMS backup:** creating an alert requires Internet. SMS, WhatsApp and RCS are not notice channels by team decision.
+* [ ] **Automatic calls:** the app only opens the dialer; the user starts the call.
+* [ ] **Locating a phone that is off or offline:** only the last recorded location is available.
+* [ ] **API Gateway:** there is no gateway in production; each client routes requests to the right service by path.
+* [ ] **Physical separation of databases by microservice:** the three services share one PostgreSQL instance; each service owns its schemas and asks for other data through `*Api` contracts.
+* [ ] **iOS and mobile web client:** the app is distributed only as an Android APK.
+* [ ] **Own encryption of evidence files:** evidence relies on HTTPS/TLS in transit; files are not encrypted with an application key.
+* [ ] **Separate moderator role:** moderation is performed by the administrator.
 
 ---
 
@@ -62,40 +69,41 @@ The final result of this phase of the project includes the following artifacts:
 
 | Deliverable | Description | Format / Repository |
 |---|---|---|
-| **Mobile client** | React Native Expo Android App Package | `.apk` / Mobile Repository |
-| **Web administration client** | Angular Web App | Web/web repository creation |
-| **Backend Services** | Spring Boot Microservices Codebase | Java Project / Backend Repository |
-| **Database schema** | DDL Migration Scripts and DBML Documentation | `.sql` / `.dbml` files |
-| **Technical documentation**| IEEE 830 SRS, ADR, Domain Maps and API Specifications | Markdown Repository (`.md`) |
+| **Mobile client** | React Native Expo Android app, v1.0.0 | `.apk` on GitHub Releases / `AlertaMujer` repository |
+| **Web client** | Angular SPA (landing, tracking, user portal, admin panel) | Vercel / `Frond-end-Web` repository |
+| **Backend Services** | Three Spring Boot microservices + shared kernel | Maven multi-module / `Backend-ALERTA-MUJER` repository |
+| **Database schema** | Structure-only script, data dictionary and ER diagrams (35 tables) | `.sql`, `.xlsx`, `.mmd`, `.png`, `.svg` |
+| **Technical documentation**| SRS, analysis, technical proposal, design, test plan, quality, implementation and manuals | `.docx` / `.pdf` and this Markdown repository |
 
 
 ### Minimum Technical Requirements (System Constraints)
 
 #### Mobile Client (Android Native App)
-* **Operating System:** Android 10.0 (API Level 29) minimum
-* **Memory (RAM):** 3 GB RAM minimum
-* **Hardware Sensors:** Integrated GPS (A-GPS), primary camera, and microphone
-* **Storage:** 200 MB available internal storage
-* **Network Connectivity:** Activate 4G/5G mobile data or Wi-Fi connection (required for real-time WebSocket coordinate streaming)
+* **Operating System:** Android 7.0 (API 24) minimum, compiled for Android 16 (API 36)
+* **Memory (RAM):** not measured; tested on a Samsung SM-A125M (Android 12) and an Infinix X678B
+* **Hardware Sensors:** GPS, accelerometer, camera and microphone
+* **Storage:** space for the app and the local copy of the evidence
+* **Network Connectivity:** mobile data or Wi-Fi to create the alert and send the location
 
 #### Web Administration Client (Angular Dashboard)
-* **Web Browser:** Modern HTML5/ES6 compliant browser (Google Chrome 110+, Mozilla Firefox 110+, or Microsoft Edge 110+)
-* **Display Resolution:** Minimum 1280x720 pixels
-* **Memory (RAM):** 4 GB RAM minimum
-* **Network Connectivity:** Broadband internet connection (minimum 5 Mbps)
+* **Web Browser:** recent versions of Google Chrome, Microsoft Edge and Mozilla Firefox
+* **Display Resolution:** desktop resolutions first; mobile view available but not prioritized
+* **Memory (RAM):** not defined
+* **Network Connectivity:** Internet connection
 
 ---
 
 ## 5. Assumptions, dependencies and scope restrictions
 
 ### 5.1 Key assumptions
-* End users own **Android 10+** smartphones with active GPS and Internet connectivity.
-* External services (e.g. Firebase Cloud Messaging, Twilio, Google Maps) maintain standard service availability during testing and evaluation.
+* Users own Android 7.0+ smartphones with GPS, Internet and the permissions required by the protection features.
+* External services (Firebase Cloud Messaging, Resend, Backblaze B2, Render, Vercel) keep their standard availability during testing and evaluation.
 
 ### 5.2 Technical restrictions
 * **Language Convention (ADR-001):** All technical artifacts, code, database schemas, and documentation are in **English**. User-facing text is localized via i18n.
-* **Architecture:** Hexagonal architecture for backend modules, MVVM pattern for mobile frontend and component/function-based structure for web.
-* **Database:** Shared PostgreSQL instance for all microservices[cite: 1, 2].
+* **Architecture:** Hexagonal architecture for the nine backend modules (checked with ArchUnit), MVVM pattern for the mobile app and core/features/shared structure with standalone components for the web.
+* **Database:** Shared PostgreSQL 16 instance for the three microservices; only Auth applies the migrations.
+* **Hosting:** free Render plan with cold start; free database with an expiration date.
 
 ---
 
@@ -105,7 +113,7 @@ By signing below, project stakeholders acknowledge and agree that this document 
 
 | Role | Name | Signature / Approval | Date |
 |---|---|---|---|
-| **Project Leader / Backend Leader** | Michael Stiven Sánchez Castañeda | `[Approved/Pending]` | `[YYYY-MM-DD]` |
+| **Project Leader / Backend Leader** | Maicol Stiven Sánchez Castañeda | `[Approved/Pending]` | `[YYYY-MM-DD]` |
 | **Database Leader** | Justin Daniela Bahamón Baloco | `[Approved/Pending]` | `[YYYY-MM-DD]` |
 | **Design Lead** | José Sebastián Suárez Cumaco | `[Approved/Pending]` | `[YYYY-MM-DD]` |
 | **Academic instructor** | Motta Vargas José de Jesús | `[Approved/Pending]` | `[YYYY-MM-DD]` |

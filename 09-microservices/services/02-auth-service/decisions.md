@@ -1,68 +1,53 @@
-# Decisiones técnicas — Auth Service
-
-> Decisiones de diseño del servicio de autenticación que complementan los ADRs globales.
+# Technical Decisions — Auth Service
 
 ---
 
-## Decisión: Algoritmo de firma JWT — RS256 vs HS256
+## Decision: JWT signing algorithm — RS256 vs HS256
 
-**Fecha:** [fecha]
-**Contexto:** JWT puede firmarse con HMAC-SHA256 (HS256, clave simétrica compartida) o
-RSA-SHA256 (RS256, par de claves pública/privada).
+**Decision:** HMAC with a shared secret (`JWT_SECRET`).
 
-**Decisión:** RS256 — clave privada solo en auth-service, clave pública disponible en
-`GET /api/v1/auth/jwks` para que cualquier servicio pueda verificar tokens sin llamar al auth-service.
+**Why:** the three services validate the token by themselves without a key distribution endpoint;
+with only three services under the same team, one secret stored as an environment variable is simpler
+than a key pair and a JWKS endpoint.
 
-**Consecuencias:**
-- Cada servicio puede verificar tokens de forma independiente (sin latencia de red)
-- La rotación de claves es operativamente más compleja (hay que distribuir la nueva clave pública)
-- El JWKS endpoint permite rotación gradual con múltiples claves activas simultáneamente
+**Safeguards:** `JwtKeyProvider` rejects an empty secret and the value that was once published in the
+repository, so the service does not start with them. The secret was rotated on 28/10/2026.
 
 ---
 
-## Decisión: Refresh tokens en base de datos vs. stateless
+## Decision: Refresh tokens in the database vs. stateless
 
-**Fecha:** [fecha]
-**Contexto:** Los refresh tokens pueden ser stateless (JWT largo) o stateful (ID en BD).
+**Decision:** the refresh token is a JWT valid 15 days, and its hash is stored per device in
+`identity.device_session` with status `active`, `expired` or `revoked`.
 
-**Decisión:** Stateful — el refresh token es un UUID almacenado en la tabla `refresh_tokens`.
-Solo el hash SHA-256 se persiste (nunca el valor real).
-
-**Consecuencias:**
-- Revocación inmediata posible (logout de dispositivo específico, suspensión de cuenta)
-- Requiere un lookup a PostgreSQL en cada uso del refresh token
-- La BD de refresh_tokens puede convertirse en bottleneck si hay millones de sesiones activas
+**Why:** a session can be revoked per phone, and the app can tell the user when her account signs in
+from a new phone. The mobile app refreshes the access token automatically when it receives a 401.
 
 ---
 
-## Decisión: Dónde vive la verificación de permisos por recurso
+## Decision: Where per-resource permission checks live
 
-**Fecha:** [fecha]
-**Contexto:** Los permisos granulares (ej: "solo puede ver sus propias citas") pueden vivir
-en auth-service o en cada servicio de negocio.
+**Decision:** in each service's use cases. The owner of alerts, contacts, locations, routes and zone
+reports is always taken from the JWT, never from the request body. Admin endpoints use
+`@PreAuthorize("hasRole('ADMIN')")`.
 
-**Decisión:** Auth-service gestiona roles (ADMIN, USER, VIEWER). Los permisos granulares
-por recurso son responsabilidad de cada microservicio de negocio.
-
-**Razón:** Auth-service no conoce el dominio de cada servicio. Centralizar permisos granulares
-crearía un acoplamiento bidireccional y haría al auth-service dependiente de todos los demás.
+**Why:** the web guards only guide the navigation; the access decision must be made on the server.
 
 ---
 
-## Decisión: Política de bloqueo de cuentas
+## Decision: Account lockout policy
 
-**Fecha:** [fecha]
-**Decisión:** [N] intentos fallidos → bloqueo por [M] minutos. El contador se resetea
-en login exitoso. El bloqueo se almacena en Redis (TTL = M minutos, autolimpieza).
+**Decision:** there is no automatic lockout after failed attempts. Brute force is limited with
+`RateLimitFilter` (5 attempts per minute per IP, then 429). Accounts are blocked manually by an
+administrator, with a reason and a capture, and login with a blocked account answers 401 "Account
+blocked".
 
-**Consecuencias:**
-- Un atacante puede hacer DoS a un usuario específico forzando el bloqueo
-- Mitigación: el bloqueo gradual (5 min → 30 min → 24 hours) reduce el impacto
+**Why:** an automatic lockout could be used to block a victim's account on purpose and stop her from
+activating alerts.
 
 ---
 
-## Correlaciones
+## Correlations
 
-- ADRs de arquitectura global → `05-architecture/decisions/records/`
-- Reglas de seguridad técnica → `00-governance/security-rules.md`
-- Modelo de datos → `data-model.md`
+- Cross-cutting authentication → `05-architecture/cross-cutting.md`
+- Security threat model → `05-architecture/security-threat-model.md`

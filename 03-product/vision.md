@@ -1,59 +1,52 @@
 # Product Vision — Woman Alert
 
-This is the vision for **Woman Alert**, built using real data from the project's SRS. The only points that remain unresolved are the three KPIs for the strategic pillars, which depend on targets that the team still needs to define.
+This is the vision for **Woman Alert**, built from the general project document (v1.9), SRS v2.6 and the state of the code published in `main` on 28/10/2026.
 
 ## Vision Statement
 
-For women at risk or victims of gender-based violence in Colombia who need a fast, reliable, and effective way to ask for help, **Woman Alert** is a system composed of a mobile application (primary channel) and a supporting web platform that allows users to activate emergency alerts with real-time location, notify their configured trusted contacts through multiple channels (SMS, email, and push notifications), and access available support information.
+For women in Colombia, and in Huila in particular, who may face a risk situation and need to ask for help quickly, **Woman Alert** is a solution made up of an Android app, from which alerts are activated with as few steps as possible, and a complementary web platform for consultation, administration and alert tracking. The app notifies the user's trusted contacts by email and push, shares her location while the alert is active, records evidence and offers discreet options for when someone is watching the phone.
 
-Unlike existing institutional mechanisms — which face limited awareness of response pathways and poorly coordinated channels — our product complements these mechanisms with a panic button, real-time tracking, evidence recording, and an administrative dashboard for management and analysis, reducing response times in situations of risk.
+Unlike the official channels, which are phone or in-person services (123 and 155), our product gathers the alert, the trusted contacts, the location and the evidence in one tool. It is a complementary support tool: it does not guarantee that an alert reaches its recipient and it does not replace the National Police, the Attorney General's Office, the Family Commissioners or the official lines. The product prioritizes women in its name, context and design criteria, but does not deny access to anyone.
 
 ## Team Mission
 
-Contribute to reducing response times in situations of gender-based violence in Colombia by empowering women with an accessible, secure, and easy-to-use technological tool for moments of high stress. This mission is derived from the introduction and general objective of the SRS.
+Apply the competences of the ADSO training program (requirements, analysis, design, development, integration, testing and documentation) to build a tool that makes it easier for a woman at risk to ask for help and share her location with the people she trusts.
 
 ## Strategic Pillars
 
-The SRS itself defines four pillars for the operation of the system; these are adopted here as the product's strategic pillars:
-
-| Pillar                  | Description (according to the SRS)                                                       | Success Metrics                                                                           |
+| Pillar                  | Description                                                                              | Success Metrics                                                                           |
 | ----------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Prevention              | Provide useful information, action guidelines, and safety recommendations                | To be defined with the team (e.g., percentage of users who consult the action guide)      |
-| Immediate Response      | Panic button that sends alerts and real-time location to configured contacts             | RNF5 compliance: ≥95% of alerts dispatched within ≤2 seconds                              |
-| Support                 | Alert history and continuous monitoring by configured contacts while the alert is active | To be defined with the team (e.g., percentage of alerts with completed active monitoring) |
-| Management and Analysis | Administrative system that allows visualization of generated data and statistics         | To be defined with the team (e.g., reports generated per period)                          |
+| Preparation             | Tutorial, trusted contacts, activation methods, cancellation and duress PINs, assistance lines | Users with at least one contact with email; tutorial completed (not measured yet)   |
+| Immediate Response      | Fast activation (SOS, contact, shake, widget), 5-second window, notices by email and push | RNF-REN-001: ≥95 % of alerts dispatched to the providers within 2 s (not measured yet)    |
+| Accompaniment           | Periodic location, evidence, chat, public tracking page, resend, lost-signal notice, trips and automatic protection | Notices opened per alert (`seen_at`); alerts with a lost-signal notice      |
+| Management and Analysis | Admin panel: dashboard, users, alerts, zones, reports, evidence, moderation, audit and configuration | Reports exported per period; moderation cases resolved                             |
 
 ## High-Level Roadmap
 
-The scope defined in the SRS already serves as a concrete Horizon 1. Horizons 2 and 3 are no longer blank — they were populated with the actual content from `03-product/roadmap.md` once that document was defined:
-
-| Horizon                             | Objective                                        | Modules / Scope                                                                                                                                                                                                                                                                                         | Uncertainty |
-| ----------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| H1 (defined scope)                  | Deliver the core system described in the SRS     | Registration/login, emergency contacts, panic button with multiple activation methods, multi-channel notifications, real-time tracking, evidence (audio/video), history, safe/risk zone map and help directory, language/theme customization, web platform (public website + user portal + admin panel) | Low         |
-| H2 (next = Phase 2 of the roadmap)  | Iterate on the MVP once it is working end-to-end | Evidence (audio/video), zone map and help directory, additional activation methods, reports and audit capabilities in the admin panel, multi-channel retry in case of failures                                                                                                                          | Medium      |
-| H3 (later = Phase 3 of the roadmap) | Continuous improvement based on real-world usage | Evaluate inactivity confirmation (discovery-brief finding), UX adjustments with real users, formal verification of critical NFRs (RNF5, RNF6, RNF7)                                                                                                                                                     | High        |
+| Horizon                             | Objective                                        | Modules / Scope |
+| ----------------------------------- | ------------------------------------------------ | --------------- |
+| H1 — delivered (APK v1.0.0, 28/10/2026) | Deliver the core system | Accounts and Google login, contacts, activation methods with cancellation and duress PINs, notices by email and push with tracking link, location, evidence, chat, history, map and zones, assistance, trips, automatic protection, user portal, admin panel, four languages and six themes |
+| H2 — next | Verify and close gaps | Manual tests of the native features with the release APK (PM-04 to PM-09), open security findings, privacy policy and terms, accessibility, web parity (trips, personal data), local queue to create the alert without connection |
+| H3 — later | Improve with real use | Validation with users from Huila, measurement of RNF-REN-001 to 003, hosting without sleep, production AAB, gateway decision, encryption of evidence |
 
 ## Product Principles
 
-Derived from the non-functional requirements already defined in the SRS. These are not new proposals; they are principles that the system is already required to fulfill:
-
-1. **Accessible even under stress** (RNF11): The interface must be simple and clear, with large visual elements and contrasting colors, allowing the user to interact without complications during an emergency.
-
-2. **Activation in the fewest possible steps** (RNF12): The app must provide at least two rapid activation methods outside the main interface, such as a widget, physical button, or touch pattern.
-
-3. **Privacy and data security by default** (RNF1, RNF8, RNF16): Profile photos must not be publicly accessible, information must be encrypted in transit (HTTPS/TLS) and at rest (AES-256), and access must be restricted according to the user's role.
-
-4. **Fault tolerance in alert delivery** (RNF9): If one communication channel fails, the system automatically retries through another available channel.
+1. **Accessible even under stress** (RNF-USB-001): visible controls and clear messages, with as few steps as possible.
+2. **Activation in the fewest possible steps** (RNF-USB-002): SOS button, alert to a contact, shake and widget, plus server activation for trips and automatic protection.
+3. **Discretion by design:** discreet mode, duress PIN, cancelling with the volume button, recording without preview.
+4. **Privacy by default** (RNF-PRI-001, RNF-PRI-002): each user only sees her data; the administration never sees the contacts' personal data; evidence and locations have retention periods.
+5. **Honesty about delivery** (RN-05, RN-15): a pending notice is never shown as sent, and the app never promises that help will arrive.
 
 ## Definition of Done
 
-**Objective:** Fulfill the core system described in the SRS scope, with the critical non-functional requirements verified.
+**Objective:** deliver the core system with the critical requirements verified by recorded tests.
 
-| Key Result                                                        | Baseline | Objective (according to the SRS)                              | Date                             |
+| Key Result                                                        | Baseline | Objective                                                     | Date / status                    |
 | ----------------------------------------------------------------- | -------- | ------------------------------------------------------------- | -------------------------------- |
-| KR1: Percentage of alerts dispatched within the time limit (RNF5) | —        | ≥95% within ≤2 seconds until delivery to the channel provider | October 20, 2026 (delivery date) |
-| KR2: Location accuracy during an active alert (RNF7)              | —        | 10–20 meters, subject to GPS signal                           | October 20, 2026 (delivery date) |
-| KR3: Device compatibility (RNF10)                                 | —        | Android 10 and later                                          | October 20, 2026 (delivery date) |
+| KR1: Automated tests passing in CI                                | 0        | 100 % green on every pull request                             | Met — 553 tests, 28/10/2026      |
+| KR2: Alerts dispatched within the time limit (RNF-REN-001)        | —        | ≥95 % within 2 s until delivery to the provider               | Not measured                     |
+| KR3: Device compatibility (RNF-COM-001)                           | —        | Android 7.0 (API 24) or later                                 | Met in the APK; tested on 2 phones |
+| KR4: Manual tests of the native features with the release APK     | 0 of 6   | PM-04 to PM-09 recorded                                       | Pending                          |
 
 ## Correlations
 

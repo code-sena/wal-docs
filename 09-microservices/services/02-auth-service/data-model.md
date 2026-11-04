@@ -1,109 +1,70 @@
-# Modelo de Datos — Auth Service
+# Data Model — Auth Service
 
-> El Auth Service es el **dueño autoritativo** de la identidad del usuario.
-> Ningún otro servicio lee directamente estas tablas. Si necesitan datos del usuario,
-> los obtienen del token JWT o consultan vía API.
-
----
-
-## Motor de base de datos
-
-**Motor principal:** PostgreSQL — para usuarios, roles y tokens de actualización.
-**Motor de caché:** Redis — para la blacklist de tokens y contadores de intentos fallidos.
-
-**Justificación PostgreSQL:** Transacciones ACID son críticas: no puede existir un usuario
-sin rol asignado, y no pueden perderse registros de intentos de login fallidos.
-
-**Justificación Redis:** La verificación del token blacklist ocurre en cada request al gateway.
-Redis soporta búsquedas O(1) con TTL automático, sin necesidad de jobs de limpieza.
+> Tables owned by the Auth service. The full column list, checks and indexes are in
+> `06-data/models.md`; this document summarizes what Auth is responsible for.
 
 ---
 
-## Esquema PostgreSQL
+## Database engine
 
-### Tabla: `users`
-
-**Propósito:** Credenciales de autenticación. Solo los datos necesarios para autenticar — perfil de aplicación va en el servicio de negocio correspondiente.
-
-| Campo | Tipo | Nullable | Descripción | Restricciones |
-|-------|------|----------|-------------|---------------|
-| id | UUID | No | Identificador único | PK, gen_random_uuid() |
-| email | VARCHAR(255) | No | Email del usuario | UNIQUE, NOT NULL |
-| password_hash | VARCHAR(255) | No | Hash bcrypt (cost 12) | NOT NULL |
-| email_verified | BOOLEAN | No | Si el email fue verificado | DEFAULT false |
-| failed_attempts | INT | No | Intentos de login fallidos | DEFAULT 0 |
-| locked_until | TIMESTAMPTZ | Sí | Bloqueado hasta esta fecha | NULL = no bloqueado |
-| created_at | TIMESTAMPTZ | No | Fecha de registro | DEFAULT NOW() |
-| updated_at | TIMESTAMPTZ | No | Última modificación | DEFAULT NOW() |
-| deleted_at | TIMESTAMPTZ | Sí | Soft delete | NULL = activo |
-
-**Índices:**
-| Nombre | Campos | Justificación |
-|--------|--------|---------------|
-| idx_users_email | email | Búsqueda por email en login (principal lookup) |
-| idx_users_deleted_at | deleted_at | Filtrar usuarios activos |
-
-### Tabla: `roles`
-
-**Propósito:** Catálogo de roles del sistema.
-
-| Campo | Tipo | Nullable | Descripción |
-|-------|------|----------|-------------|
-| id | UUID | No | PK |
-| name | VARCHAR(50) | No | Nombre del rol (UNIQUE): ADMIN, USER, VIEWER |
-| description | TEXT | Sí | Descripción legible del rol |
-| created_at | TIMESTAMPTZ | No | DEFAULT NOW() |
-
-### Tabla: `user_roles`
-
-**Propósito:** Relación many-to-many entre usuarios y roles.
-
-| Campo | Tipo | Nullable | Descripción |
-|-------|------|----------|-------------|
-| user_id | UUID | No | FK → users.id ON DELETE CASCADE |
-| role_id | UUID | No | FK → roles.id ON DELETE RESTRICT |
-| assigned_at | TIMESTAMPTZ | No | Cuándo se asignó el rol |
-| assigned_by | UUID | Sí | FK → users.id — quién asignó el rol |
-
-**PK compuesta:** (user_id, role_id)
-
-### Tabla: `refresh_tokens`
-
-**Propósito:** Tokens de actualización activos. Permite rotación y revocación.
-
-| Campo | Tipo | Nullable | Descripción |
-|-------|------|----------|-------------|
-| id | UUID | No | PK |
-| user_id | UUID | No | FK → users.id ON DELETE CASCADE |
-| token_hash | VARCHAR(255) | No | Hash SHA-256 del token (nunca el token real) |
-| expires_at | TIMESTAMPTZ | No | Expiración del refresh token |
-| revoked_at | TIMESTAMPTZ | Sí | NULL = activo, fecha = revocado |
-| created_at | TIMESTAMPTZ | No | DEFAULT NOW() |
-| user_agent | TEXT | Sí | Para mostrar sesiones activas al usuario |
+PostgreSQL 16, shared with alert-service and evidence-service. Auth owns the `identity` and `admin`
+schemas and is the only service that runs Liquibase (v1.0.0 to v1.6.0, changeset 25). The application
+database user can read and write data but cannot create or drop tables or modify the audit log.
 
 ---
 
-## Esquema Redis
+## PostgreSQL schema
 
-| Key pattern | Tipo | TTL | Propósito |
-|-------------|------|-----|-----------|
-| `blacklist:{jti}` | String | Hasta expiración del JWT | Tokens revocados (logout) |
-| `attempts:{email}` | String (int) | 5 minutos | Contador de intentos fallidos |
-| `locked:{email}` | String | Hasta unlock | Email bloqueado temporalmente |
+### Table: `identity.users`
+
+Registered people: first and last name, email (unique, format checked), phone (unique, format
+checked), document, birth date, `role_id`, `terms_accepted_at`. `users.id` is the `sub` of the JWT.
+
+### Table: `identity.role`
+
+Two rows: `user` (id 1) and `administrator` (id 2). There is no separate moderator role.
+
+### Table: `identity.account` / `identity.user_profile` / `identity.admin_profile`
+
+`account` (1 to 1 with `users`) stores the BCrypt hash, status (`active`, `inactive`, `blocked`,
+`pending`) and last access. `user_profile` (1 to 1 with `users`) is the id that alerts, contacts and
+locations reference. `admin_profile` marks administration accounts.
+
+### Table: `identity.device_session`
+
+One session per device with the hash of its refresh token (15 days), status (`active`, `expired`,
+`revoked`), expiration and last use.
+
+### Other `identity` tables
+
+`device` (UUID, push token, brand, model, OS, app version, GPS status, status), `device_permission`,
+`alert_activation_setting`, `recovery_request` (code hash, attempts, expiration, requesting IP) and
+`user_preference` (language, theme, notifications).
+
+### `admin` tables
+
+`audit_log` (immutable), `user_report`, `moderation_action`, `system_configuration` (single row),
+`alert_report` (reports exported to PDF or CSV) and `account_deletion_request` (needs a second
+administrator).
 
 ---
 
-## Migraciones
+## Redis schema
 
-**Herramienta:** [Flyway / Alembic / golang-migrate — según el stack del proyecto]
-**Ubicación de scripts:** `src/migrations/` (ver guía en `_stacks/[tu-stack].md`)
-
-**Política:** Todas las migraciones son forward-only en producción. Los rollbacks de datos se hacen con migraciones adicionales, no revirtiendo scripts.
+Not used. Sessions are stored in `identity.device_session` and the rate limit counters live in memory.
 
 ---
 
-## Correlaciones
+## Migrations
 
-- Runbook del servicio → `runbook.md`
-- Eventos que emite → `events.md`
-- Política de seguridad y JWT → `00-governance/security-policy.md`
+- File `db/changelog/db.changelog-master.yaml` with one file per change in `changesets/`.
+- Applied automatically when Auth starts, locally (Docker) and in Render.
+- An applied changeset is never edited. Details → `06-data/migration-strategy.md`.
+
+---
+
+## Correlations
+
+- Full table structure → `06-data/models.md`
+- Field meanings → `06-data/data-dictionary.md`
+- Entities and rules → `02-domain/entities-and-rules.md`

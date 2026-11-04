@@ -1,489 +1,604 @@
 # User Stories — Woman Alert
 
-> Formalization of the user stories (US) that were already included in `03-product/product-backlog.md`, using the Gherkin format of this folder. There are no sprint dates yet (see `03-product/roadmap.md`), so "Target Sprint" remains pending until the team defines it.
+> User stories (US) from Software Analysis v3.4, written in the Gherkin format of this folder. They do not replace the formal requirements of SRS v2.6: they check that every use case answers a real need. The status is taken from the requirements linked to each story; "Done" means the feature exists in the code published in `main` and "pending" notes say which manual test is still missing. The team did not record sprint estimates, so story points are not filled in.
 
 ## Backlog Status
 
 | Current | Total US | Refined | In Progress | Completed |
 | ------- | -------- | ------- | ----------- | --------- |
-| Current | 15       | 15      | 5           | 1         |
+| Current | 17       | 17      | 1           | 16        |
 
-*(Updated with the actual status confirmed by the team: the mobile application has been under development for some time — HU-MOVIL-002 is already completed, while the other three existing mobile user stories are in progress with details still to be polished. The web panel is under reconstruction based on instructor feedback, so the two existing web user stories are considered in progress. The 9 new user stories (HU-MOVIL-005 to 009, HU-WEB-ADMIN-002 to 005) have just been formalized from SRS FRs that did not previously have a user story, so they remain in the Backlog — none of them is an invented decision; they are simply the "As a / I want / So that" form applied to an existing requirement.)*
+*(Updated on 28/10/2026 against SRS v2.6 and the code in `main`. Features were frozen on 24/10/2026.)*
 
 ## Epics
 
 | Epic ID | Description           | Scope                                                                                         |
 | ------- | --------------------- | --------------------------------------------------------------------------------------------- |
-| EP-001  | Alerts and Activation | Everything related to activating an alert and ensuring it reaches trusted contacts (FR4, FR5) |
-| EP-002  | User Management       | Emergency contacts, evidence, resources, and map (FR2.2, FR6, FR7, FR9)                       |
-| EP-003  | User Web Portal       | Profile, history, and evidence consultation from the web (FR12)                               |
-| EP-004  | Administrative Panel  | Management and supervision from the administrator role (FR13)                                 |
+| EP-001  | Alerts and Activation | Activation, cancellation, notices to contacts, location during the alert and evidence (RF-ACT, RF-ALE, RF-EVI) |
+| EP-002  | User Management       | Account, recovery, trusted contacts, map and assistance (RF-USU, RF-CON, RF-UBI, RF-REC)                  |
+| EP-003  | User Web Portal       | History, evidence and account information from the web (RF-WEB, RF-HIS)                       |
+| EP-004  | Administrative Panel  | Management, configuration, audit and session of the administrator role (RF-ADM, RF-AUD, RF-SES)          |
 
 ---
 
-### HU-MOVIL-001 — Activate Emergency Alert {#HU-MOVIL-001}
+### HU-USU-001 — Create an Account and Log In {#HU-USU-001}
 
-**Epic:** EP-001
+**Epic:** EP-002
 
-> **As** a mobile application user
-> **I want** to activate an alert through at least two quick-access methods (widget, physical button, or touch pattern)
-> **So that** my real-time location is sent and my trusted contacts are notified without needing to open the app
-
-**Acceptance Criteria:**
+> **As** an user
+> **I want** to create an account and log in
+> **So that** I can access my private features
 
 ```gherkin
-Scenario 1: Successful activation through widget or physical button
-  Given the user has emergency contacts configured
-  When she activates the alert through a widget, sudden movement, or physical button (FR5.1-FR5.3)
-  Then the system sends the location and notifies the configured contacts (FR4.1, FR4.2)
-  And dispatch occurs within a maximum of 2 seconds up to delivery to the channel provider, in at least 95% of cases (RNF5)
+Scenario 1: Valid registration
+  Given I fill in the registration form with valid data and accept the terms
+  When I submit it
+  Then the account is created and the private area opens
 
-Scenario 2: Notification channel failure
-  Given an alert has been activated
-  When the primary delivery channel fails
-  Then the system automatically retries through another available channel (RNF9)
+Scenario 2: Invalid data
+  Given a field does not pass the validation
+  When I submit the form
+  Then the account is not created and the reason is shown
 
-Scenario 3: Activation method registration
-  Given an alert has been triggered
-  When the system processes it
-  Then it is labeled with the activation method used, only as historical/analytical data, without affecting the priority or urgency with which it is processed, which is always maximum (FR4.4); the system may also request discreet confirmation when applicable (FR5.4) and generate reminders or mini-alerts according to configured rules (FR4.5)
+Scenario 3: Login with Google
+  Given I choose to log in with Google
+  When the server verifies the token signature
+  Then I enter with the same account in the app and on the web
 ```
 
 | Field               | Value                                                       |
 | ------------------- | ----------------------------------------------------------- |
-| Story Points        | 8                                                           |
-| Priority            | High                                                        |
-| Target Sprint       | To Be Defined                                               |
-| Status              | In Progress                                                 |
-| Dependencies        | HU-MOVIL-002 (requires configured contacts)                 |
-| Affected Service(s) | Alert module (backend), `features/BotonActivacion` (mobile) |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-USU-01 |
+| Requirements        | RF-USU-001, RF-USU-003 |
+| Status              | Done |
+| Affected Service(s) | Auth (identity), `features/authentication` |
 
 ---
 
-### HU-MOVIL-002 — Manage Emergency Contacts {#HU-MOVIL-002}
+### HU-USU-002 — Recover Access to My Account {#HU-USU-002}
 
 **Epic:** EP-002
 
-> **As** a mobile application user
-> **I want** to add, view, modify, and delete my emergency contacts
-> **So that** the system knows whom to notify when I activate an alert
-
-**Acceptance Criteria:**
+> **As** an user
+> **I want** to recover access if I forget my password
+> **So that** I can use my account again
 
 ```gherkin
-Scenario 1: Add an emergency contact
-  Given I am in the contacts module
-  When I add a contact with a name and phone number
-  Then it is saved in my trusted contacts list (FR2.2)
+Scenario 1: Code sent
+  Given I request the recovery with my email
+  When the request is processed
+  Then a 6-digit code is sent, valid for 15 minutes, and the answer is the same whether the account exists or not
 
-Scenario 2: Delete a contact
-  Given I have saved contacts
-  When I delete one
-  Then it will no longer receive notifications for future alerts
+Scenario 2: Too many attempts
+  Given I enter a wrong code 5 times
+  When I try again
+  Then the code is no longer accepted and I must request a new one
+
+Scenario 3: Reset
+  Given the code is valid
+  When I save a new password of 8 to 100 characters
+  Then the previous password stops working
 ```
 
-| Field               | Value                                                    |
-| ------------------- | -------------------------------------------------------- |
-| Story Points        | 5                                                        |
-| Priority            | High                                                     |
-| Target Sprint       | To Be Defined                                            |
-| Status              | Done                                                     |
-| Dependencies        | None                                                     |
-| Affected Service(s) | Contacts module (backend), `features/contacts` (mobile) |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-USU-02 |
+| Requirements        | RF-USU-002 |
+| Status              | Done |
+| Affected Service(s) | Auth (identity) |
 
 ---
 
-### HU-MOVIL-003 — Record Evidence During an Alert {#HU-MOVIL-003}
+### HU-CON-001 — Keep My Trusted Contacts Updated {#HU-CON-001}
 
 **Epic:** EP-002
 
-> **As** a mobile application user
-> **I want** to capture audio and/or video as evidence during an alert
-> **So that** a stored record of what happened is available
-
-**Acceptance Criteria:**
+> **As** an user
+> **I want** to add, view, edit and remove my trusted contacts
+> **So that** the notices reach the people I chose
 
 ```gherkin
-Scenario 1: Record evidence during an active alert
-  Given I have an active alert
-  When I record audio or video
-  Then it is stored and backed up, associated with that alert (FR6.1-FR6.3)
+Scenario 1: Add a contact
+  Given I have fewer contacts than the configured limit
+  When I save a contact with name, phone and email
+  Then it appears in the list on the app and the web
+
+Scenario 2: Limit reached
+  Given I already have the maximum (5 by default)
+  When I try to add another
+  Then the server rejects it with 409 and the app shows the allowed maximum
+
+Scenario 3: Change not saved
+  Given the request fails
+  When I edit a contact
+  Then the change is not shown as saved
 ```
 
-| Field               | Value                                                                   |
-| ------------------- | ----------------------------------------------------------------------- |
-| Story Points        | 5                                                                       |
-| Priority            | Medium                                                                  |
-| Target Sprint       | To Be Defined                                                           |
-| Status              | In Progress                                                             |
-| Dependencies        | HU-MOVIL-001                                                            |
-| Affected Service(s) | Evidence module (backend), camera/microphone permissions (FR1.5, FR1.6) |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-CON-01 |
+| Requirements        | RF-CON-001, RF-CON-002 |
+| Status              | Done |
+| Affected Service(s) | Alert (alerts), `features/contacts` |
 
 ---
 
-### HU-MOVIL-004 — View Zone Map and Emergency Resources {#HU-MOVIL-004}
+### HU-ACT-001 — Activate an Alert with an Accessible Method {#HU-ACT-001}
 
-**Epic:** EP-002
+**Epic:** EP-001
 
-> **As** a mobile application user
-> **I want** to view safe/risk zones and a directory of nearby help centers
-> **So that** I can make informed decisions about my safety
-
-**Acceptance Criteria:**
+> **As** an user
+> **I want** to activate an alert with the SOS button, a contact, a shake or the widget
+> **So that** I can ask for help when I am at risk
 
 ```gherkin
-Scenario 1: View current zone
-  Given I open the map
-  When I check my zone
-  Then I can see whether it is marked as safe or risky (FR9.1)
+Scenario 1: Alert issued
+  Given I start an activation
+  When 5 seconds pass without cancelling
+  Then the alert is registered with the activation method, date, time and available location
 
-Scenario 2: View help directory
-  Given I need help
-  When I access the directory
-  Then I can see available phone numbers, organizations, and help centers (FR7.1, FR9.3)
+Scenario 2: No connectivity
+  Given the phone has no Internet
+  When the alert is sent
+  Then the app shows the alert as failed and offers to retry instead of presenting it as registered
+
+Scenario 3: Shake with the screen off
+  Given the shake method is enabled
+  When I shake the phone with the app closed
+  Then the native foreground service starts the countdown
 ```
 
-| Field               | Value                                            |
-| ------------------- | ------------------------------------------------ |
-| Story Points        | 5                                                |
-| Priority            | Medium                                           |
-| Target Sprint       | To Be Defined                                    |
-| Status              | In Progress                                      |
-| Dependencies        | None                                             |
-| Affected Service(s) | Zones module (backend), `features/mapa` (mobile) |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-ACT-01 |
+| Requirements        | RF-ACT-005, RF-ALE-001 |
+| Status              | Done (manual test with the release APK pending) |
+| Affected Service(s) | Alert (alerts), `features/activation`, `modules/shake-sensor` |
 
 ---
 
-### HU-WEB-USUARIA-001 — View History and Status from the Web Portal {#HU-WEB-USUARIA-001}
+### HU-ACT-002 — Cancel an Activation Made by Mistake {#HU-ACT-002}
+
+**Epic:** EP-001
+
+> **As** an user
+> **I want** to cancel an activation during 5 seconds
+> **So that** I avoid an unwanted alert
+
+```gherkin
+Scenario 1: Cancel in time
+  Given the countdown is running
+  When I press cancel or press volume-down four times
+  Then no alert is created and I am told it was cancelled
+
+Scenario 2: PIN configured
+  Given I configured a cancellation PIN
+  When I try to finish an issued alert
+  Then the app asks for the PIN before closing it
+
+Scenario 3: Duress PIN
+  Given someone forces me to cancel
+  When I enter the duress PIN
+  Then the app looks cancelled and my contacts receive a silent notice
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-ACT-01 |
+| Requirements        | RF-ACT-006 |
+| Status              | Done |
+| Affected Service(s) | Mobile app |
+
+---
+
+### HU-ALE-001 — Notify My Contacts with My Location {#HU-ALE-001}
+
+**Epic:** EP-001
+
+> **As** an user
+> **I want** my contacts to receive a notice with my available location
+> **So that** they know I need help
+
+```gherkin
+Scenario 1: Notice per contact
+  Given the alert was registered
+  When the Alert service sends the notices
+  Then each contact receives an email with the tracking link and, if they have the app, a push; the result is recorded per contact and channel
+
+Scenario 2: Nobody opens it
+  Given no contact opens the notice
+  When 5 minutes pass
+  Then the notice is resent once with the latest location
+
+Scenario 3: Channel failure
+  Given the email or push provider fails
+  When the send is processed
+  Then the failure is recorded as `failed` and the notice is not shown as sent
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-ALE-01 |
+| Requirements        | RF-ALE-002, RF-ALE-006 |
+| Status              | Done (end-to-end evidence pending) |
+| Affected Service(s) | Alert (notifications) |
+
+---
+
+### HU-ALE-002 — Link My Location to the Active Alert {#HU-ALE-002}
+
+**Epic:** EP-001
+
+> **As** an user
+> **I want** my location to be linked to the active alert
+> **So that** my contacts have context during the event
+
+```gherkin
+Scenario 1: Periodic location
+  Given the alert is active and the permission is granted
+  When time passes
+  Then the app sends the location every 15 s for 5 minutes and then every 30 s, also with the app closed
+
+Scenario 2: Lost signal
+  Given the server stops receiving locations
+  When 5 minutes pass
+  Then the contacts are warned with the last recorded location
+
+Scenario 3: No location
+  Given the location could not be obtained
+  When the screen is updated
+  Then it is not presented as updated
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-ALE-02 |
+| Requirements        | RF-ALE-003 |
+| Status              | Done |
+| Affected Service(s) | Alert (alerts), Kotlin foreground service |
+
+---
+
+### HU-HIS-001 — Check My Previous Alerts {#HU-HIS-001}
 
 **Epic:** EP-003
 
-> **As** a user authenticated on the web platform
-> **I want** to view my profile, alerts, history, location, and evidence from a computer
-> **So that** I can review my information when I do not have my phone available, as a complement to the mobile app
-
-**Acceptance Criteria:**
+> **As** an user
+> **I want** to check my previous alerts
+> **So that** I can review the registered events
 
 ```gherkin
-Scenario 1: View information from the web
-  Given I log in to the web platform (FR12.1)
-  When I access the portal
-  Then I can see my profile, alerts, and history (FR12.2, FR12.3, FR12.4)
+Scenario 1: History
+  Given I have previous alerts
+  When I open the history
+  Then I see only my alerts with totals by status, map, route, evidence and contacts notified
 
-Scenario 2: Evidence visible only to its owner
-  Given I have evidence recorded from the mobile app
-  When I view it on the web
-  Then I can only see the evidence associated with my own account (FR12.6, RNF16)
-```
+Scenario 2: Empty state
+  Given I have no alerts
+  When I open the history
+  Then an empty state is shown
 
-| Field               | Value                                                                   |
-| ------------------- | ----------------------------------------------------------------------- |
-| Story Points        | 5                                                                       |
-| Priority            | Medium                                                                  |
-| Target Sprint       | To Be Defined                                                           |
-| Status              | Under Reconstruction                                                    |
-| Dependencies        | HU-MOVIL-001, HU-MOVIL-003 (alerts/evidence must exist to be consulted) |
-| Affected Service(s) | `features/dashboard` (web)                                              |
-
----
-
-### HU-WEB-ADMIN-001 — Manage Users, Alerts, and Reports {#HU-WEB-ADMIN-001}
-
-**Epic:** EP-004
-
-> **As** a web platform administrator
-> **I want** to manage users, alerts, and reports
-> **So that** I can supervise the system and perform operational follow-up
-
-**Acceptance Criteria:**
-
-```gherkin
-Scenario 1: View users and alerts
-  Given I am an authenticated administrator
-  When I access the panel
-  Then I can view and manage users (FR13.1) and generated alerts (FR13.2)
-
-Scenario 2: Generate a filtered report
-  Given I need to generate a report for a period
-  When I generate a report using date/type/status/city filters
-  Then I can download it as PDF or Excel, or print it (FR13.4)
-
-Scenario 3: Action auditing
-  Given an administrator performs an action in the panel
-  Then the system records it (administrator, action, date, time, IP) (FR13.9)
-```
-
-| Field               | Value                                          |
-| ------------------- | ---------------------------------------------- |
-| Story Points        | 8                                              |
-| Priority            | Medium                                         |
-| Target Sprint       | To Be Defined                                  |
-| Status              | Under Reconstruction                           |
-| Dependencies        | HU-MOVIL-001 (alerts must exist to be managed) |
-| Affected Service(s) | `features/admin` (web)                         |
-
----
-
-### HU-MOVIL-005 — Grant Required App Permissions {#HU-MOVIL-005}
-
-**Epic:** EP-002
-
-> **As** a mobile application user
-> **I want** the app to request the necessary permissions (contacts, calls, location, notifications, microphone, camera)
-> **So that** I can use all emergency functions without failures caused by missing permissions
-
-```gherkin
-Scenario 1: Permission request by function
-  Given I open the app for the first time
-  When I access each function that requires permission
-  Then the app requests the corresponding permission (contacts FR1.1, calls FR1.2, location FR1.3, notifications FR1.4, microphone FR1.5, camera FR1.6)
-
-Scenario 2: Critical permission denied
-  Given I deny a critical permission (location or notifications)
-  When I try to activate an alert
-  Then the app explains which function will not work without that permission
-```
-
-| Field               | Value                                 |
-| ------------------- | ------------------------------------- |
-| Story Points        | 3                                     |
-| Priority            | High                                  |
-| Target Sprint       | To Be Defined                         |
-| Status              | Backlog                               |
-| Dependencies        | None                                  |
-| Affected Service(s) | Operating system permissions (mobile) |
-
----
-
-### HU-MOVIL-006 — Register and Recover My Account {#HU-MOVIL-006}
-
-**Epic:** EP-002
-
-> **As** a mobile application user
-> **I want** to create an account and recover access if I lose it
-> **So that** I can use the app securely and not lose access to my contacts and history
-
-```gherkin
-Scenario 1: Account registration
-  Given I am a new user
-  When I complete the registration with the required information
-  Then my account is created (FR2.1)
-
-Scenario 2: Access recovery
-  Given I forgot my password or lost access
-  When I use the recovery option
-  Then I can reset access to my account (FR2.3)
-```
-
-| Field               | Value                           |
-| ------------------- | ------------------------------- |
-| Story Points        | 5                               |
-| Priority            | High                            |
-| Target Sprint       | To Be Defined                   |
-| Status              | Backlog                         |
-| Dependencies        | None                            |
-| Affected Service(s) | Authentication module (backend) |
-
----
-
-### HU-MOVIL-007 — View Start Guide and System Notices {#HU-MOVIL-007}
-
-**Epic:** EP-002
-
-> **As** a mobile application user
-> **I want** to see a guide to the main functions, my current location, and relevant notices from the home screen
-> **So that** I understand how to use the app and stay informed about important updates
-
-```gherkin
-Scenario 1: Interactive guide
-  Given I enter the app for the first time
-  When I reach the home screen
-  Then I see an interactive guide to the main functions (FR3.1)
-
-Scenario 2: Home screen panel
-  Given I am on the home screen
-  When I view it
-  Then I see my current location and registered locations (FR3.2), as well as relevant reminders or warnings (FR3.3)
-```
-
-| Field               | Value                      |
-| ------------------- | -------------------------- |
-| Story Points        | 3                          |
-| Priority            | Low                        |
-| Target Sprint       | To Be Defined              |
-| Status              | Backlog                    |
-| Dependencies        | None                       |
-| Affected Service(s) | `features/inicio` (mobile) |
-
----
-
-### HU-MOVIL-008 — Customize App Language and Theme {#HU-MOVIL-008}
-
-**Epic:** EP-002
-
-> **As** a mobile application user
-> **I want** to change the interface language and visual theme (light/dark)
-> **So that** the app adapts to my preferences and is more comfortable to use
-
-```gherkin
-Scenario 1: Language change
-  Given I am in settings
-  When I change the language
-  Then the entire interface is updated to that language (FR10.1)
-
-Scenario 2: Theme change
-  Given I am in settings
-  When I change the theme
-  Then the app is displayed in light or dark mode according to my selection (FR11.1)
-```
-
-| Field               | Value                             |
-| ------------------- | --------------------------------- |
-| Story Points        | 2                                 |
-| Priority            | Low                               |
-| Target Sprint       | To Be Defined                     |
-| Status              | Backlog                           |
-| Dependencies        | None                              |
-| Affected Service(s) | `features/configuracion` (mobile) |
-
----
-
-### HU-MOVIL-009 — Receive High-Priority Emergency Notifications {#HU-MOVIL-009}
-
-**Epic:** EP-001
-
-> **As** a mobile application user
-> **I want** emergency-related notifications to have high priority and remain visible
-> **So that** I do not miss them while an alert is active
-
-```gherkin
-Scenario 1: High-priority notification
-  Given an event related to an emergency occurs
-  When the system generates the notification
-  Then it is displayed with high priority (FR8.1)
-
-Scenario 2: Persistence during an active alert
-  Given I have an active alert
-  When I check my notifications
-  Then notifications related to that alert remain visible for the duration of the alert (FR8.2)
+Scenario 3: Error
+  Given the service does not answer
+  When I open the history
+  Then an error message is shown
 ```
 
 | Field               | Value                                                       |
 | ------------------- | ----------------------------------------------------------- |
-| Story Points        | 3                                                           |
-| Priority            | Medium                                                      |
-| Target Sprint       | To Be Defined                                               |
-| Status              | Backlog                                                     |
-| Dependencies        | HU-MOVIL-001                                                |
-| Affected Service(s) | Notification module (backend), notification system (mobile) |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-HIS-01 |
+| Requirements        | RF-HIS-001, RF-WEB-004 |
+| Status              | Done |
+| Affected Service(s) | Alert (alerts), app and web |
 
 ---
 
-### HU-WEB-ADMIN-002 — Manage Zones and Their Risk Level {#HU-WEB-ADMIN-002}
+### HU-UBI-001 — See My Last Recorded Location {#HU-UBI-001}
 
-**Epic:** EP-004
+**Epic:** EP-002
 
-> **As** a web platform administrator
-> **I want** to create, view, modify, and delete zones together with their risk level
-> **So that** the safe/risk zone information displayed to users remains up to date
+> **As** an user
+> **I want** to see my last recorded location with its date and time
+> **So that** I know where it was recorded for the last time
 
 ```gherkin
-Scenario 1: Manage a zone
-  Given I am an administrator
-  When I create or edit a zone
-  Then I can assign a risk level to it and it becomes available to users (FR13.3)
+Scenario 1: Last location
+  Given there are recorded points
+  When I open the map
+  Then the last recorded location is shown with its date and time, separate from the current location
+
+Scenario 2: No data
+  Given there are no points
+  When I open the map
+  Then I am told there is no information and no location is invented
 ```
 
-| Field               | Value                                          |
-| ------------------- | ---------------------------------------------- |
-| Story Points        | 5                                              |
-| Priority            | Medium                                         |
-| Target Sprint       | To Be Defined                                  |
-| Status              | Backlog                                        |
-| Dependencies        | None                                           |
-| Affected Service(s) | Zones module (backend), `features/admin` (web) |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-UBI-01 |
+| Requirements        | RF-UBI-001 |
+| Status              | Done |
+| Affected Service(s) | Alert (alerts), MapLibre |
 
 ---
 
-### HU-WEB-ADMIN-003 — View a User's Contacts, Devices, and Evidence {#HU-WEB-ADMIN-003}
+### HU-REC-001 — Open the Dialer with an Emergency Number {#HU-REC-001}
 
-**Epic:** EP-004
+**Epic:** EP-002
 
-> **As** a web platform administrator
-> **I want** to view a specific user's emergency contacts, device information, and evidence
-> **So that** I can perform complete follow-up of an alert when necessary
+> **As** an user
+> **I want** to choose an emergency number and open the dialer
+> **So that** I decide whether to make the call
 
 ```gherkin
-Scenario 1: Complete user profile
-  Given I am reviewing a user
-  When I view their profile
-  Then I can see their emergency contacts (FR13.5), device information (brand, model, version, GPS status, and permission status) (FR13.6), and evidence related to their alerts (FR13.7)
+Scenario 1: Dialer
+  Given I am in the assistance module
+  When I choose 123, the purple line or the mental health line
+  Then the dialer opens with the number
+
+Scenario 2: No automatic call
+  Given the dialer is open
+  When I do nothing
+  Then no call is started
 ```
 
-| Field               | Value                                                                     |
-| ------------------- | ------------------------------------------------------------------------- |
-| Story Points        | 5                                                                         |
-| Priority            | Medium                                                                    |
-| Target Sprint       | To Be Defined                                                             |
-| Status              | Backlog                                                                   |
-| Dependencies        | HU-MOVIL-002, HU-MOVIL-003 (contacts/evidence must exist to be consulted) |
-| Affected Service(s) | `features/admin` (web)                                                    |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-REC-01 |
+| Requirements        | RF-REC-001, RF-REC-002 |
+| Status              | Done |
+| Affected Service(s) | Mobile app |
 
 ---
 
-### HU-WEB-ADMIN-004 — Configure General System Parameters {#HU-WEB-ADMIN-004}
+### HU-EVI-001 — Record Evidence During an Alert {#HU-EVI-001}
 
-**Epic:** EP-004
+**Epic:** EP-001
 
-> **As** a web platform administrator
-> **I want** to manage general system parameters (maximum SOS time, emergency number, administrative email, notifications, visual parameters)
-> **So that** the system can be adjusted without depending on a code change
+> **As** an user
+> **I want** audio and video to be recorded as evidence of an alert
+> **So that** information about the event is kept
 
 ```gherkin
-Scenario 1: Modify a general parameter
-  Given I am an administrator
-  When I modify a general parameter
-  Then the change is applied to the system without requiring a new deployment (FR13.8)
+Scenario 1: Automatic recording
+  Given I granted camera and microphone
+  When the alert starts
+  Then the app records video and then audio automatically (RN-14)
+
+Scenario 2: Upload queue
+  Given there is no connection
+  When a chunk finishes
+  Then it stays in the queue and is uploaded when the connection returns
+
+Scenario 3: Storage failure
+  Given the upload fails
+  When the result is processed
+  Then the evidence is not shown as saved
 ```
 
-| Field               | Value                  |
-| ------------------- | ---------------------- |
-| Story Points        | 3                      |
-| Priority            | Medium                 |
-| Target Sprint       | To Be Defined          |
-| Status              | Backlog                |
-| Dependencies        | None                   |
-| Affected Service(s) | `features/admin` (web) |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-EVI-01 |
+| Requirements        | RF-EVI-001, RF-EVI-002, RF-EVI-003 |
+| Status              | Done (field test pending) |
+| Affected Service(s) | Evidence, `features/recording` |
 
 ---
 
-### HU-WEB-ADMIN-005 — Manage Reported Users {#HU-WEB-ADMIN-005}
+### HU-EVI-002 — Check My Evidence from the Web {#HU-EVI-002}
+
+**Epic:** EP-003
+
+> **As** an authenticated user
+> **I want** to check my evidence from the web
+> **So that** I can review the recorded information
+
+```gherkin
+Scenario 1: Evidence list
+  Given I have evidence
+  When I open Evidence
+  Then only my authorized evidence is shown and I can download it
+
+Scenario 2: Keep evidence
+  Given I mark an alert to keep
+  When the 30 days pass
+  Then its evidence is not deleted (up to 5 alerts)
+
+Scenario 3: Empty
+  Given I have no evidence
+  When I open Evidence
+  Then I am told there is none
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-EVI-02 |
+| Requirements        | RF-WEB-006 |
+| Status              | Done |
+| Affected Service(s) | Evidence, web `features/dashboard` |
+
+---
+
+### HU-WEB-001 — Consult My Information from the Web Portal {#HU-WEB-001}
+
+**Epic:** EP-003
+
+> **As** an user
+> **I want** to consult the information of my account from the web portal
+> **So that** I can review it when I am not using the app
+
+```gherkin
+Scenario 1: Portal
+  Given I log in on the web
+  When I open the portal
+  Then I see my alerts, locations, contacts, alerts received and device status with their date and time
+
+Scenario 2: Phone off
+  Given my phone is off
+  When I check the location
+  Then the portal shows the last recorded location and does not claim to locate the phone
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-WEB-01, CU-USU-03 |
+| Requirements        | RF-WEB-001, RF-WEB-003, RF-WEB-005 |
+| Status              | Done (no trips and no personal data editing on the web) |
+| Affected Service(s) | Web + Auth + Alert |
+
+---
+
+### HU-ADM-001 — Manage Users, Alerts, Reports and Moderation {#HU-ADM-001}
 
 **Epic:** EP-004
 
-> **As** a web platform administrator
-> **I want** to view reported users, review the reason for the report, and perform administrative actions
-> **So that** the system has a moderation mechanism for misuse
+> **As** an administrator
+> **I want** to manage users, alerts, reports and user reports according to my role
+> **So that** I can attend the operation of the system
 
 ```gherkin
-Scenario 1: Review a report
-  Given there is a report about a user
-  When I review it
-  Then I can see the reason and perform the corresponding administrative action (FR13.10)
+Scenario 1: Role check
+  Given I do not have the admin role
+  When I call `/api/admin/**`
+  Then the server answers 403
+
+Scenario 2: Audit
+  Given I change the status of an alert
+  When the change is saved
+  Then it is recorded in the audit log
+
+Scenario 3: Export
+  Given I filter the reports
+  When I export to PDF or CSV
+  Then the file respects the filters and my permissions
 ```
 
-| Field               | Value                  |
-| ------------------- | ---------------------- |
-| Story Points        | 3                      |
-| Priority            | Medium                 |
-| Target Sprint       | To Be Defined          |
-| Status              | Backlog                |
-| Dependencies        | None                   |
-| Affected Service(s) | `features/admin` (web) |
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-ADM-01, CU-ADM-02, CU-ADM-04, CU-ADM-06 |
+| Requirements        | RF-ADM-001, RF-ADM-002, RF-ADM-004, RF-ADM-009 |
+| Status              | Done |
+| Affected Service(s) | Auth (admin), web `features/admin` |
+
+---
+
+### HU-ADM-002 — Change System Parameters with Confirmation {#HU-ADM-002}
+
+**Epic:** EP-004
+
+> **As** an administrator
+> **I want** to modify the system parameters with prior confirmation
+> **So that** I avoid accidental changes
+
+```gherkin
+Scenario 1: Confirmation
+  Given I change the alert duration
+  When I press save
+  Then the panel shows a summary and asks for confirmation
+
+Scenario 2: Out of range
+  Given I enter a duration outside 30 to 1440 minutes
+  When I save
+  Then the value is rejected
+
+Scenario 3: Audit of values
+  Given the change is saved
+  When I check the audit log
+  Then today only the names of the modified columns are recorded; recording previous and new values is in development
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-ADM-07 |
+| Requirements        | RF-ADM-008, RF-AUD-002 |
+| Status              | In Progress |
+| Affected Service(s) | Auth (settings, admin) |
+
+---
+
+### HU-ADM-003 — See Who Did Each Operation {#HU-ADM-003}
+
+**Epic:** EP-004
+
+> **As** an administrator
+> **I want** to see who did each operation, when and from where
+> **So that** I can follow up the changes
+
+```gherkin
+Scenario 1: Record
+  Given an administrative operation is executed
+  When I open the audit log
+  Then I see date, actor, role, origin, action and IP
+
+Scenario 2: Filter and export
+  Given there are many records
+  When I filter by actor and date
+  Then I can export the result
+
+Scenario 3: Immutability
+  Given someone tries to edit a record
+  When the operation reaches the database
+  Then the trigger prevents it
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-AUD-01 |
+| Requirements        | RF-AUD-001, RF-AUD-004 |
+| Status              | Done |
+| Affected Service(s) | Auth (admin), database triggers |
+
+---
+
+### HU-SES-001 — Close My Admin Session after Inactivity {#HU-SES-001}
+
+**Epic:** EP-004
+
+> **As** an administrator
+> **I want** my session to close after a period of inactivity
+> **So that** the panel is protected if I leave
+
+```gherkin
+Scenario 1: Inactivity
+  Given I stop using the panel
+  When the threshold passes
+  Then the session closes and the event is recorded
+
+Scenario 2: Return
+  Given my session was closed
+  When I come back
+  Then I must log in again
+```
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Story Points        | Not estimated                                               |
+| Use cases           | CU-SES-01 |
+| Requirements        | RF-SES-002 |
+| Status              | Done |
+| Affected Service(s) | Web + Auth (admin) |
+
+---
 
 ## Formalized Stories — Gaps Closed
 
-FR4.4, FR4.5, and FR5.4 did not generate a separate user story: they were added as AC3 within HU-MOVIL-001 because they are refinements of the same alert activation story. The same applies to FR9.2, which was added as AC3 to HU-MOVIL-004. The remaining FRs that did not have a user story now have their own story above (HU-MOVIL-005 to 009, HU-WEB-ADMIN-002 to 005).
+Software Analysis v3.4 has 17 stories for 32 use cases, so not every requirement has its own story. The features added after the first SRS (trips, automatic protection, duress PIN, lost signal notice, chat, public tracking page, notifications inbox and minimum version) were incorporated into SRS v2.6 with proposed identifiers and are traced directly from the requirement to the use case and the test case in `04-requirements/traceability-matrix.md`. The previous stories HU-MOVIL-001 to 009 and HU-WEB-ADMIN-001 to 005 were replaced by these.
 
 ## Correlations
 

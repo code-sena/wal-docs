@@ -1,50 +1,32 @@
-# Eventos — API Gateway
+# Events — API Gateway
 
-> El API Gateway **no emite eventos de dominio**. Su responsabilidad es de infraestructura
-> (enrutamiento, autenticación, rate limiting), no de negocio.
->
-> Los eventos de dominio (cosas que le importan al negocio) los emiten los servicios detrás del gateway.
+> Not applicable: there is no gateway process. Domain events are published and consumed by the
+> services themselves.
 
 ---
 
-## Eventos publicados
+## Published events
 
-**Ninguno.** El API Gateway no publica al message broker.
-
----
-
-## Eventos consumidos
-
-**Ninguno.** El API Gateway no suscribe al message broker.
+None.
 
 ---
 
-## Logs de acceso (no son eventos de dominio)
+## Consumed events
 
-El gateway sí genera **logs de acceso** estructurados por cada petición HTTP:
-
-```json
-{
-  "timestamp": "2024-01-15T10:30:00.123Z",
-  "level": "info",
-  "type": "access_log",
-  "method": "POST",
-  "path": "/api/v1/auth/login",
-  "status": 200,
-  "durationMs": 45,
-  "ip": "192.168.1.100",
-  "correlationId": "550e8400-e29b-41d4-a716-446655440000",
-  "upstreamService": "auth-service",
-  "upstreamStatus": 200
-}
-```
-
-Estos logs van a la plataforma de observabilidad (`13-operations/observability.md`) pero
-**no se publican al broker de mensajes** — no son eventos de negocio.
+None.
 
 ---
 
-## Correlaciones
+## Access logs (not domain events)
 
-- Observabilidad y logs → `13-operations/observability.md`
-- Eventos de negocio de los servicios → `09-microservices/services/02-auth-service/events.md`
+There are no central access logs. Each service writes its own logs, which are read from the **Logs**
+tab of each service in Render. The authentication attempts blocked by the rate limit appear in the
+Auth logs as 429 responses, and the admin session events (login, failed attempt, password change,
+logout) are stored in `admin.audit_log` with IP and origin.
+
+---
+
+## Correlations
+
+- Domain events → `02-domain/domain-events.md`
+- Observability → `13-operations/observability.md`

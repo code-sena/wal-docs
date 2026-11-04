@@ -10,10 +10,12 @@
 
 | Level | Name | Definition | Example | Response time |
 |-------|------|------------|---------|---------------|
-| **P0** | Critical | System completely down. Total impact to all users. | API Gateway down, DB inaccessible | **Immediate** (<5 min) |
-| **P1** | High | Core functionality degraded. Impact to > 50% of users. | Login not working, payments failing | **15 minutes** |
-| **P2** | Medium | Secondary functionality degraded. Workaround available. | Report export slow | **1 hour** |
-| **P3** | Low | Minor nuisance. No impact on business operations. | Button with incorrect label | **Next sprint** |
+| **P0** | Critical | The alert path does not work: alerts cannot be created or contacts are not notified. | Alert service down, database unreachable or expired, email and push failing at the same time, `JWT_SECRET` mismatch | **Immediate** (<5 min) |
+| **P1** | High | Core functionality degraded for many users. | Login or Google login not working, tracking link not opening, evidence uploads failing | **15 minutes** |
+| **P2** | Medium | Secondary functionality degraded. Workaround available. | PDF/CSV export failing, admin dashboard slow, map tiles not loading | **1 hour** |
+| **P3** | Low | Minor nuisance. No impact on the alert path. | Wrong label or translation, a wrong text in the tutorial | **Next delivery** |
+
+During an incident the users are reminded that the app does not replace the official lines 123 and 155.
 
 ---
 
@@ -21,10 +23,10 @@
 
 | Role | Responsibility | When activated |
 |------|----------------|----------------|
-| **Incident Commander (IC)** | Coordinates response. Makes decisions. Communicates. | P0 and P1 always |
-| **Tech Lead** | In-depth technical diagnosis | P0 and P1 always |
-| **On-Call Engineer** | First responder. Executes technical actions | All incidents |
-| **Comms Lead** | Communicates to external stakeholders | P0 and P1 |
+| **Incident Commander (IC)** | Coordinates response, makes decisions and communicates — the project leader | P0 and P1 always |
+| **Tech Lead** | In-depth technical diagnosis of the affected service (backend, web or mobile) | P0 and P1 always |
+| **On-Call Engineer** | First responder: checks the health endpoints and the Render logs | All incidents |
+| **Comms Lead** | Informs the instructor and the test users | P0 and P1 |
 
 ---
 
@@ -34,13 +36,14 @@
 
 ```
 How do you know there is an incident?
-  → Alert from Prometheus / PagerDuty
-  → User report
-  → Proactive monitoring on the dashboard
+  → UptimeRobot reports a health endpoint down
+  → User or tester report
+  → Admin panel: Configuration > System status
+  → GitHub Actions failing on main
 
 Immediate action:
-  1. Acknowledge the alert in PagerDuty (to silence it and mark that someone responded)
-  2. Go to the Slack #incidents channel and write: "Investigating [brief description] — [your name]"
+  1. Check the three /actuator/health endpoints
+  2. Write in the team group: "Investigating [brief description] — [your name]"
   3. Open the runbook for the affected service: `09-microservices/services/[service]/runbook.md`
 ```
 
@@ -54,8 +57,8 @@ Determine severity:
 
 If P0 or P1:
   → Activate the Incident Commander
-  → Create the incident ticket in [Jira/Linear]: INC-XXX
-  → Open the War Room (temporary Slack channel or video call)
+  → Create the incident record (GitHub issue): INC-XXX
+  → Open a call with the team
 ```
 
 ### Step 3: COMMUNICATE (10-15 min)
@@ -78,11 +81,12 @@ IC: [Incident Commander Name]
 
 ```
 Diagnostic tools (in order):
-  1. Grafana → When did the problem start? Which service has a high error rate?
-  2. Logs (Kibana/CloudWatch) → What does the affected service say?
-  3. Jaeger/Zipkin → Where does the trace break?
-  4. kubectl get pods / docker ps → Is the pod/container running?
-  5. Manual health check → curl http://[service]/health
+  1. Health checks → curl https://alerta-mujer-{auth,alert,evidence}.onrender.com/actuator/health
+  2. Render → Logs tab of the affected service; last deploy and its startup
+  3. Admin panel → Configuration > System status (database, push, active alerts, last expiration review)
+  4. alert.alert_contact → are the notices `failed`? which channel?
+  5. Installed APK → adb logcat -v time ReactNativeJS:V AndroidRuntime:E *:S
+  6. Providers → Resend, Firebase and Backblaze status pages; Render database expiration
 
 Key question: What changed in the last 2 hours?
   → Last deploy
@@ -97,16 +101,16 @@ Key question: What changed in the last 2 hours?
 
 ```
 Mitigation options (from safest to riskiest):
-  1. Rollback to the last stable deploy (if a deploy caused the problem)
-  2. Disable the feature flag that introduced the problem
-  3. Scale horizontally if it is a capacity issue
-  4. Temporarily increase timeout / circuit breaker
-  5. Redirect traffic to an alternative region (if available)
-  6. Activate maintenance mode (last resort)
+  1. Wake the sleeping services (call the three health endpoints)
+  2. Rollback: redeploy the previous commit of main in Render / Vercel, or revert the pull request
+  3. Fix configuration: JWT_SECRET, INTERNAL_API_KEY, CORS_ORIGIN, email or storage keys
+  4. Database problem caused by a migration: write a new changeset that corrects it (never edit the applied one)
+  5. Switch the email provider to the alternative (Brevo) if Resend is down
+  6. Tell the users to rely on the official lines 123 and 155 until the service is back (last resort)
 ```
 
 **Before each change during an incident:**
-- Announce in the War Room what you are going to do
+- Announce in the call what you are going to do
 - Wait for the IC's confirmation
 - Execute the change
 - Report the result within 2 minutes
@@ -115,9 +119,9 @@ Mitigation options (from safest to riskiest):
 
 ```
 The incident is resolved when:
-  - Error metrics return to normal levels
-  - Health checks respond 200 on all services
-  - The PO / stakeholder confirms users can operate normally
+  - Health checks respond UP on the three services
+  - A test alert reaches a test contact by email and push
+  - The project leader confirms users can operate normally
 
 Resolution communication:
 ─────────────────────────
@@ -177,11 +181,11 @@ Held within 2 business days after resolving the incident.
 
 | Channel | Purpose |
 |---------|---------|
-| Slack `#incidents` | Main channel for all incidents |
-| Slack `#war-room-[INC-XXX]` | Temporary channel created for P0/P1 incidents |
-| PagerDuty | Alerts and on-call rotation |
-| [Ticketing system] | Official record: INC-XXX |
-| Status Page | Public communication to users (if applicable) |
+| Team group | Main channel for all incidents |
+| Call with the team | Temporary space for P0/P1 incidents |
+| UptimeRobot | Health monitoring of the three services every 5 minutes |
+| GitHub issues | Official record: INC-XXX |
+| Landing page / release notes | Communication to users (if applicable) |
 
 ---
 
