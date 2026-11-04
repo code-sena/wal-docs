@@ -20,13 +20,13 @@
 
 ### JWT (JSON Web Tokens)
 
-| Property | Required value |
-|----------|---------------|
-| Signing algorithm | RS256 (asymmetric) or HS256 with 256+ bit secret |
-| Access token expiration | 1 hour (`exp`) |
-| Refresh token expiration | 7 days |
-| Required claims | `sub` (userId), `iat`, `exp`, `jti` (unique token ID) |
-| Client storage | `httpOnly cookie` (web) or Keychain/Keystore (mobile) |
+| Property | Woman Alert (current) | Note |
+|----------|-----------------------|------|
+| Signing algorithm | HMAC with `JWT_SECRET` (256+ bit), shared by the three services | The services do not start with an empty secret or with the value that was once published; rotated on 28/10/2026 |
+| Access token expiration | 24 hours (`exp`) | — |
+| Refresh token expiration | 15 days (hash stored per device in `identity.device_session`) | — |
+| Claims | `sub` (users.id), `role`, `iat`, `exp` | No `jti` |
+| Client storage | `expo-secure-store` (mobile); `localStorage` (web) | Web storage is an open finding: move it out of `localStorage` |
 
 **Prohibited in the payload:**
 - Passwords
@@ -46,42 +46,36 @@
 
 ### RBAC (Role-Based Access Control)
 
-> **Implementation note:** The `role` table in the database (`06-data/models.md`) stores two
-> values: `user` and `administrator`. The four roles below are **application-layer concepts**
-> that map onto those two DB values as follows:
-> - `SUPER_ADMIN` → stored as `administrator`; distinguished at the application layer by a
->   dedicated `admin_profile` record and permissions granted in the service layer.
-> - `ADMIN` → stored as `administrator`; same DB role, different permission scope enforced in code.
-> - `USER` → stored as `user`.
-> - `VIEWER` → stored as `user`; read-only access enforced by the service layer, not the DB.
->
-> The `12-ux-ui/navigation-map.md` guards use `user` and `admin` to match the JWT claim values.
+> **Implementation note:** The `identity.role` table stores two values: `user` (id 1) and
+> `administrator` (id 2). There are no other roles: moderation is executed by the administrator
+> and there is no separate moderator, super admin or viewer role. The JWT carries `role: user` or
+> `role: admin`, and the web guards (`authGuard`, `userGuard`, `adminGuard`) use those values.
 
 | Role | Description | Permissions |
 |------|-------------|------------|
-| `SUPER_ADMIN` | System technical administrator (menticio) | All system permissions, user management, configuration |
-| `ADMIN` | Administrative panel user (organization staff) | View alerts, manage zones, moderate reports, view statistics, **block/warn/unblock users, review user reports, execute moderation actions** (FR13.10) |
-| `USER` | Regular app user (women using the service) | Manage own profile, contacts, alerts, evidence, frequent locations |
-| `VIEWER` | Read-only auditor (external review) | View-only access to non-sensitive data for compliance |
+| `administrator` (`role: admin`) | Administrative panel user | Dashboard, users (list, edit, block with reason), alerts (status, route of active or attended alerts only), zones and help points, reports with PDF/CSV export, evidence review, moderation of user reports, devices, read-only audit log, system configuration, account deletion approved by a second administrator. Never sees the personal data of trusted contacts |
+| `user` (`role: user`) | Person who uses the app and the user portal | Own profile, contacts, alerts, locations, routes, trips, automatic protection, evidence (download and keep up to 5) and zone reports. Always limited to her own data |
+
+The first administrator is created by registering normally and changing `role_id` to 2 in the
+database; the token carries the new role after logging in again.
 
 **Permission model:**
 
 ```
 Permission: [resource]:[action]
 
-Examples:
-  orders:create
-  orders:read
-  orders:update
-  orders:delete
-  users:read
-  reports:export
+Woman Alert does not use fine-grained permissions: access is decided by the role
+and by the owner of the resource (taken from the JWT). Examples of the rules in code:
+  /api/admin/**                 → role admin
+  /api/alerts/{id}              → owner of the alert (otherwise 403)
+  /api/contacts/{id} PUT/DELETE → owner of the contact
+  /api/public/tracking/{code}   → valid tracking code, no session
 ```
 
 **Validation:**
-- The API Gateway validates the JWT (signature and expiration)
-- Each service validates the role permissions for the specific operation
-- Roles are included in the JWT as claim `roles: ["OPERATOR", "VIEWER"]`
+- There is no API Gateway: each service (Auth, Alert, Evidence) validates the JWT (signature and expiration) with the same key
+- Each service checks the role for the specific operation (`@PreAuthorize("hasRole('ADMIN')")` on `/api/admin/**`) and the owner of the resource, taken from the JWT
+- The role travels in the JWT as claim `role: user` or `role: admin` (roles `user` and `administrator` in `identity.role`)
 
 ---
 

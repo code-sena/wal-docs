@@ -81,9 +81,8 @@ Allow the user to manage up to 5 emergency contacts ordered by priority. These c
    * Row actions: [✏️ Edit] [🗑️ Delete] [↑ Move Up] [↓ Move Down]
 5. **Add/Edit Contact Modal:**
 
-   * Full Name | Relationship (select) | Phone | Email (optional)
+   * Full Name | Relationship (select) | Phone | Email (the notice and the tracking link arrive by email)
    * Checkbox "Mark as primary contact"
-   * Checkbox "Send verification SMS when saving"
    * Buttons Cancel / 💾 Save
 6. **Delete Confirmation Modal (danger):**
 
@@ -124,4 +123,4 @@ Allow the user to manage up to 5 emergency contacts ordered by priority. These c
 
 ## Prompt Ready for Google Stitch
 
-> Design the Emergency Contacts screen for AlertaMujer Web in Angular. Web platform, DashboardLayout with sidebar and topbar. Background `#f5f4ff`. The screen has the title "👥 Emergency Contacts" in `2rem 700 #1e1a3c`, an informational banner with background `#ede9fe` and `3px solid #7c3aed` left border explaining that contacts are notified in priority order, and a white card with `border: 1.5px solid #c4b5fd` and `border-radius 12px` displaying the header "My Contacts (3 / max. 5)" with an "➕ ADD" button. The table has columns No. | Name/Relationship | Phone | Status | Actions; contact order 1 has ⭐ in `#d97706`; the Status column displays a ✅ badge (background `#dcfce7`, text `#16a34a`) or ⏳ badge (background `#fef3c7`, text `#d97706`); actions are ✏️ buttons in `#7c3aed`, 🗑️ buttons in `#dc2626`, and ↑ and ↓ buttons in `#6b7280`. Clicking ➕ or ✏️ opens a modal with a Full Name field, Relationship select (Mom/Dad/Sibling/Partner/Friend/Other), Phone with international format, optional Email, and two checkboxes to mark the contact as primary and send a verification SMS. Clicking 🗑️ opens a danger confirmation modal. On mobile, display contact cards instead of a table. The design must comply with WCAG AA accessibility guidelines.
+> Design the Emergency Contacts screen for AlertaMujer Web in Angular. Web platform, DashboardLayout with sidebar and topbar. Background `#f5f4ff`. The screen has the title "👥 Emergency Contacts" in `2rem 700 #1e1a3c`, an informational banner with background `#ede9fe` and `3px solid #7c3aed` left border explaining that contacts are notified in priority order, and a white card with `border: 1.5px solid #c4b5fd` and `border-radius 12px` displaying the header "My Contacts (3 / max. 5)" with an "➕ ADD" button. The table has columns No. | Name/Relationship | Phone | Status | Actions; contact order 1 has ⭐ in `#d97706`; the Status column displays a ✅ badge (background `#dcfce7`, text `#16a34a`) or ⏳ badge (background `#fef3c7`, text `#d97706`); actions are ✏️ buttons in `#7c3aed`, 🗑️ buttons in `#dc2626`, and ↑ and ↓ buttons in `#6b7280`. Clicking ➕ or ✏️ opens a modal with a Full Name field, Relationship select (Mom/Dad/Sibling/Partner/Friend/Other), Phone with international format, Email (the notice and the tracking link arrive by email), and a checkbox to mark the contact as primary. Clicking 🗑️ opens a danger confirmation modal. On mobile, display contact cards instead of a table. The design must comply with WCAG AA accessibility guidelines.
