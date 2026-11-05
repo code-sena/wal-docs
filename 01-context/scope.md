@@ -46,7 +46,7 @@ What the system **builds and maintains** (per SRS v2.6 and the general project d
 |-------------|-------|--------|
 | Local | Docker Compose: PostgreSQL, SeaweedFS (local S3) and the three services on ports 8081, 8082 and 8083; web on `localhost:4200`; app with a development APK | Feature branches |
 | Integration | Pull request to `develop`, promoted to `qa`; GitHub Actions runs the tests | `develop`, `qa` |
-| Production | Render (Auth, Alert, Evidence and PostgreSQL), Vercel (web), GitHub Releases (APK v1.0.0) | `main` |
+| Production | Render (Auth, Alert, Evidence and PostgreSQL), Vercel (web), GitHub Releases (APK v1.0.1) | `main` |
 
 ---
 

@@ -61,7 +61,7 @@ Location intervals (RN-09): during an active alert the app sends the location ev
 
 | ID | Category | Requirement | Previous ID | Current evidence | Test | Status |
 |----|----------|-------------|-------------|------------------|------|--------|
-| RNF-COM-001 | Compatibility | The mobile app targets Android 7.0 (API 24) or higher; compatibility is checked on the target devices | RNF10 y RNF006 | APK v1.0.0: minSdk 24, targetSdk 36; manual tests on Samsung SM-A125M and Infinix X678B | — | Implemented |
+| RNF-COM-001 | Compatibility | The mobile app targets Android 7.0 (API 24) or higher; compatibility is checked on the target devices | RNF10 y RNF006 | APK v1.0.1: minSdk 24, targetSdk 36; manual tests on Samsung SM-A125M and Infinix X678B | — | Implemented |
 | RNF-COM-002 | Compatibility | The web platform works on modern browsers: recent Chrome, Edge and Firefox | RNF17 y RNF010 | Not formally tested | — | Proposed |
 | RNF-COM-003 | Compatibility / usability | The web platform is oriented to desktop resolutions, especially the admin panel; the mobile view is available but not prioritized | RNF18 | Responsive with desktop priority; breakpoints not documented | — | Proposed |
 

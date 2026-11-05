@@ -128,7 +128,7 @@
 | RNF-REN-001 | Performance | The dispatch of an alert to the notice channels must take at most 2… | CP-REN-001 | Not measured | ⚪ Proposed |
 | RNF-REN-002 | Performance | GPS and sensor use must not exceed 10 % of battery per hour of… | — | Not measured | ⚪ Proposed |
 | RNF-REN-003 | Performance / reliability | The app tries to update the location with 10 to 20 m accuracy and… | — | Intervals defined in RN-09; accuracy not measured | ⚪ Proposed |
-| RNF-COM-001 | Compatibility | The mobile app targets Android 7.0 (API 24) or higher; compatibility… | — | APK v1.0.0: minSdk 24, targetSdk 36; manual tests on Samsung SM-A125M and Infinix X678B | ✅ Implemented |
+| RNF-COM-001 | Compatibility | The mobile app targets Android 7.0 (API 24) or higher; compatibility… | — | APK v1.0.1: minSdk 24, targetSdk 36; manual tests on Samsung SM-A125M and Infinix X678B | ✅ Implemented |
 | RNF-COM-002 | Compatibility | The web platform works on modern browsers: recent Chrome, Edge and… | — | Not formally tested | ⚪ Proposed |
 | RNF-COM-003 | Compatibility / usability | The web platform is oriented to desktop resolutions, especially the… | — | Responsive with desktop priority; breakpoints not documented | ⚪ Proposed |
 | RNF-USB-001 | Usability / accessibility | Emergency actions use visible controls and clear messages with as few… | — | Not evaluated with users | ⚪ Proposed |

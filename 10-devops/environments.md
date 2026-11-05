@@ -11,7 +11,7 @@
 |-------------|-------|--------|----------|-------------|
 | Local | Developer machine: Docker Compose (PostgreSQL, SeaweedFS, Auth :8081, Alert :8082, Evidence :8083), web on :4200, development APK | `feature/*`, `fix/*`, `refactor/*` | PostgreSQL in Docker with test data (`dev` context) | Each developer |
 | Integration | GitHub Actions on every push and pull request | `develop`, `qa` | Tests only | Team |
-| Production | Render (three services + PostgreSQL 16, free plan), Vercel (web), GitHub Releases (APK v1.0.0) | `main` | Render PostgreSQL 16 | Users, contacts, administrators |
+| Production | Render (three services + PostgreSQL 16, free plan), Vercel (web), GitHub Releases (APK v1.0.1) | `main` | Render PostgreSQL 16 | Users, contacts, administrators |
 
 Each repository keeps only `develop`, `qa` and `main`. Changes enter by pull request to `develop`,
 are promoted to `qa` and then to `main`, which is production since 28/10/2026.
@@ -74,7 +74,7 @@ The services do not start if `JWT_SECRET` is empty or has the value that was onc
 |--------|------|-------|
 | Automatic deploy on push to `main` (Render, Vercel) | **Yes** | Each service is rebuilt from its `Dockerfile` |
 | Blue/green or canary | No | Not available on the free plan |
-| Manual APK release | **Yes** | v1.0.0 on GitHub Releases, linked from the landing page |
+| Manual APK release | **Yes** | v1.0.1 on GitHub Releases, linked from the landing page |
 | Production AAB | No | Never executed |
 
 ### Production deploy checklist

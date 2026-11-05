@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Alerta Mujer - Registro</title>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Poppins & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              purple: '#4c176e',
+              deep: '#3d1257',
+              border: '#c283ce',
+              gold: '#e6af2e',
+              lilacBg: '#cfb5ea',
+              lilacLight: '#faf5fc'
+            }
+          },
+          fontFamily: {
+            sans: ['Nunito', 'sans-serif'],
+            heading: ['Montserrat', 'sans-serif']
+          },
+          boxShadow: {
+            card: '0 10px 25px -4px rgba(76, 23, 110, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.05)',
+            input: '0 1px 3px rgba(0, 0, 0, 0.02)'
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    /* Custom scrollbar suppression for pure mobile app look */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #cfb5ea;
+      font-family: 'Nunito', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4 selection:bg-purple-200">
+<!-- BEGIN: PhoneFrame -->
+<!-- Constrained container replicating mobile device canvas -->
+<main class="w-full max-w-[392px] min-h-[820px] bg-[#cfb5ea] flex flex-col justify-between shadow-2xl relative overflow-hidden sm:rounded-[40px] sm:border-[8px] sm:border-slate-800" data-purpose="mobile-viewport">
+<!-- BEGIN: AndroidStatusBar -->
+<header class="w-full pt-2 px-6 flex justify-between items-center text-xs font-semibold text-white/90 select-none z-10" data-purpose="status-bar">
+<div class="flex items-center space-x-1.5">
+<span class="tracking-tight text-[13px] font-medium text-white drop-shadow-sm">10:01</span>
+<span class="text-[10px] text-white/80">p. m.</span>
+<!-- Telegram / Notification dot icon -->
+<svg class="w-3.5 h-3.5 fill-current opacity-80 ml-1" viewbox="0 0 24 24">
+<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"></path>
+</svg>
+</div>
+<div class="flex items-center space-x-1.5 opacity-90">
+<!-- VoLTE / Signal Icons -->
+<svg class="w-3.5 h-3.5 fill-current text-white" viewbox="0 0 24 24">
+<path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.64 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"></path>
+</svg>
+<!-- WiFi Icon -->
+<svg class="w-3.5 h-3.5 fill-current text-white" viewbox="0 0 24 24">
+<path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4zm0 3.3c3.78 0 7.22 1.47 9.77 3.89L12 19.01 2.23 11.19C4.78 8.77 8.22 7.3 12 7.3z"></path>
+</svg>
+<span class="text-[10px] font-bold text-white tracking-tighter">4G</span>
+<!-- Battery Icon -->
+<div class="w-5 h-2.5 border border-white rounded-[2px] p-[1px] flex items-center">
+<div class="h-full bg-white w-full rounded-[1px]"></div>
+</div>
+</div>
+</header>
+<!-- END: AndroidStatusBar -->
+<!-- Scrollable Body Content -->
+<div class="flex-1 px-4 pt-1 pb-4 flex flex-col justify-start overflow-y-auto">
+<!-- BEGIN: BrandHeader -->
+<section class="flex flex-col items-center justify-center my-1" data-purpose="app-branding">
+<!-- Circular Panther Logo -->
+<div class="w-16 h-16 rounded-full overflow-hidden shadow-md flex items-center justify-center bg-[#4c176e] border border-purple-300/30">
+<img alt="Logo Alerta Mujer" class="w-full h-full object-cover transform scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI_jXaul-K7_zTsna9eCrdtbDQNkov-e0ZO1Eof40-U_iD8JhEigX5fTAPc1HzM0DVHJp6lWfKUezOFkpQAp60LBmhSlmIfa8IQ4l70qFSXss5L60MFsfJDF4B3hJD9VRfBtU7zWXYW4Rm9Ux61FAQ2Fdvj98LbLDD0SuFN2S2xt9tbQWwYPF_sQco8NX3M4Oc6APq6_qal2_0ew0GJ9FH2SXXbEHVSTulo_1_CvUi7lSHds-aReuKROeJh8x7nC1a-A"/>
+</div>
+<!-- Typography Branding -->
+<h1 class="text-center font-heading font-black text-[21px] text-[#481163] tracking-wide mt-1 leading-none drop-shadow-sm">
+          ALERTA<br/>MUJER
+        </h1>
+<p class="text-[9.5px] font-extrabold tracking-wider text-[#e5a820] mt-1 uppercase drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)]">
+          SEGURIDAD PARA TODAS
+        </p>
+</section>
+<!-- END: BrandHeader -->
+<!-- BEGIN: RegistrationCard -->
+<section class="bg-white rounded-[28px] shadow-card px-5 py-4 mt-2 mb-3 border border-purple-50" data-purpose="registration-form-card">
+<!-- Card Title -->
+<h2 class="text-center font-heading font-bold text-[18px] text-gray-900 leading-tight mb-4">
+          Únete a nosotros, crea tu<br/>cuenta
+        </h2>
+<!-- Inputs Container -->
+<form class="space-y-2.5" data-purpose="user-registration-fields" onsubmit="event.preventDefault();">
+<!-- Field 1: Nombre completo -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full pl-11 pr-4 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-700 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" placeholder="Nombre completo" type="text"/>
+</div>
+<!-- Field 2: Teléfono -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800 fill-current" viewbox="0 0 24 24">
+<path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path>
+</svg>
+</span>
+<input class="w-full pl-11 pr-4 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-700 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" placeholder="Teléfono" type="tel"/>
+</div>
+<!-- Field 3: Número de documento -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<rect height="16" rx="2" stroke-linecap="round" stroke-linejoin="round" width="18" x="3" y="4"></rect>
+<circle cx="9" cy="10" r="2" stroke-linecap="round" stroke-linejoin="round"></circle>
+<path d="M15 8h2m-2 4h2M7 16h10" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full pl-11 pr-4 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-700 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" placeholder="Número de documento" type="text"/>
+</div>
+<!-- Field 4: Tipo de documento (Dropdown) -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<rect height="16" rx="2" stroke-linecap="round" stroke-linejoin="round" width="18" x="3" y="4"></rect>
+<circle cx="9" cy="10" r="2" stroke-linecap="round" stroke-linejoin="round"></circle>
+<path d="M15 8h2m-2 4h2M7 16h10" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<select class="w-full pl-11 pr-10 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none appearance-none transition-all shadow-input cursor-pointer">
+<option disabled="" selected="" value="">Tipo de documento</option>
+<option value="dni">DNI - Documento Nacional</option>
+<option value="ce">Carné de Extranjería</option>
+<option value="pasaporte">Pasaporte</option>
+</select>
+<!-- Dropdown Chevron -->
+<span class="absolute right-4 text-gray-800 pointer-events-none flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+</div>
+<!-- Field 5: Fecha de Nacimiento (DD/MM/AAAA) -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<rect height="18" rx="2" stroke-linecap="round" stroke-linejoin="round" width="18" x="3" y="4"></rect>
+<line stroke-linecap="round" stroke-linejoin="round" x1="16" x2="16" y1="2" y2="6"></line>
+<line stroke-linecap="round" stroke-linejoin="round" x1="8" x2="8" y1="2" y2="6"></line>
+<line stroke-linecap="round" stroke-linejoin="round" x1="3" x2="21" y1="10" y2="10"></line>
+<!-- Dotted grid inside calendar -->
+<circle cx="8" cy="14" fill="currentColor" r="0.75"></circle>
+<circle cx="12" cy="14" fill="currentColor" r="0.75"></circle>
+<circle cx="16" cy="14" fill="currentColor" r="0.75"></circle>
+<circle cx="8" cy="17" fill="currentColor" r="0.75"></circle>
+<circle cx="12" cy="17" fill="currentColor" r="0.75"></circle>
+<circle cx="16" cy="17" fill="currentColor" r="0.75"></circle>
+</svg>
+</span>
+<input class="w-full pl-11 pr-4 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-700 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" placeholder="DD/MM/AAAA" type="text"/>
+</div>
+<!-- Field 6: Correo Electrónico -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<rect height="16" rx="2" stroke-linecap="round" stroke-linejoin="round" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full pl-11 pr-4 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-700 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" placeholder="Ingresa tu correo" type="email"/>
+</div>
+<!-- Field 7: Contraseña -->
+<div class="relative flex items-center">
+<span class="absolute left-3.5 text-gray-700 pointer-events-none flex items-center justify-center">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<input class="w-full pl-11 pr-11 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-500 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" id="password-field-1" placeholder="Ingresa tu contraseña" type="password"/>
+<!-- Eye toggle button -->
+<button class="absolute right-3.5 text-gray-800 hover:text-purple-900 transition-colors p-1" data-purpose="toggle-password" onclick="togglePasswordVisibility('password-field-1', this)" type="button">
+<svg class="w-4 h-4 eye-off" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Field 8: Confirmar Contraseña -->
+<div class="relative flex items-center">
+<input class="w-full pl-6 pr-11 py-2.5 rounded-full border-[1.5px] border-[#c48ed4] text-xs font-semibold text-gray-800 placeholder-gray-500 bg-[#fdfcff] focus:border-[#86259e] focus:ring-1 focus:ring-[#86259e] focus:outline-none transition-all shadow-input" id="password-field-2" placeholder="Confirmar contraseña" type="password"/>
+<!-- Eye toggle button -->
+<button class="absolute right-3.5 text-gray-800 hover:text-purple-900 transition-colors p-1" data-purpose="toggle-confirm-password" onclick="togglePasswordVisibility('password-field-2', this)" type="button">
+<svg class="w-4 h-4 eye-off" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</form>
+</section>
+<!-- END: RegistrationCard -->
+<!-- BEGIN: TermsAndAgreements -->
+<footer class="px-2 space-y-2 mt-1 select-none" data-purpose="legal-agreements">
+<!-- Checkbox 1: Terms -->
+<label class="flex items-center space-x-2.5 cursor-pointer group">
+<input class="w-4 h-4 rounded-[3px] border-[1.5px] border-gray-800 bg-transparent text-[#4c176e] focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-[11.5px] font-bold text-gray-900 leading-tight">
+            Acepto los <a class="text-[#4e1173] underline decoration-1 hover:text-purple-900" href="#">Términos y condiciones</a>
+</span>
+</label>
+<!-- Checkbox 2: Privacy Policy -->
+<label class="flex items-center space-x-2.5 cursor-pointer group">
+<input class="w-4 h-4 rounded-[3px] border-[1.5px] border-gray-800 bg-transparent text-[#4c176e] focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-[11.5px] font-bold text-gray-900 leading-tight">
+            Acepto la <a class="text-[#4e1173] underline decoration-1 hover:text-purple-900" href="#">Política de privacidad</a>
+</span>
+</label>
+</footer>
+<!-- END: TermsAndAgreements -->
+</div>
+<!-- BEGIN: AndroidNavigationBar -->
+<nav class="w-full h-11 flex items-center justify-around px-10 text-white/50 bg-[#cfb5ea] select-none" data-purpose="android-system-navigation">
+<!-- Back / Triangle -->
+<button class="p-2 active:opacity-40 transition-opacity" type="button">
+<svg class="w-4 h-4 stroke-current stroke-2 fill-none" viewbox="0 0 24 24">
+<path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- Home / Circle -->
+<button class="p-2 active:opacity-40 transition-opacity" type="button">
+<div class="w-3.5 h-3.5 rounded-full border-2 border-white/60"></div>
+</button>
+<!-- Recent Apps / Square or Burger -->
+<button class="p-2 active:opacity-40 transition-opacity flex flex-col justify-center items-center space-y-[3px]" type="button">
+<div class="w-3.5 h-[2px] bg-white/60 rounded"></div>
+<div class="w-3.5 h-[2px] bg-white/60 rounded"></div>
+<div class="w-3.5 h-[2px] bg-white/60 rounded"></div>
+</button>
+</nav>
+<!-- END: AndroidNavigationBar -->
+</main>
+<!-- END: PhoneFrame -->
+<!-- BEGIN: InteractiveScripts -->
+<script data-purpose="password-visibility-handler">
+    function togglePasswordVisibility(fieldId, button) {
+      const field = document.getElementById(fieldId);
+      if (!field) return;
+      
+      const isPassword = field.getAttribute('type') === 'password';
+      field.setAttribute('type', isPassword ? 'text' : 'password');
+      
+      // Update eye icon appearance
+      if (isPassword) {
+        button.innerHTML = `
+          <svg class="w-4 h-4 text-purple-900" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        `;
+      } else {
+        button.innerHTML = `
+          <svg class="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+          </svg>
+        `;
+      }
+    }
+  </script>
+<!-- END: InteractiveScripts -->
+</body></html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><title>Emergency Active State</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;min-height:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-highest": "#e4dfff", "surface-variant": "#e4dfff", "secondary-container": "#e1a0ff", "on-tertiary-fixed": "#002113", "error": "#ba1a1a", "primary": "#b0007c", "on-tertiary-fixed-variant": "#005236", "primary-fixed-dim": "#ffafd6", "surface-bright": "#fcf8ff", "on-primary-fixed-variant": "#8a0061", "tertiary-container": "#00855b", "primary-fixed": "#ffd8e8", "on-secondary-fixed-variant": "#652c83", "on-error": "#ffffff", "on-primary-container": "#fffbff", "on-background": "#1b1739", "outline-variant": "#dfbecc", "secondary-fixed": "#f6d9ff", "surface-dim": "#dcd5ff", "on-primary-fixed": "#3c0028", "tertiary-fixed-dim": "#4edea3", "surface-container": "#f0ebff", "on-surface": "#1b1739", "surface": "#fcf8ff", "inverse-primary": "#ffafd6", "surface-container-lowest": "#ffffff", "tertiary-fixed": "#6ffbbe", "on-tertiary-container": "#f4fff6", "outline": "#8b6f7c", "on-secondary-container": "#682f85", "on-tertiary": "#ffffff", "surface-container-high": "#eae5ff", "surface-container-low": "#f6f1ff", "on-secondary-fixed": "#310049", "on-secondary": "#ffffff", "inverse-on-surface": "#f3eeff", "secondary-fixed-dim": "#e8b3ff", "on-primary": "#ffffff", "error-container": "#ffdad6", "inverse-surface": "#302c4f", "primary-container": "#db079c", "surface-tint": "#b4007f", "background": "#fcf8ff", "secondary": "#7f459d", "tertiary": "#006947", "on-error-container": "#93000a", "on-surface-variant": "#58404b" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin": "2rem", "space-md": "1rem", "space-xl": "2.5rem", "gutter": "1.5rem", "space-lg": "1.5rem", "margin-mobile": "1rem", "gutter-sm": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem" }, "fontFamily": { "display-hero-mobile": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "title-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"] }, "fontSize": { "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-sm": ["22px", { "lineHeight": "30px", "fontWeight": "600" }], "title-md": ["18px", { "lineHeight": "26px", "fontWeight": "600" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }], "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }] } } } };</script></head><body class="bg-surface-container-low text-on-surface font-body-md min-h-screen relative flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed"><div class="fixed top-0 inset-x-0 z-50 pt-safe pointer-events-none"><div class="h-7 px-gutter-sm flex items-center justify-between text-on-surface select-none"><span class="font-label-sm text-label-sm font-semibold tracking-tight">09:41</span><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span><span class="material-symbols-outlined text-[16px]">wifi</span><span class="material-symbols-outlined text-[18px]">battery_full</span></div></div></div><div class="fixed top-9 inset-x-0 z-40 px-margin-mobile flex items-center justify-between pointer-events-none"><button aria-label="Menu" class="pointer-events-auto w-12 h-12 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_4px_20px_-2px_rgba(67,2,97,0.08)] flex items-center justify-center text-on-surface transition-transform active:scale-95 hover:bg-surface-container-lowest" type="button"><span class="material-symbols-outlined text-[22px]">menu</span></button><button aria-label="Center Location" class="pointer-events-auto w-12 h-12 rounded-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_4px_20px_-2px_rgba(67,2,97,0.08)] flex items-center justify-center text-primary transition-transform active:scale-95 hover:bg-surface-container-lowest" type="button"><span class="material-symbols-outlined text-[22px]">my_location</span></button></div><main class="flex-1 flex flex-col relative w-full bg-surface-container-low pb-safe"><div class="flex flex-col w-full">
+<div class="px-margin-mobile pt-3 pb-2 flex items-center justify-between">
+<div class="flex items-center gap-1.5 p-1 bg-surface-container rounded-full overflow-x-auto select-none">
+<button class="px-3 py-1 rounded-full font-label-sm text-label-sm transition-all duration-200 bg-primary text-on-primary shadow-sm flex items-center gap-1" id="tab-activa" onclick="setState('activa')" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-bright animate-pulse"></span>
+        Activa
+      </button>
+<button class="px-3 py-1 rounded-full font-label-sm text-label-sm transition-all duration-200 text-on-surface-variant hover:bg-surface-container-high flex items-center gap-1" id="tab-viendo" onclick="setState('viendo')" type="button">
+<span class="material-symbols-outlined text-[14px]">visibility</span>
+        Guardianes
+      </button>
+<button class="px-3 py-1 rounded-full font-label-sm text-label-sm transition-all duration-200 text-on-surface-variant hover:bg-surface-container-high flex items-center gap-1" id="tab-desescalada" onclick="setState('desescalada')" type="button">
+<span class="material-symbols-outlined text-[14px]">task_alt</span>
+        A salvo
+      </button>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-container-lowest/90 px-2.5 py-1 rounded-full shadow-sm">
+<img alt="AlertaMujer" class="w-6 h-6 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbRZBRvPxW6WqOTSBiLOJn-m24_g_GBbG_Zhmr9Iv5f82WrEYycSc72IXpbUo_GFIjIWE46mlzHnwkebnGmA0Hl5g_VklDovotzZaS461N-2T6CY5q9-AefZp1Fi_98fuEHZUkDnw_p0IH9DORXQe--3GOAHr6-ql2jptjTbVvS7A0BEJezRpvc-Cp0uiG_14w20fqD_pIBNzQFqy3JI7hAB4fP5Z_-_ZKe9RRhsRJbOtGDnI-UVQLwRVxRdnRDUplVQ"/>
+<span class="font-label-sm text-label-sm font-bold text-secondary">AlertaMujer</span>
+</div>
+</div>
+<div class="px-margin-mobile pt-3 pb-2 flex flex-col">
+<div class="flex items-center justify-between">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight" id="status-title">
+        Alerta activa
+      </h1>
+<span class="px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">emergency</span>
+        SOS
+      </span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75" id="pulse-ring"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-error" id="pulse-dot"></span>
+</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant font-medium" id="live-indicator">
+        Tu red fue notificada • <span class="text-error font-semibold">Transmisión en vivo</span>
+</p>
+</div>
+</div>
+<div class="relative py-4 flex flex-col items-center justify-center">
+<div class="relative w-[210px] h-[210px] flex items-center justify-center">
+<div class="absolute inset-0 rounded-full bg-primary-fixed-dim/30 animate-ping duration-1000" id="ambient-ring"></div>
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 220 220">
+<circle class="drop-shadow-sm" cx="110" cy="110" fill="#ffffff" r="94"></circle>
+<circle cx="110" cy="110" fill="none" r="94" stroke="#f0ebff" stroke-width="8"></circle>
+<circle class="transition-all duration-1000 ease-linear" cx="110" cy="110" fill="none" id="timer-progress" r="94" stroke="#db079c" stroke-dasharray="590.62" stroke-dashoffset="130" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div aria-live="polite" class="absolute inset-0 flex flex-col items-center justify-center select-none">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center mb-1 text-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px]">notifications_active</span>
+</div>
+<span class="font-display-hero-mobile text-display-hero-mobile text-on-surface font-extrabold tracking-tight" id="timer-display">03:02</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 uppercase tracking-wider">Tiempo restante</span>
+</div>
+</div>
+</div>
+<div class="px-margin-mobile flex flex-col gap-3 pb-4">
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex items-start gap-3.5 transition-all duration-300">
+<div class="w-11 h-11 rounded-full bg-surface-container flex-shrink-0 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">verified_user</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<h2 class="font-title-md text-title-md text-secondary font-bold truncate">
+            Servicios de emergencia activos
+          </h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-secondary-container font-label-sm text-label-sm">
+            Nivel 1
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-snug">
+          Cuando estés a salvo, presiona <strong class="text-on-surface font-semibold">“Estoy bien”</strong> para notificar a tu red y cerrar el protocolo.
+        </p>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<h3 class="font-label-md text-label-md text-on-surface font-bold">
+            Compartiendo ubicación
+          </h3>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+          GPS Activo
+        </span>
+</div>
+<div class="grid grid-cols-2 gap-3 pt-1">
+<div class="bg-surface-container-low rounded-lg p-3 flex flex-col justify-between">
+<div class="flex items-center gap-1.5 text-primary mb-1">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface">En tiempo real</span>
+</div>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-tertiary">gps_fixed</span>
+            Precisión ±4m
+          </span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 flex flex-col justify-between">
+<div class="flex items-center gap-1.5 text-secondary mb-1">
+<span class="material-symbols-outlined text-[20px]" id="guardians-icon">visibility</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface" id="guardians-label">0 vistas</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="guardians-sub">
+            3 contactos alertados
+          </span>
+</div>
+</div>
+</div>
+<button class="w-full min-h-[72px] bg-secondary-fixed hover:bg-secondary-fixed-dim active:scale-[0.98] transition-all rounded-xl p-4 flex items-center gap-3.5 shadow-sm text-left" id="btn-safe" onclick="triggerSafeAction()" type="button">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex-shrink-0 flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[26px]">favorite</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-secondary-fixed font-bold leading-tight">
+            Estoy bien
+          </span>
+<span class="material-symbols-outlined text-[20px] text-on-secondary-fixed-variant">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-secondary-fixed-variant leading-snug">
+          Notifica a tu red que estás a salvo
+        </p>
+</div>
+</button>
+<div class="pt-2 flex flex-col items-center">
+<a class="w-full h-14 bg-error-container hover:bg-error text-on-error-container hover:text-on-error active:scale-[0.98] transition-all rounded-full flex items-center justify-center gap-2.5 shadow-sm font-label-md text-label-md font-bold uppercase tracking-wide" href="tel:911">
+<span class="material-symbols-outlined text-[22px]">call</span>
+        Llamar al 911
+      </a>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2 text-center">
+        Línea de emergencia directa • Gratuita 24/7
+      </span>
+</div>
+<div class="w-full flex justify-center py-2">
+<div class="w-32 h-1 bg-on-surface/20 rounded-full"></div>
+</div>
+</div>
+</div>
+<script>
+  let secondsRemaining = 182;
+  const initialOffset = 590.62;
+  const timerDisplay = document.getElementById('timer-display');
+  const timerProgress = document.getElementById('timer-progress');
+  const pulseRing = document.getElementById('pulse-ring');
+  const pulseDot = document.getElementById('pulse-dot');
+  const liveIndicator = document.getElementById('live-indicator');
+  const guardiansLabel = document.getElementById('guardians-label');
+  const guardiansSub = document.getElementById('guardians-sub');
+  const guardiansIcon = document.getElementById('guardians-icon');
+  const statusTitle = document.getElementById('status-title');
+  const btnSafe = document.getElementById('btn-safe');
+
+  const interval = setInterval(() => {
+    if (secondsRemaining > 0) {
+      secondsRemaining--;
+      const mins = Math.floor(secondsRemaining / 60);
+      const secs = secondsRemaining % 60;
+      timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      
+      const fraction = (182 - secondsRemaining) / 182;
+      const offset = initialOffset - (fraction * initialOffset);
+      timerProgress.style.strokeDashoffset = offset;
+    }
+  }, 1000);
+
+  function setState(state) {
+    const tabs = ['activa', 'viendo', 'desescalada'];
+    tabs.forEach(t => {
+      const el = document.getElementById(`tab-${t}`);
+      if (t === state) {
+        el.className = 'px-3 py-1 rounded-full font-label-sm text-label-sm transition-all duration-200 bg-primary text-on-primary shadow-sm flex items-center gap-1';
+      } else {
+        el.className = 'px-3 py-1 rounded-full font-label-sm text-label-sm transition-all duration-200 text-on-surface-variant hover:bg-surface-container-high flex items-center gap-1';
+      }
+    });
+
+    if (state === 'activa') {
+      statusTitle.innerText = 'Alerta activa';
+      pulseRing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75';
+      pulseDot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-error';
+      liveIndicator.innerHTML = 'Tu red fue notificada • <span class="text-error font-semibold">Transmisión en vivo</span>';
+      guardiansLabel.innerText = '0 vistas';
+      guardiansSub.innerText = '3 contactos alertados';
+      guardiansIcon.innerText = 'visibility_off';
+    } else if (state === 'viendo') {
+      statusTitle.innerText = 'Alerta asistida';
+      pulseRing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75';
+      pulseDot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary';
+      liveIndicator.innerHTML = 'Conexión asegurada • <span class="text-tertiary font-semibold">2 personas en directo</span>';
+      guardiansLabel.innerText = '2 activas';
+      guardiansSub.innerText = 'Mamá, Valeria observando';
+      guardiansIcon.innerText = 'visibility';
+    } else if (state === 'desescalada') {
+      statusTitle.innerText = 'Protocolo seguro';
+      pulseRing.className = 'hidden';
+      pulseDot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary';
+      liveIndicator.innerHTML = 'Alerta finalizada • <span class="text-tertiary font-semibold">Reporte guardado</span>';
+      guardiansLabel.innerText = 'Confirmado';
+      guardiansSub.innerText = 'Red informada que estás a salvo';
+      guardiansIcon.innerText = 'task_alt';
+      timerDisplay.innerText = '00:00';
+      timerProgress.style.stroke = '#006947';
+      timerProgress.style.strokeDashoffset = '0';
+    }
+  }
+
+  function triggerSafeAction() {
+    setState('desescalada');
+    btnSafe.classList.add('opacity-75');
+    btnSafe.innerHTML = `
+      <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex-shrink-0 flex items-center justify-center text-tertiary shadow-sm">
+        <span class="material-symbols-outlined text-[26px]">check_circle</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="font-title-md text-title-md text-on-surface font-bold leading-tight">
+          Confirmación enviada
+        </span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+          Tu red y guardianes saben que estás a salvo.
+        </p>
+      </div>
+    `;
+  }
+</script></main></body></html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>AlertaMujer - Botón SOS</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              purple: '#650dc9',
+              darkPurple: '#3b0764',
+              midPurple: '#7c3aed',
+              lightPurple: '#ede9fe',
+              fuchsia: '#db079c',
+              gold: '#d4af37',
+              bgLavender: '#f6f1fb',
+              safeGreen: '#16a34a',
+              alertRed: '#dc2626'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="custom-layout">
+    /* Android Mobile Viewport Container */
+    body {
+      background-color: #1a162b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .mobile-frame {
+      width: 100%;
+      max-width: 412px;
+      height: 100vh;
+      max-height: 890px;
+      background-color: #f6f1fb;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (min-width: 420px) {
+      .mobile-frame {
+        border-radius: 36px;
+        height: 860px;
+        border: 4px solid #2d1d4d;
+      }
+    }
+  </style>
+<style data-purpose="sos-button-effects">
+    /* Realistic SOS Pulsating and Metallic Radial Visuals */
+    .sos-glow-ring {
+      box-shadow: 0 0 35px rgba(219, 7, 156, 0.45), 
+                  0 12px 30px rgba(0, 0, 0, 0.3),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      animation: pulse-ring 2.8s infinite ease-in-out;
+    }
+
+    .sos-inner-grad {
+      background: radial-gradient(circle at 35% 35%, #a855f7 0%, #7c3aed 45%, #3b0764 100%);
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% {
+        box-shadow: 0 0 24px rgba(219, 7, 156, 0.4), 0 10px 24px rgba(0, 0, 0, 0.28);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 45px rgba(219, 7, 156, 0.65), 0 16px 36px rgba(101, 13, 201, 0.35);
+        transform: scale(1.02);
+      }
+    }
+
+    /* Active pressing state */
+    .sos-button:active {
+      transform: scale(0.96);
+      filter: brightness(0.92);
+      transition: transform 0.08s ease;
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body>
+<!-- BEGIN: MobileDeviceShell -->
+<div aria-label="Aplicación AlertaMujer" class="mobile-frame" role="region">
+<!-- BEGIN: AndroidStatusBar -->
+<header class="w-full bg-gradient-to-r from-[#650dc9] via-[#7c3aed] to-[#db079c] text-white pt-2 px-5 pb-1 select-none shrink-0" data-purpose="android-status-bar">
+<!-- Status icons line -->
+<div class="flex justify-between items-center text-xs font-semibold tracking-tight opacity-95">
+<span class="text-[13px]">9:41</span>
+<div class="flex items-center space-x-2">
+<!-- Wi-Fi Icon SVG -->
+<svg aria-hidden="true" class="w-3.5 h-3.5 fill-current" viewbox="0 0 24 24">
+<path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4zm0 3.5c3.31 0 6.36 1.25 8.7 3.32L12 19.5 3.3 10.82C5.64 8.75 8.69 7.5 12 7.5z"></path>
+</svg>
+<!-- 4G/LTE Label -->
+<span class="text-[11px] font-bold">4G</span>
+<!-- Battery Icon SVG -->
+<svg aria-hidden="true" class="w-5 h-2.5 fill-current" viewbox="0 0 24 24">
+<path d="M17 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h13c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm4 4v4h1v-4h-1z"></path>
+</svg>
+</div>
+</div>
+<!-- App Header Bar -->
+<div class="flex items-center justify-between py-2.5 mt-0.5">
+<!-- Hamburger Menu Button -->
+<button aria-label="Abrir menú de navegación" class="p-2 -ml-1.5 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-300" id="menu-toggle-btn" type="button">
+<svg aria-hidden="true" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- Brand Identity & Logo -->
+<div class="flex items-center space-x-2.5 pr-1">
+<div class="text-right">
+<h1 class="text-sm font-extrabold tracking-wider text-white leading-tight uppercase">Alerta Mujer</h1>
+<p class="text-[9px] font-medium tracking-widest text-amber-300 uppercase">Seguridad para todas</p>
+</div>
+<!-- Lion Brand Logo Badge -->
+<div class="w-10 h-10 rounded-full bg-purple-950/70 p-0.5 border border-amber-400/80 shadow-md flex items-center justify-center overflow-hidden shrink-0">
+<img alt="Logo AlertaMujer - Silueta León Dorado" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqEwhWp5FMjTaQ-yg6V0T9C0mLwZ86BXMsNnG64FUSP5aMTbnxIFavS3AWaSSjTNtBoAQL_jOk5rJwOibbfUMec4zf5-dXiw-sXNoB48C11HRESQ94mZl89h7GN4YftnGdE00vBk9fC403svNzwHHRj20oPUCoplLiBLW81AdejH_MO_u8n3Zkp1fpu-qKmfgJrsgNyN3fG3j2t0OJyJYSRFMcwrZ-hXnbHV2FgTsrTADWDIetaxOnFVVWu3Vlf9sjtw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- END: AndroidStatusBar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col justify-between" id="main-content">
+<!-- Top Section: Status & Permission Chips -->
+<div class="w-full flex flex-col space-y-2.5">
+<!-- Safety Status Card -->
+<section aria-live="polite" class="bg-white rounded-2xl p-3.5 border-[1.5px] border-[#16a34a] shadow-sm flex items-center justify-between cursor-pointer hover:bg-green-50/40 active:bg-green-50 transition-colors" data-purpose="safety-status-card" role="status">
+<div class="flex items-center space-x-3">
+<!-- Shield Check Icon -->
+<div class="w-11 h-11 rounded-full bg-[#dcfce7] flex items-center justify-center shrink-0 text-emerald-600 shadow-inner">
+<svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+</svg>
+</div>
+<!-- Status Details -->
+<div class="flex flex-col">
+<span class="text-[1.05rem] font-bold text-[#16a34a] leading-tight">Zona segura</span>
+<span class="text-[0.85rem] text-gray-500 font-normal">Sin incidentes • GPS inactivo</span>
+<span class="text-[0.8rem] font-bold text-[#dc2626] flex items-center mt-0.5">
+<span class="w-1.5 h-1.5 bg-red-600 rounded-full inline-block mr-1.5 animate-pulse"></span>
+                Permiso denegado
+              </span>
+</div>
+</div>
+<!-- Chevron Right Icon -->
+<div aria-hidden="true" class="text-gray-400 pl-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</section>
+<!-- Permission Status Strip (Chips) -->
+<div class="grid grid-cols-2 gap-2.5 pt-0.5" data-purpose="permissions-strip">
+<!-- Camera Permission Chip -->
+<button aria-label="Permiso de Cámara: Denegado. Presione para solucionar" class="flex items-center justify-between px-3 py-2 bg-white/90 rounded-xl border border-red-200 shadow-xs hover:bg-red-50/50 active:bg-red-50 text-left transition-all" type="button">
+<div class="flex items-center space-x-2 overflow-hidden">
+<span aria-hidden="true" class="w-2 h-2 rounded-full bg-red-600 shrink-0"></span>
+<!-- Camera Icon -->
+<svg class="w-4 h-4 text-gray-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<div class="truncate">
+<div class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Cámara</div>
+<div class="text-[0.72rem] font-bold text-[#dc2626] leading-none">Denegado</div>
+</div>
+</div>
+<span aria-hidden="true" class="text-xs text-red-500 font-bold">!</span>
+</button>
+<!-- Microphone Permission Chip -->
+<button aria-label="Permiso de Micrófono: Denegado. Presione para solucionar" class="flex items-center justify-between px-3 py-2 bg-white/90 rounded-xl border border-red-200 shadow-xs hover:bg-red-50/50 active:bg-red-50 text-left transition-all" type="button">
+<div class="flex items-center space-x-2 overflow-hidden">
+<span aria-hidden="true" class="w-2 h-2 rounded-full bg-red-600 shrink-0"></span>
+<!-- Mic Icon -->
+<svg class="w-4 h-4 text-gray-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<div class="truncate">
+<div class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Micrófono</div>
+<div class="text-[0.72rem] font-bold text-[#dc2626] leading-none">Denegado</div>
+</div>
+</div>
+<span aria-hidden="true" class="text-xs text-red-500 font-bold">!</span>
+</button>
+</div>
+</div>
+<!-- BEGIN: SOSEmergencySection -->
+<section class="flex flex-col items-center justify-center my-auto py-2" data-purpose="sos-trigger-area">
+<!-- Interactive Big Circular SOS Button Container -->
+<div class="relative flex items-center justify-center">
+<!-- Outer Pulsating Decorative Rings -->
+<div class="absolute w-[268px] h-[268px] rounded-full border border-fuchsia-400/30 animate-ping opacity-25 pointer-events-none"></div>
+<!-- Main SOS Pressable Button -->
+<button aria-label="Botón de emergencia SOS. Mantén presionado por tres segundos para activar alerta máxima" class="sos-button sos-glow-ring w-[246px] h-[246px] rounded-full p-2.5 bg-gradient-to-b from-[#4c1d95] via-[#2e1065] to-[#1e0a38] border-[5px] border-[#9333ea]/70 flex flex-col items-center justify-center text-center cursor-pointer select-none transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-fuchsia-400" id="sos-trigger-btn" type="button">
+<!-- Inner Beveled Gradient Core -->
+<div class="sos-inner-grad w-full h-full rounded-full flex flex-col items-center justify-center p-3 shadow-inner border border-white/20 relative overflow-hidden">
+<!-- Subtle light refraction flare -->
+<div class="absolute -top-10 left-1/4 w-32 h-20 bg-white/20 rounded-full blur-xl pointer-events-none"></div>
+<!-- Embossed Golden Lion Head Logo -->
+<div class="w-20 h-20 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 to-purple-900 shadow-lg border border-amber-300/80 mb-1.5 flex items-center justify-center shrink-0">
+<img alt="" aria-hidden="true" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjlOmpvJOFzhl5Omy73fiV3U5caUyM4N-svFBoaGIIHCHPykOhskMo7ZC8t-FcspHf-AJRfrf4Oj7i5nwc2R3WXVQT8EhR0IBJl0QhQQP-BthT6srTIZegXpmCm0JoXupM5jMrUmVVcJDRtwo9b4OniBtTjSBk-HgpPwiohfkOtKy_f7MmV7Dfp8zY4aZ5d2NxqDhTEfLlYOd_eUdAt3jYdCOpb2lWuRql_JELMhbnuAiyjyZUgIu9OkQXtLADEuN8OQ"/>
+</div>
+<!-- ALERTA Typography -->
+<span class="text-[1.75rem] font-extrabold text-white tracking-[2.5px] uppercase drop-shadow-md leading-none mt-0.5">
+                ALERTA
+              </span>
+<!-- Action SOS Badge / Subtitle -->
+<div class="mt-1.5 px-3 py-0.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 shadow-sm">
+<span class="text-[0.68rem] font-bold tracking-wider text-amber-200 uppercase">
+                  MANTÉN PRESIONADO 3s
+                </span>
+</div>
+</div>
+</button>
+</div>
+<!-- Gesture Instructions Legend Tooltip -->
+<div class="mt-4 px-3.5 py-1.5 bg-white/80 backdrop-blur-xs rounded-full border border-purple-200/80 shadow-xs max-w-[340px] text-center">
+<p class="text-[0.68rem] font-medium text-purple-950 leading-tight">
+<strong class="font-bold text-purple-700">1 toque:</strong> Silenciosa • 
+            <strong class="font-bold text-purple-700">2 toques:</strong> Llamada • 
+            <strong class="font-bold text-purple-700">Mantener:</strong> SOS
+          </p>
+</div>
+</section>
+<!-- END: SOSEmergencySection -->
+<!-- BEGIN: LastAlertSummaryCard -->
+<section aria-label="Historial: Última alerta enviada hace 168 días en Neiva, Huila. Presione para ver detalles completos" class="bg-white rounded-2xl px-4 py-3 border border-purple-100 shadow-sm flex items-center justify-between cursor-pointer hover:bg-purple-50/50 active:bg-purple-50 transition-colors" data-purpose="last-alert-summary" role="button" tabindex="0">
+<div class="flex items-center space-x-3">
+<!-- Clock Icon Circle -->
+<div class="w-10 h-10 rounded-full bg-[#ede9fe] flex items-center justify-center shrink-0 text-brand-purple">
+<svg aria-hidden="true" class="w-5 h-5 text-purple-700" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<!-- Description Text -->
+<div class="flex flex-col text-left">
+<span class="text-[0.92rem] font-bold text-[#1e1a3c] leading-tight">
+              Última alerta: Hace 168 días
+            </span>
+<span class="text-[0.76rem] text-gray-500 font-normal mt-0.5">
+              Última ubicación: 14:32 — Neiva, Huila
+            </span>
+</div>
+</div>
+<!-- Chevron Icon -->
+<div aria-hidden="true" class="text-gray-400 pl-1">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</section>
+<!-- END: LastAlertSummaryCard -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigationBar -->
+<nav aria-label="Navegación principal" class="w-full bg-gradient-to-r from-[#5b068a] to-[#7c3aed] text-white shadow-lg shrink-0 select-none">
+<div class="grid grid-cols-5 pt-2 pb-1 px-1">
+<!-- Tab 1: INICIO (Active) -->
+<button aria-current="page" class="flex flex-col items-center justify-center py-1 group focus:outline-none" data-tab="inicio" type="button">
+<div class="relative flex flex-col items-center">
+<!-- Home Icon Filled -->
+<svg aria-hidden="true" class="w-5 h-5 text-white" fill="currentColor" viewbox="0 0 24 24">
+<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+</svg>
+<span class="text-[9.5px] font-bold tracking-wider uppercase text-white mt-1">INICIO</span>
+<!-- Active Indicator Dot -->
+<span aria-hidden="true" class="w-1.5 h-1.5 bg-amber-300 rounded-full mt-0.5 shadow-sm"></span>
+</div>
+</button>
+<!-- Tab 2: MAPA -->
+<button class="flex flex-col items-center justify-center py-1 opacity-75 hover:opacity-100 transition-opacity focus:outline-none" data-tab="mapa" type="button">
+<div class="relative flex flex-col items-center">
+<!-- Map Marker Icon -->
+<svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[9.5px] font-medium tracking-wider uppercase text-white mt-1">MAPA</span>
+<span aria-hidden="true" class="w-1.5 h-1.5 opacity-0 mt-0.5"></span>
+</div>
+</button>
+<!-- Tab 3: ASISTENCIA -->
+<button class="flex flex-col items-center justify-center py-1 opacity-75 hover:opacity-100 transition-opacity focus:outline-none" data-tab="asistencia" type="button">
+<div class="relative flex flex-col items-center">
+<!-- Support / Heart Icon -->
+<svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[9.5px] font-medium tracking-wider uppercase text-white mt-1">ASISTENCIA</span>
+<span aria-hidden="true" class="w-1.5 h-1.5 opacity-0 mt-0.5"></span>
+</div>
+</button>
+<!-- Tab 4: CONTACTOS -->
+<button class="flex flex-col items-center justify-center py-1 opacity-75 hover:opacity-100 transition-opacity focus:outline-none" data-tab="contactos" type="button">
+<div class="relative flex flex-col items-center">
+<!-- Contacts / Users Icon -->
+<svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[9.5px] font-medium tracking-wider uppercase text-white mt-1">CONTACTOS</span>
+<span aria-hidden="true" class="w-1.5 h-1.5 opacity-0 mt-0.5"></span>
+</div>
+</button>
+<!-- Tab 5: HISTORIAL -->
+<button class="flex flex-col items-center justify-center py-1 opacity-75 hover:opacity-100 transition-opacity focus:outline-none" data-tab="historial" type="button">
+<div class="relative flex flex-col items-center">
+<!-- Clock / History Icon -->
+<svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[9.5px] font-medium tracking-wider uppercase text-white mt-1">HISTORIAL</span>
+<span aria-hidden="true" class="w-1.5 h-1.5 opacity-0 mt-0.5"></span>
+</div>
+</button>
+</div>
+<!-- Android Home Navigation Bar Pill Indicator -->
+<div class="w-full flex justify-center pb-2 pt-1">
+<div class="w-32 h-1 bg-white/40 rounded-full"></div>
+</div>
+</nav>
+<!-- END: BottomNavigationBar -->
+</div>
+<!-- END: MobileDeviceShell -->
+<!-- BEGIN: Interactive Feedback Script -->
+<script data-purpose="interaction-handlers">
+    document.addEventListener('DOMContentLoaded', () => {
+      const sosBtn = document.getElementById('sos-trigger-btn');
+      let pressTimer;
+
+      // Handle SOS Press Feedback
+      if (sosBtn) {
+        sosBtn.addEventListener('mousedown', () => {
+          pressTimer = window.setTimeout(() => {
+            alert('🚨 ¡ALERTA SOS ACTIVADA!\nSe está notificando a tus contactos de emergencia y autoridades locales.');
+          }, 3000);
+        });
+
+        sosBtn.addEventListener('mouseup', () => {
+          clearTimeout(pressTimer);
+        });
+
+        sosBtn.addEventListener('touchstart', () => {
+          pressTimer = window.setTimeout(() => {
+            alert('🚨 ¡ALERTA SOS ACTIVADA!\nSe está notificando a tus contactos de emergencia y autoridades locales.');
+          }, 3000);
+        });
+
+        sosBtn.addEventListener('touchend', () => {
+          clearTimeout(pressTimer);
+        });
+      }
+
+      // Simple Bottom Nav Switching feedback
+      const navButtons = document.querySelectorAll('nav button[data-tab]');
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          navButtons.forEach(b => {
+            b.classList.remove('opacity-100');
+            b.classList.add('opacity-75');
+            const dot = b.querySelector('.bg-amber-300');
+            if (dot) {
+              dot.classList.remove('bg-amber-300');
+              dot.classList.add('opacity-0');
+            }
+          });
+
+          btn.classList.remove('opacity-75');
+          btn.classList.add('opacity-100');
+          const activeDot = btn.querySelector('span:last-child');
+          if (activeDot) {
+            activeDot.classList.remove('opacity-0');
+            activeDot.classList.add('bg-amber-300');
+          }
+        });
+      });
+    });
+  </script>
+<!-- END: Interactive Feedback Script -->
+</body></html>

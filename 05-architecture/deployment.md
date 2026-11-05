@@ -23,7 +23,7 @@ Each repository keeps only the `develop`, `qa` and `main` branches. Changes ente
 | `evidence-service` | Docker image | Render; uses Backblaze B2 through the S3 API |
 | PostgreSQL 16 | Render managed database (free plan) | Migrated by Auth at startup; free plan with an expiration date |
 | `alerta-mujer-web` | Angular production build (static assets) | Vercel, `vercel.json`, deploys on every push to `main` |
-| Mobile app | Android APK built locally with EAS (`eas build --local`) | v1.0.0 published on GitHub Releases on 28/10/2026 and downloaded from the landing page; `eas.json` holds the URLs of the three services. A production build (AAB) has never been run |
+| Mobile app | Android APK built locally with EAS (`eas build --local`) | v1.0.1 published on GitHub Releases on 28/10/2026 and downloaded from the landing page; `eas.json` holds the URLs of the three services. A production build (AAB) has never been run |
 
 `render.yaml` describes the three services and a group of shared environment variables.
 
@@ -36,7 +36,7 @@ Each repository keeps only the `develop`, `qa` and `main` branches. Changes ente
        |                        |
        |                        +--HTTPS + JWT (routed by path)--+
        |                                                         |
-  [Android APK v1.0.0] --HTTPS + JWT (routed by path)------------+
+  [Android APK v1.0.1] --HTTPS + JWT (routed by path)------------+
                                                                  v
               +--------------------- Render (free plan, Docker) ----------------------+
               |  alerta-mujer-auth      alerta-mujer-alert      alerta-mujer-evidence  |
