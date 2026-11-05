@@ -1,16 +1,18 @@
-# Wireframe: Historial de Ubicaciones
+# Wireframe: Location History
 
-**Ruta:** `/dashboard/location-history`  
-**Componente:** `LocationHistoryComponent`  
+**Route:** `/dashboard/location-history`  
+**Component:** `LocationHistoryComponent`  
 **Layout:** `DashboardLayout` (Sidebar + Topbar + BottomNav)  
-**Rol requerido:** USER (operador)  
+**Required role:** USER (operator)  
 **Guards:** `authGuard` + `userGuard`  
-**Lazy loading:** sí  
-**Estado:** ✅ Implementada  
+**Lazy loading:** yes  
+**Status:** ✅ Implemented  
 
 ---
 
-## Layout ASCII
+## ASCII layout
+
+The labels inside the layout are the Spanish texts of the interface.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -59,95 +61,95 @@
 
 ---
 
-## Campos del Formulario
+## Form fields
 
-No hay formulario de creación. La pantalla es de visualización e historial.
+There is no creation form. The screen is for viewing the history.
 
-### Controles de filtro
+### Filter controls
 
-| Control | Tipo | Descripción |
+| Control | Type | Description |
 |---------|------|-------------|
-| Buscador de dirección | `text` input | Filtra la tabla por coincidencia en el campo `address` |
-| Período | `app-period-badge` | Hoy · Última semana · Último mes · Personalizado |
+| Address search | `text` input | Filters the table by a match in the `address` field |
+| Period | `app-period-badge` | «Hoy» · «Última semana» · «Último mes» · «Personalizado» (today, last week, last month, custom) |
 
-### Datos mostrados — Tabla
+### Data shown — Table
 
-| Columna | Fuente | Descripción |
-|---------|--------|-------------|
-| # | índice | Número de fila |
-| Fecha/Hora | `UbicacionEntry.time` | Timestamp formateado |
-| Dirección | `UbicacionEntry.address` | Dirección formateada completa |
-| GPS | `UbicacionEntry.gpsSignal` | Ícono de nivel de señal |
-| Batería | `UbicacionEntry.battery` | Porcentaje con mini barra de color |
+| Column | Source | Description |
+|--------|--------|-------------|
+| # | index | Row number |
+| Date/Time | `UbicacionEntry.time` | Formatted timestamp |
+| Address | `UbicacionEntry.address` | Full formatted address |
+| GPS | `UbicacionEntry.gpsSignal` | Signal level icon |
+| Battery | `UbicacionEntry.battery` | Percentage with a small colored bar |
 
-### Mapa — Trayectoria
+### Map — Route
 
-| Elemento | Descripción |
-|----------|-------------|
-| Polilínea | Línea punteada que une todos los puntos del historial en orden temporal |
-| Marcador inicio | Pin verde → punto más antiguo del período seleccionado |
-| Marcador final | Pin rojo → punto más reciente |
-| Marcadores intermedios | Círculos pequeños púrpura al hacer click en fila |
-| Popup | Click en marcador muestra: dirección + hora + batería + GPS |
+| Element | Description |
+|---------|-------------|
+| Polyline | Dashed line that joins all the history points in time order |
+| Start marker | Green pin → oldest point of the selected period |
+| End marker | Red pin → most recent point |
+| Intermediate markers | Small purple circles shown when a row is clicked |
+| Popup | Clicking a marker shows: address + time + battery + GPS |
 
 ---
 
-## Validaciones
+## Validations
 
 ```typescript
-// Filtro buscador (client-side)
-busqueda: no requerido, filtra en tiempo real con debounce 300ms
+// Search filter (client-side)
+search: not required, filters in real time with a 300 ms debounce
 ```
 
 ---
 
-## Estados
+## States
 
-| Estado | Descripción | UI |
-|--------|-------------|-----|
-| `cargando` | Obteniendo historial | Spinner sobre mapa + skeleton en tabla |
-| `listo` | Datos cargados | Mapa con polilínea + tabla con registros |
-| `filtrado-busqueda` | Texto en buscador | Tabla actualizada; mapa solo muestra puntos filtrados |
-| `filtrado-periodo` | Período cambiado | Fetch nuevo; mapa y tabla actualizados |
-| `seleccion-fila` | Click en fila | Mapa hace flyTo + popup abierto en marcador |
-| `sin-datos` | Sin historial | Mapa vacío + mensaje "No hay registros de ubicación" |
-| `error` | Fallo API | Banner rojo + botón reintentar |
+| State | Description | UI |
+|-------|-------------|-----|
+| `loading` | Fetching the history | Spinner over the map + table skeleton |
+| `ready` | Data loaded | Map with polyline + table with records |
+| `search-filtered` | Text in the search box | Table updated; the map shows only the filtered points |
+| `period-filtered` | Period changed | New fetch; map and table updated |
+| `row-selected` | Row clicked | The map flies to the point and opens its popup |
+| `no-data` | No history | Empty map + message «No hay registros de ubicación» |
+| `error` | API failure | Red banner + retry button |
 
 ---
 
-## Flujo
+## Flow
 
 ```
 /dashboard/location-history
-  ├── onInit → PhoneLocationService.getHistory(usuarioId)
-  │             → Llena tabla
-  │             → Dibuja polilínea + marcadores en mapa
+  ├── onInit → PhoneLocationService.getHistory(userId)
+  │             → Fills the table
+  │             → Draws the polyline and markers on the map
   │
-  ├── Input buscador (debounce 300ms)
-  │     → Filtra tabla localmente por `address`
-  │     → Mapa actualiza puntos visibles
+  ├── Search input (300 ms debounce)
+  │     → Filters the table locally by `address`
+  │     → The map updates the visible points
   │
-  ├── Cambio en app-period-badge
-  │     → PhoneLocationService.getHistory(usuarioId, período)
-  │     → Actualiza tabla y redibuja polilínea
+  ├── Change in app-period-badge
+  │     → PhoneLocationService.getHistory(userId, period)
+  │     → Updates the table and redraws the polyline
   │
-  ├── Click en fila de tabla
-  │     → Mapa flyTo(lat, lng) de esa entrada
-  │     → Popup con datos de esa ubicación
-  │     → Fila resaltada con fondo var(--purple-pale)
+  ├── Click on a table row
+  │     → Map flyTo(lat, lng) of that entry
+  │     → Popup with the data of that location
+  │     → Row highlighted with background var(--purple-pale)
   │
-  └── [Limpiar selección]
-        → Quita highlight de fila y cierra popup del mapa
-        → Vuelve a vista de polilínea completa
+  └── [Clear selection]
+        → Removes the row highlight and closes the map popup
+        → Goes back to the full polyline view
 ```
 
 ---
 
-## Estilos Aplicados
+## Applied styles
 
-### Colores
+### Colors
 ```css
-/* Fondo de página */
+/* Page background */
 background: var(--bg-base); /* #f5f4ff */
 
 /* Cards */
@@ -156,117 +158,117 @@ border: 1.5px solid var(--border);
 border-radius: var(--dash-radius-card); /* 12px */
 box-shadow: var(--dash-shadow-card);
 
-/* Polilínea en mapa */
+/* Map polyline */
 color: var(--purple-deep); /* #7c3aed */
 stroke-dasharray: 6, 4;
 stroke-width: 3;
 
-/* Marcador inicio */
+/* Start marker */
 color: var(--green); /* #16a34a */
 
-/* Marcador final */
+/* End marker */
 color: var(--red); /* #dc2626 */
 
-/* Marcadores intermedios */
+/* Intermediate markers */
 color: var(--purple-mid); /* #a78bfa */
 radius: 5px;
 
-/* Señal GPS */
---gps-fuerte   : var(--green);
---gps-moderada : var(--amber);
---gps-debil    : var(--red);
+/* GPS signal */
+--gps-strong   : var(--green);
+--gps-moderate : var(--amber);
+--gps-weak     : var(--red);
 
-/* Batería inline */
+/* Inline battery */
 --bat-high   : var(--green);
 --bat-medium : var(--amber);
 --bat-low    : var(--red);
 
-/* Fila seleccionada */
+/* Selected row */
 background: var(--purple-pale);   /* #ede9fe */
 border-left: 3px solid var(--purple-deep);
 
-/* Modo oscuro — filtro mapa */
+/* Dark mode — map filter */
 filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6);
 ```
 
-### Tipografía
+### Typography
 ```css
-/* Título página */
+/* Page title */
 font-size: 2rem; font-weight: 700; color: var(--text-primary);
 
-/* Cabecera tabla */
+/* Table header */
 font-size: 0.875rem; font-weight: 600; color: var(--text-muted);
 
-/* Celdas tabla */
+/* Table cells */
 font-size: 0.875rem; color: var(--text-primary);
 
-/* Buscador */
+/* Search box */
 font-size: 0.9rem;
 ```
 
-### Espaciado
+### Spacing
 ```css
-padding: 24px;          /* página */
-gap: 24px;              /* entre card mapa y card tabla */
+padding: 24px;          /* page */
+gap: 24px;              /* between the map card and the table card */
 
-/* Mapa */
+/* Map */
 height: 380px;
 border-radius: var(--dash-radius-card);
 
-/* Tabla */
-padding: 12px 16px;     /* filas */
+/* Table */
+padding: 12px 16px;     /* rows */
 ```
 
 ---
 
-## Componentes Utilizados
+## Components used
 
-| Componente | Variante/Config | Uso |
-|------------|----------------|-----|
-| `app-card` | — | Contenedor mapa y contenedor tabla |
-| `app-period-badge` | `conDropdown: true` | Selector de período temporal |
-| `app-button` | `secondary`, `sm` | "Limpiar selección" |
-| `app-spinner` | `md`, `inline` | Estado cargando |
-| Mapa Leaflet | tiles Google Maps | Visualización de trayectoria |
-| Input búsqueda nativo | `text` con ícono 🔍 | Filtro de dirección |
+| Component | Variant/Config | Use |
+|-----------|----------------|-----|
+| `app-card` | — | Map container and table container |
+| `app-period-badge` | `conDropdown: true` | Time period selector |
+| `app-button` | `secondary`, `sm` | «Limpiar selección» (clear selection) |
+| `app-spinner` | `md`, `inline` | Loading state |
+| Leaflet map | OpenStreetMap tiles | Route display |
+| Native search input | `text` with 🔍 icon | Address filter |
 
 ---
 
 ## Responsive
 
-| Breakpoint | Comportamiento |
-|------------|---------------|
-| Desktop `>1024px` | Mapa 380px; tabla con todas las columnas |
-| Tablet `760–1024px` | Mapa 280px; tabla sin columna GPS detallada |
-| Mobile `<760px` | Mapa 220px; tabla con scroll horizontal; buscador a ancho completo; sidebar → BottomNav |
+| Breakpoint | Behavior |
+|------------|----------|
+| Desktop `>1024px` | 380 px map; table with all columns |
+| Tablet `760–1024px` | 280 px map; table without the detailed GPS column |
+| Mobile `<760px` | 220 px map; table with horizontal scroll; full-width search box; sidebar → BottomNav |
 
 ---
 
-## Accesibilidad
+## Accessibility
 
-- Mapa con `aria-label="Mapa de trayectoria de ubicaciones"`
-- Tabla con `<caption>` "Historial de ubicaciones del dispositivo"
-- Buscador con `aria-label="Filtrar por dirección"` y `role="searchbox"`
-- Filas de tabla como `role="button"` + `aria-label="Ver en mapa: [dirección]"`
-- Polilínea con descripción textual en `aria-description` del contenedor del mapa
-- Popup del mapa accesible con texto completo (no solo visual)
+- Map with `aria-label="Mapa de trayectoria de ubicaciones"`
+- Table with `<caption>` «Historial de ubicaciones del dispositivo»
+- Search box with `aria-label="Filtrar por dirección"` and `role="searchbox"`
+- Table rows as `role="button"` + `aria-label="Ver en mapa: [dirección]"`
+- Polyline with a text description in the `aria-description` of the map container
+- Accessible map popup with the full text (not only visual)
 
 ---
 
-## Integración con Servicios
+## Service integration
 
 ```typescript
-// PhoneLocationService — método utilizado
+// PhoneLocationService — method used
 
-// Obtener historial de ubicaciones
-PhoneLocationService.getHistory(usuarioId: number): Observable<UbicacionEntry[]>
-// GET /phone-location/:usuarioId/history
+// Get the location history
+PhoneLocationService.getHistory(userId: number): Observable<UbicacionEntry[]>
+// GET /phone-location/:userId/history
 
-// Con filtro de período
-PhoneLocationService.getHistory(usuarioId: number, desde: string, hasta: string): Observable<UbicacionEntry[]>
-// GET /phone-location/:usuarioId/history?desde=...&hasta=...
+// With a period filter
+PhoneLocationService.getHistory(userId: number, from: string, to: string): Observable<UbicacionEntry[]>
+// GET /phone-location/:userId/history?desde=...&hasta=...
 
-// Modelo de datos
+// Data model
 interface UbicacionEntry {
   id        : number;
   usuarioId : number;
@@ -281,13 +283,13 @@ interface UbicacionEntry {
 
 ---
 
-## Casos de Uso
+## Use cases
 
-| # | Actor | Acción | Resultado |
-|---|-------|--------|-----------|
-| 1 | Usuaria | Navega a `/dashboard/location-history` | Ve mapa con trayectoria del día + tabla completa |
-| 2 | Usuaria | Cambia período a "Última semana" | Mapa redibuja polilínea semanal; tabla actualiza |
-| 3 | Usuaria | Escribe "Cra 7" en buscador | Tabla filtra; mapa muestra solo esos puntos |
-| 4 | Usuaria | Click en fila | Mapa hace zoom al punto; popup con detalle |
-| 5 | Usuaria | Click "Limpiar selección" | Mapa vuelve a vista global de la polilínea |
-| 6 | Usuaria | Sin historial en período | Mapa vacío + mensaje descriptivo |
+| # | Actor | Action | Result |
+|---|-------|--------|--------|
+| 1 | User | Opens `/dashboard/location-history` | Sees the map with today's route + the full table |
+| 2 | User | Changes the period to «Última semana» | The map redraws the weekly polyline; the table updates |
+| 3 | User | Types "Cra 7" in the search box | The table filters; the map shows only those points |
+| 4 | User | Clicks a row | The map zooms to the point; popup with the detail |
+| 5 | User | Clicks «Limpiar selección» | The map goes back to the full polyline view |
+| 6 | User | No history in the period | Empty map + descriptive message |

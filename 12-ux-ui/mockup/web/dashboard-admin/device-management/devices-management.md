@@ -118,7 +118,7 @@
 | UUID | `text` | ✅ | Format UUID v4 (`/^[0-9a-f]{8}-[0-9a-f]{4}-/i`) |
 | User asignada | `select` with search | ✅ | Existing user in the system |
 | Model | `text` | ❌ | Max. 100 characters |
-| Status inicial | `radio` | ✅ | `Activo` / `Inactivo` |
+| Initial status | `radio` | ✅ | `Activo` / `Inactivo` |
 
 ### Edit Device (Detail Modal)
 
@@ -154,8 +154,8 @@ estado   : required, enum['Connected','Disconnected','Inactivo']
 
 | Status | Description | UI |
 |--------|-------------|-----|
-| `cargando` | Obteniendo devices | Skeleton stat cards + tabla |
-| `listo` | Data loaded | Stat cards + tabla paginada |
+| `loading` | Fetching devices | Skeleton stat cards + table |
+| `ready` | Data loaded | Stat cards + paginated table |
 | `filtrado` | Chips / búsqueda | Updated table |
 | `modal-registrar` | New device modal | Empty form |
 | `modal-detalle` | Row click | Modal with details + status editing |
@@ -171,10 +171,10 @@ estado   : required, enum['Connected','Disconnected','Inactivo']
 /admin/devices-management
   ├── onInit → DevicesService.getAll()
   │             → Stat cards (total / connected / disconnected)
-  │             → Tabla paginada
+  │             → Paginated table
   │
   ├── Search / Chips
-  │     → DevicesService.getAll(filtros)
+  │     → DevicesService.getAll(filters)
   │     → Updates table
   │
   ├── [➕ Registrar]
@@ -190,8 +190,8 @@ estado   : required, enum['Connected','Disconnected','Inactivo']
   │     → DevicesService.updateStatus(id, newStatus)
   │     → Badge updated in table; success toast
   │
-  └── [🗑️ Delete] (dentro del modal detalle)
-        → Modal danger: "¿Delete dispositivo UUID?"
+  └── [🗑️ Delete] (inside the detail modal)
+        → Modal danger: "¿Eliminar dispositivo UUID?"
         → DevicesService.delete(id)
         → Row removed from table
 ```
@@ -235,7 +235,7 @@ background: var(--bg-card-hover); cursor: pointer;
 
 | Component | Variant/Config | Usage |
 |------------|----------------|-----|
-| `app-card` | — | Stat cards, filtros, tabla |
+| `app-card` | — | Stat cards, filters, table |
 | `app-chip` | `active: boolean` | Status filters |
 | `app-button` | `primary`, `sm` | "➕ Registrar" |
 | `app-modal` | `md`, `default` | Register + detail/edit modal |
@@ -256,11 +256,11 @@ background: var(--bg-card-hover); cursor: pointer;
 
 ## Accessibility
 
-- Tabla con `<caption>` "Lista de devices registrados"
+- Table with `<caption>` "Lista de dispositivos registrados"
 - UUID with `aria-label="Unique device identifier"` and full `title`
-- Battery crítica con `aria-label="Battery crítica: 15%"`
-- Stat card "Disconnected" con `aria-live="polite"` para actualizaciones
-- Modal con `role="dialog"`, `aria-modal="true"`, focus trapped
+- Critical battery with `aria-label="Batería crítica: 15%"`
+- Stat card "Disconnected" with `aria-live="polite"` for updates
+- Modal with `role="dialog"`, `aria-modal="true"`, focus trapped
 
 ---
 
@@ -308,10 +308,10 @@ interface Device {
 
 | # | Actor | Action | Result |
 |---|-------|--------|-----------|
-| 1 | Admin | Navigates to `/admin/devices-management` | Ve stat cards + tabla de todos los devices |
+| 1 | Admin | Navigates to `/admin/devices-management` | Sees the stat cards + the table of all devices |
 | 2 | Admin | Filtra por "Disconnected" | Solo devices no signal activa |
 | 3 | Admin | Searches by partial UUID | Table filters the specific device |
 | 4 | Admin | Clicks "➕ Register" | Modal with form to link a new device |
 | 5 | Admin | Row click | Modal with complete device + user details |
 | 6 | Admin | Changes status to "Inactive" in modal | Badge actualizado; device will not receive notifications |
-| 7 | Admin | Device con batería < 20% | Battery en rojo con indicador de alerta |
+| 7 | Admin | Device with battery < 20% | Battery in red with an alert indicator |
