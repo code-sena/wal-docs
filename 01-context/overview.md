@@ -38,7 +38,7 @@ Woman Alert is a complementary support tool. It depends on connectivity, GPS, ba
 ## Current status
 
 - **Phase:** final delivery of the SENA training project. New features were frozen on 24/10/2026; after that date only automatic protection (approved before the freeze) and bug fixes were added.
-- **Current version:** APK v1.0.0 published on GitHub Releases on 28/10/2026 (Android 7.0 / API 24 or higher, compiled for API 36). Render and Vercel publish from `main` since 28/10/2026.
+- **Current version:** APK v1.0.1 published on GitHub Releases on 28/10/2026 (it replaced v1.0.0 the same day with the 15, 25 and 35-minute automatic protection times) (Android 7.0 / API 24 or higher, compiled for API 36). Render and Vercel publish from `main` since 28/10/2026.
 - **Latest delivery:** SRS v2.6 (102 functional and 25 non-functional requirements), Software Analysis v3.4, Technical Proposal v4.5, Software Design v5.2, Database (script, data dictionary and ER diagrams), Test Plan v7.1, Quality and Improvements v8.1, Implementation v9.1 and the technical, installation, user and administrator manuals.
 - **Verification:** 553 automated tests pass (backend 351, web 39, mobile 163) and GitHub Actions runs them on every pull request. Manual tests of the native features with the release APK (PM-04 to PM-09) and end-to-end evidence of the notices between two phones are still pending.
 - **Next milestone:** run and record the pending manual tests, close the open security findings (web token in `localStorage`, no switch for daily location sharing, no own encryption of evidence files) and write the privacy policy, data treatment policy and terms and conditions.

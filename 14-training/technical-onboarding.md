@@ -15,7 +15,7 @@
 - [ ] Ask for the Firebase service account file and `google-services.json` (never commit them)
 - [ ] Configure your local environment following `10-devops/local-setup.md`
 - [ ] Verify that `curl http://localhost:8081/actuator/health` (and 8082, 8083) responds `{"status":"UP"}`
-- [ ] Install the APK v1.0.0 from GitHub Releases on an Android phone and try the main flow
+- [ ] Install the APK v1.0.1 from GitHub Releases on an Android phone and try the main flow
 
 ### Afternoon: Read core documentation
 

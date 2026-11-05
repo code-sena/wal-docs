@@ -85,7 +85,7 @@ No automated E2E tests. The manual plan (Test Plan v7.1) has 47 cases:
 
 Manual tests on devices: Samsung SM-A125M (Android 12) and Infinix X678B. The notices between two
 phones were tested by hand in production on 23/10/2026 but the evidence is not archived yet. The
-manual tests of the native features with the release APK v1.0.0 (PM-04 to PM-09) are pending.
+manual tests of the native features with the release APK v1.0.1 (PM-04 to PM-09) are pending.
 
 ---
 

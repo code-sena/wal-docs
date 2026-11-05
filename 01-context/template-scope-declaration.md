@@ -9,7 +9,7 @@
 ## 1. General description and objective of the project
 
 * **Project name:** Woman Alert (ALERTA MUJER)
-* **Release/Target Phase:** Final academic delivery - SENA, ADSO program, group 3145556. APK v1.0.0 (28/10/2026)
+* **Release/Target Phase:** Final academic delivery - SENA, ADSO program, group 3145556. APK v1.0.1 (28/10/2026)
 * **Project Purpose:** Provide an integrated solution, made up of an Android app from which emergency alerts are activated and a complementary web platform for consultation and administration, so that women can ask for help quickly, share their location with their trusted contacts and access information related to risk situations.
 
 ---
@@ -69,7 +69,7 @@ The final result of this phase of the project includes the following artifacts:
 
 | Deliverable | Description | Format / Repository |
 |---|---|---|
-| **Mobile client** | React Native Expo Android app, v1.0.0 | `.apk` on GitHub Releases / `AlertaMujer` repository |
+| **Mobile client** | React Native Expo Android app, v1.0.1 | `.apk` on GitHub Releases / `AlertaMujer` repository |
 | **Web client** | Angular SPA (landing, tracking, user portal, admin panel) | Vercel / `Frond-end-Web` repository |
 | **Backend Services** | Three Spring Boot microservices + shared kernel | Maven multi-module / `Backend-ALERTA-MUJER` repository |
 | **Database schema** | Structure-only script, data dictionary and ER diagrams (35 tables) | `.sql`, `.xlsx`, `.mmd`, `.png`, `.svg` |
