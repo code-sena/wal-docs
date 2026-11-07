@@ -58,9 +58,9 @@ lsof -i :8081
 ### Step 1: Clone the repository
 
 ```bash
-git clone <backend-repository-url> Backend-ALERTA-MUJER
-git clone <web-repository-url> Frond-end-Web
-git clone <mobile-repository-url> AlertaMujer
+git clone https://github.com/JustinDanielaBahamon/Backend-ALERTA-MUJER.git Backend-ALERTA-MUJER
+git clone https://github.com/JustinDanielaBahamon/Frond-end-Web.git Frond-end-Web
+git clone https://github.com/JustinDanielaBahamon/AlertaMujer.git AlertaMujer
 ```
 
 Create your branch from `develop`; changes enter by pull request to `develop`.
