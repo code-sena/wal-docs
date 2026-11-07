@@ -5,6 +5,10 @@
 | **ID** | ADR-001 |
 | **Date** | 2026-09-19 |
 | **Status** | Accepted |
+
+## Status
+
+Accepted
 | **Authors** | Maicol Sánchez Castañeda (menticio) — Tech Lead / Backend |
 | **Reviewers** | José Sebastián Suárez Cumaco (JoseSebastianSuarezCumaco) — UI Lead; Justin Daniela Bahamón Baloco (JustinDanielaBahamon) — Database Leader |
 
