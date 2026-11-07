@@ -5,10 +5,6 @@
 The team is three developers building this as a SENA training project (group 3145556), with one
 shared PostgreSQL database modeled in `06-data/models.md`. The backend started as a modular
 monolith; earlier versions of the documentation described it that way. During October 2026 the
-
-## Status
-
-Accepted
 team split it into microservices and moved every module to a hexagonal structure. The technical
 audit of 20/10/2026 and its update of 24/10/2026 confirmed the result, and on 25/10/2026 the old
 monolith (`backend-monolith/`), the gateway and the previous `am-*` services were deleted from the

@@ -61,37 +61,33 @@ how it is deployed, what data it has.
 | prod | api.domain.com | Production | Ops team | Real data | Manual (double approval) |
 ```
 
-### `ci-cd.md` ✅ (COMPLETE)
-Continuous integration and deployment pipeline using GitHub Actions and Render.
-**Includes:**
-- GitHub Actions workflows for backend (Maven + 351 tests), web (Angular + 39 tests), and mobile (Jest + 163 tests)
-- Automatic deployment to Render on `main` push (Auth, Alert, Evidence services)
-- Automatic deployment to Vercel on `main` push (Angular web frontend)
-- Manual APK releases to GitHub Releases
-- Branching strategy: `develop` → `qa` → `main`
-- Test coverage: 553 tests total across all services
+### `ci-cd.md` ⭐
+Description of the continuous integration and deployment pipeline.
+**Fill in:** what tool (GitHub Actions, GitLab CI, Jenkins), what steps it executes,
+when each pipeline is triggered, what it verifies before allowing a merge.
 
-### `production-monitoring.md` ✅ (COMPLETE)
-Health checks, logs, performance monitoring, and incident response for production.
-**Includes:**
-- Spring Boot Actuator endpoints for all services
-- Render logs, database monitoring, and backup procedures
-- Response time monitoring and cold start mitigation
-- On-call responsibilities and alerting setup
-- Troubleshooting guide for common issues (502 errors, DB timeouts, high CPU, disk space)
-- Incident response runbook and full system restart procedure
+**Format:**
+```markdown
+## PR Pipeline (runs on every Pull Request)
+1. Lint and code format
+2. Unit tests
+3. Integration tests
+4. Coverage analysis (minimum [X]%)
+5. Security analysis (SAST)
 
-### `release-procedures.md` ✅ (COMPLETE)
-Step-by-step guides for releasing to QA and production.
-**Includes:**
-- Pre-release checklist (tests, approval, migrations, documentation)
-- QA release process (PR to `qa`, merge, smoke test)
-- Production release process (PR to `main`, merge, smoke test, monitoring)
-- Rollback procedures (quick revert, full rollback, database restore)
-- Mobile app release (APK build with EAS, GitHub Releases)
-- Hotfix release process (emergency deployments)
-- Changelog format and release schedule
-- Post-release tasks
+## Pipeline on merge to `dev`
+1. All of the above
+2. Docker image build
+3. Deploy to dev environment
+4. Smoke tests in dev
+
+## Release pipeline to production
+1. Manual approval by [role]
+2. Deploy to staging
+3. Acceptance test suite
+4. Manual approval by [role]
+5. Deploy to production with blue-green / canary
+```
 
 ---
 

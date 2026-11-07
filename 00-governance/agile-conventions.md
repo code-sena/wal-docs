@@ -12,7 +12,7 @@
 | Duration | 2 weeks |
 | Sprint start | Monday |
 | Sprint end | Friday of week 2 |
-| Current sprint | Sprint 1 — October 3, 2026 to November 14, 2026 |
+| Current sprint | Sprint 1 — September 19, 2026 to October 2, 2026 |
 | Estimated capacity | 20 story points per sprint (4 team members × 5 SP average) |
 
 ---
